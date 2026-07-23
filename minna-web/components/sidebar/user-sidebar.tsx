@@ -50,8 +50,10 @@ export function UserSidebar() {
   const getAvatarUrl = (url?: string | null) => {
     if (!url) return ""
     if (url.startsWith("http")) return url
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
-    return `${baseUrl.replace('/api', '')}${url}`
+    
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"
+    const rootUrl = apiUrl.replace(/\/api\/?$/, "").replace(/\/$/, "")
+    return `${rootUrl}${url}`
   }
 
   return (
