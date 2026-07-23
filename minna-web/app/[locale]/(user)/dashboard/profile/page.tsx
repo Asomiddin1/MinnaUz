@@ -289,6 +289,7 @@ export default function ProfilePage() {
       if (res.data.success) {
         setUser((prev) => (prev ? { ...prev, avatar: res.data.avatar } : prev))
         await update({ image: res.data.avatar })
+        window.location.reload()
       }
     } catch (err: any) {
       console.error(err)
