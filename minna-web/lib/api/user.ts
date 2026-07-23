@@ -16,9 +16,7 @@ export const userAPI = {
   // AVATAR
   // ==========================================
   uploadAvatar: (formData: FormData): Promise<AxiosResponse> => 
-    apiClient.post("/user/avatar", formData, {
-      headers: { "Content-Type": "multipart/form-data" }
-    }),
+    apiClient.post("/user/avatar", formData),
     
   revertAvatar: (): Promise<AxiosResponse> => 
     apiClient.post("/user/avatar/default"),
