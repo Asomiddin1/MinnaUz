@@ -290,9 +290,10 @@ export default function ProfilePage() {
         setUser((prev) => (prev ? { ...prev, avatar: res.data.avatar } : prev))
         await update({ image: res.data.avatar })
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err)
-      alert("Rasm yuklashda xatolik yuz berdi")
+      const backendMessage = err?.response?.data?.message || JSON.stringify(err?.response?.data || err.message)
+      alert(`Rasm yuklashda xatolik yuz berdi: ${backendMessage}`)
     } finally {
       setIsUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ""
