@@ -79,10 +79,6 @@ Route::get('/levels/{slug}', [UserLevelController::class, 'show']);
 */
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::get('/user', function (Request $request) {
-        return response()->json($request->user());
-    });
-
     // -------- AI ROUTELARI --------
     Route::post('/ai/chat', [\App\Http\Controllers\AiController::class, 'chat']);
     Route::get('/ai/history', [\App\Http\Controllers\AiController::class, 'history']);
@@ -94,8 +90,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/{id}', [UserArticleController::class, 'show']); 
         Route::post('/{id}/submit-quiz', [UserArticleController::class, 'submitQuiz']); 
     });
-    
-    Route::get('/user/streaks', [UserProfileController::class, 'getStreaks']);
 
     // YOPILGAN MATERIALLAR
     Route::get('/levels/{slug}/grammars', [UserMaterialController::class, 'getGrammars']);
@@ -109,6 +103,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // User harakatlari va Test qismi
     Route::prefix('user')->group(function () {
+        
+        // ===== PROFILE =====
+        Route::get('/profile', [UserProfileController::class, 'getProfile']);
+        // ===================
+        
+        // ===== STREAKS =====
+        Route::get('/streaks', [UserProfileController::class, 'getStreaks']);
+        // ===================
         
         // ===== DEVICE MANAGER =====
         Route::get('/devices', [UserProfileController::class, 'getDevices']);

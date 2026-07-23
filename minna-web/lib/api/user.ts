@@ -2,8 +2,10 @@ import { AxiosResponse } from "axios"
 import apiClient from "./axios" // Asosiy axios sozlamasini chaqiramiz
 
 export const userAPI = {
-  getProfile: (): Promise<AxiosResponse> => apiClient.get("/user"),
+  // ✅ TO'G'RILANDI: /user/profile ga o'zgartirildi
+  getProfile: (): Promise<AxiosResponse> => apiClient.get("/user/profile"),
 
+  // ✅ TO'G'RILANDI: /user/streaks prefix ichida
   getStreaks: (year?: number, month?: number): Promise<AxiosResponse> =>
     apiClient.get("/user/streaks", { params: { year, month } }),
 
@@ -46,7 +48,7 @@ export const userAPI = {
   getMyResults: (): Promise<AxiosResponse> => apiClient.get("/user/results"),
 
   // ==========================================
-  // QURILMALARNI BOSHQRISH (DEVICE MANAGER)
+  // QURILMALARNI BOSHQARISH (DEVICE MANAGER)
   // ==========================================
 
   // Faol qurilmalar ro'yxatini olish
@@ -137,7 +139,7 @@ export const userAPI = {
   ): Promise<AxiosResponse> =>
     apiClient.post(`/articles/${id}/submit-quiz`, data),
 
-    // AI bilan suhbatlashish (Voice/Text Chat) xabarlarini jo'natish
+  // AI bilan suhbatlashish (Voice/Text Chat) xabarlarini jo'natish
   sendAiChatMessage: (data: {
     message: string;
     lang: string;
