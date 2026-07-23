@@ -1,3 +1,5 @@
+"use client"
+
 import React from 'react'
 import Image from "next/image" // <-- 1. Next.js Image import qilindi
 import {
@@ -9,8 +11,11 @@ import {
 } from "@/components/ui/carousel"
 import Banner1 from "./images/banner1.jpg"
 import { StreakCalendar } from '../streak-calendar'
+import { useCheckIn } from '@/hooks/useCheckIn'
 
 const BannerCarousel = () => {
+  // Kunlik check-in — dashboard ochilganda 1 marta ishlaydi
+  useCheckIn()
 
   const banners = [
     { 

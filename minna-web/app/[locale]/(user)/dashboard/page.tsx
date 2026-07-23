@@ -23,14 +23,39 @@ import BannerCarousel from "@/components/user-components/banner/banner-carousel"
 import JlptLevels from "@/components/user-components/home-fuctions/jlpt-levels/jlpt-levels"
 
 // Lazy-loaded tab components — загружаются только при клике на вкладку
-const GamesList = dynamic(() => import("@/components/user-components/home-fuctions/games/games"), { ssr: false })
-const Lugat = dynamic(() => import("@/components/user-components/home-fuctions/lugat/lugat"), { ssr: false })
-const Dokkai = dynamic(() => import("@/components/user-components/home-fuctions/dokkai/dokkai"), { ssr: false })
-const Shop = dynamic(() => import("@/components/user-components/home-fuctions/shop/shop"), { ssr: false })
-const Translate = dynamic(() => import("@/components/user-components/home-fuctions/translate/translate"), { ssr: false })
-const AiComponent = dynamic(() => import("@/components/user-components/home-fuctions/ai/ai"), { ssr: false })
-const Kanji = dynamic(() => import("@/components/user-components/home-fuctions/kanji/kanji"), { ssr: false })
-const Premium = dynamic(() => import("@/components/user-components/home-fuctions/premium/premium"), { ssr: false })
+const GamesList = dynamic(
+  () => import("@/components/user-components/home-fuctions/games/games"),
+  { ssr: false }
+)
+const Lugat = dynamic(
+  () => import("@/components/user-components/home-fuctions/lugat/lugat"),
+  { ssr: false }
+)
+const Dokkai = dynamic(
+  () => import("@/components/user-components/home-fuctions/dokkai/dokkai"),
+  { ssr: false }
+)
+const Shop = dynamic(
+  () => import("@/components/user-components/home-fuctions/shop/shop"),
+  { ssr: false }
+)
+const Translate = dynamic(
+  () =>
+    import("@/components/user-components/home-fuctions/translate/translate"),
+  { ssr: false }
+)
+const AiComponent = dynamic(
+  () => import("@/components/user-components/home-fuctions/ai/ai"),
+  { ssr: false }
+)
+const Kanji = dynamic(
+  () => import("@/components/user-components/home-fuctions/kanji/kanji"),
+  { ssr: false }
+)
+const Premium = dynamic(
+  () => import("@/components/user-components/home-fuctions/premium/premium"),
+  { ssr: false }
+)
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -38,14 +63,63 @@ export default function DashboardPage() {
   const t = useTranslations("Dashboard")
 
   const MENU_ITEMS = [
-    { id: "dictionary", label: t("dictionary"), icon: Copy, href: "/dashboard/dictionary", isTab: true },
-    { id: "games", label: t("games"), icon: Gamepad2, href: "/dashboard/games", isTab: true },
-    { id: "dokkai", label: t("dokkai"), icon: BookOpen, href: "/dashboard/dokkai", isTab: true },
-    { id: "kanji", label: t("kanji"), icon: GraduationCap, href: "/dashboard/kanji", isTab: true },
-    { id: "shop", label: t("shop"), icon: ShoppingCart, href: "/dashboard/shop", isTab: true },
-    { id: "translator", label: t("translator"), icon: Languages, href: "/dashboard/translator", isTab: true },
-    { id: "ai", label: t("ai"), icon: Sparkles, href: "/dashboard/ai", isTab: true },
-    { id: "premium", label: t("premium"), icon: Gem, href: "/dashboard/premium", color: "text-amber-500 dark:text-amber-400", isTab: true },
+    {
+      id: "dictionary",
+      label: t("dictionary"),
+      icon: Copy,
+      href: "/dashboard/dictionary",
+      isTab: true,
+    },
+    {
+      id: "games",
+      label: t("games"),
+      icon: Gamepad2,
+      href: "/dashboard/games",
+      isTab: true,
+    },
+    {
+      id: "dokkai",
+      label: t("dokkai"),
+      icon: BookOpen,
+      href: "/dashboard/dokkai",
+      isTab: true,
+    },
+    {
+      id: "kanji",
+      label: t("kanji"),
+      icon: GraduationCap,
+      href: "/dashboard/kanji",
+      isTab: true,
+    },
+    {
+      id: "shop",
+      label: t("shop"),
+      icon: ShoppingCart,
+      href: "/dashboard/shop",
+      isTab: true,
+    },
+    {
+      id: "translator",
+      label: t("translator"),
+      icon: Languages,
+      href: "/dashboard/translator",
+      isTab: true,
+    },
+    {
+      id: "ai",
+      label: t("ai"),
+      icon: Sparkles,
+      href: "/dashboard/ai",
+      isTab: true,
+    },
+    {
+      id: "premium",
+      label: t("premium"),
+      icon: Gem,
+      href: "/dashboard/premium",
+      color: "text-amber-500 dark:text-amber-400",
+      isTab: true,
+    },
   ]
 
   // State'lar
@@ -168,59 +242,53 @@ export default function DashboardPage() {
           </header>
         </div>
 
-  
         {/* MOBIL KONTENT */}
-         <div className="w-full max-w-[100vw] space-y-4 overflow-hidden px-2 pt-4 pb-10">
-  {/* 🚀 YANGILANGAN PREMIUM BANNER QISMI (Dark Mode bilan) */}
-  <div className="w-full px-2">
-    <div className="relative overflow-hidden rounded-[32px] border border-white/60 dark:border-slate-800 bg-white/40 dark:bg-slate-900/50 shadow-[0_20px_40px_rgba(0,0,0,0.08)] backdrop-blur-sm transition-all hover:shadow-[0_25px_50px_rgba(0,0,0,0.12)]">
-      <div className="absolute inset-0 rounded-[32px] ring-1 ring-inset ring-white/30 dark:ring-white/5 pointer-events-none z-10" />
-      <BannerCarousel />
-    </div>
-  </div>
-
-  {/* Tugmalar menyusi */}
-  <div className="relative w-full p-4">
-    {/* Orqa tarafdagi "blob" - dark rejimda kamroq ko'rinadi */}
-    <div className="absolute right-0 top-0 h-48 w-48 rounded-full bg-indigo-500/20 blur-3xl -z-10" />
-
-    <div className="grid grid-cols-4 gap-x-3 gap-y-6">
-      {MENU_ITEMS.map((item) => (
-        <button
-          key={item.id}
-          onClick={() => router.push(item.href)}
-          className="group flex flex-col items-center gap-2"
-        >
-          {/* Tugmaning DARK MODE'ga moslashuvchan uslubi */}
-          <div className="flex h-[72px] w-[72px] items-center justify-center rounded-[24px] 
-                          bg-white dark:bg-slate-900 
-                          border border-slate-200/50 dark:border-slate-800 
-                          shadow-[5px_5px_10px_rgba(0,0,0,0.05),-5px_-5px_10px_rgba(255,255,255,0.8)] 
-                          dark:shadow-[5px_5px_10px_rgba(0,0,0,0.4),-5px_-5px_10px_rgba(255,255,255,0.02)]
-                          transition-all active:scale-95">
-            <item.icon
-              className={`h-8 w-8 ${item.color ? item.color : "text-slate-800 dark:text-slate-200"}`}
-              strokeWidth={1.5}
-            />
+        <div className="w-full max-w-[100vw] space-y-4 overflow-hidden px-2 pt-4 pb-10">
+          {/* 🚀 YANGILANGAN PREMIUM BANNER QISMI (Dark Mode bilan) */}
+          <div className="w-full px-2">
+            <div className="relative overflow-hidden rounded-[32px] border border-white/60 bg-white/40 shadow-[0_20px_40px_rgba(0,0,0,0.08)] backdrop-blur-sm transition-all hover:shadow-[0_25px_50px_rgba(0,0,0,0.12)] dark:border-slate-800 dark:bg-slate-900/50">
+              <div className="pointer-events-none absolute inset-0 z-10 rounded-[32px] ring-1 ring-white/30 ring-inset dark:ring-white/5" />
+              <BannerCarousel />
+            </div>
           </div>
-          <span className="text-[11px] font-semibold text-slate-800 dark:text-slate-300 text-center leading-tight">
-            {item.label}
-          </span>
-        </button>
-      ))}
-    </div>
-  </div>
 
-  {/* JLPT Darajalari qismi */}
-  <div className="flex flex-col gap-3">
-    <div className="px-2">
-      <h1 className="text-[20px] font-semibold text-slate-900 dark:text-white">
-        Jlpt darajalari
-      </h1>
-    </div>
-    <JlptLevels />
-  </div>
-  </div>
+          {/* Tugmalar menyusi */}
+          <div className="relative w-full p-4">
+            {/* Orqa tarafdagi "blob" - dark rejimda kamroq ko'rinadi */}
+            <div className="absolute top-0 right-0 -z-10 h-48 w-48 rounded-full bg-indigo-500/20 blur-3xl" />
+
+            <div className="grid grid-cols-4 gap-x-3 gap-y-6">
+              {MENU_ITEMS.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => router.push(item.href)}
+                  className="group flex flex-col items-center gap-2"
+                >
+                  {/* Tugmaning DARK MODE'ga moslashuvchan uslubi */}
+                  <div className="flex h-[72px] w-[72px] items-center justify-center rounded-[24px] border border-slate-200/50 bg-white shadow-[5px_5px_10px_rgba(0,0,0,0.05),-5px_-5px_10px_rgba(255,255,255,0.8)] transition-all active:scale-95 dark:border-slate-800 dark:bg-slate-900 dark:shadow-[5px_5px_10px_rgba(0,0,0,0.4),-5px_-5px_10px_rgba(255,255,255,0.02)]">
+                    <item.icon
+                      className={`h-8 w-8 ${item.color ? item.color : "text-slate-800 dark:text-slate-200"}`}
+                      strokeWidth={1.5}
+                    />
+                  </div>
+                  <span className="text-center text-[11px] leading-tight font-semibold text-slate-800 dark:text-slate-300">
+                    {item.label}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* JLPT Darajalari qismi */}
+          <div className="flex flex-col gap-3">
+            <div className="px-2">
+              <h1 className="text-[20px] font-semibold text-slate-900 dark:text-white">
+                Jlpt darajalari
+              </h1>
+            </div>
+            <JlptLevels />
+          </div>
+        </div>
       </div>
 
       {/* =======================
@@ -270,7 +338,7 @@ export default function DashboardPage() {
             <div className="flex w-full items-center justify-between border-b border-slate-200 bg-white/95 px-5 py-3 shadow-sm backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/95">
               <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
                 {activeTab === "jlpt"
-                  ?  `${t('main_page')}`
+                  ? `${t("main_page")}`
                   : MENU_ITEMS.find((i) => i.id === activeTab)?.label}
               </h1>
 
@@ -281,8 +349,8 @@ export default function DashboardPage() {
                   title="Sahifani to'liq ekranda ochish"
                 >
                   <Maximize className="h-4 w-4 transition-transform group-hover:scale-110" />
-                  
-                 {t('expansion')}
+
+                  {t("expansion")}
                 </button>
               </div>
             </div>

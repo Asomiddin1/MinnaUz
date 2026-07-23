@@ -47,6 +47,13 @@ export function UserSidebar() {
   const userName = session?.user?.name || "Guest User"
   const userEmail = session?.user?.email || ""
 
+  const getAvatarUrl = (url?: string | null) => {
+    if (!url) return ""
+    if (url.startsWith("http")) return url
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+    return `${baseUrl.replace('/api', '')}${url}`
+  }
+
   return (
     <Sidebar
       collapsible="icon"
@@ -150,7 +157,7 @@ export function UserSidebar() {
               <Skeleton className="h-9 w-9 rounded-full dark:bg-[#1E293B]" />
             ) : session?.user?.image ? (
               <img
-                src={session.user.image}
+                src={getAvatarUrl(session.user.image)}
                 alt="avatar"
                 className="h-9 w-9 rounded-full border border-slate-200 object-cover dark:border-transparent"
               />

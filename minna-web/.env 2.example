@@ -1,9 +1,0 @@
-# NextAuth uchun majburiy (istalgan uzun matn yozishingiz mumkin)
-NEXTAUTH_SECRET=
-
-# Laravel API manzili
-NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/api
-
-# Google OAuth
-GOOGLE_CLIENT_ID=
-GOOGLE_CLIENT_SECRET=
