@@ -92,6 +92,40 @@ class UserController extends Controller
     }
 
     // ==========================================
+    // GET PROFILE
+    // ==========================================
+    #[OA\Get(
+        path: '/api/user/profile',
+        summary: 'Profil ma\'lumotlarini olish',
+        description: 'Joriy foydalanuvchining to\'liq profil ma\'lumotlarini qaytaradi.',
+        tags: ['User Profile'],
+        security: [['bearerAuth' => []]],
+        responses: [
+            new OA\Response(response: 200, description: 'Profil ma\'lumotlari'),
+            new OA\Response(response: 401, description: 'Autentifikatsiya talab qilinadi'),
+        ]
+    )]
+    public function getProfile(Request $request)
+    {
+        $user = $request->user();
+        
+        return response()->json([
+            'success' => true,
+            'user'    => [
+                'id'           => $user->id,
+                'name'         => $user->name,
+                'email'        => $user->email,
+                'role'         => $user->role,
+                'coins'        => $user->coins,
+                'streak'       => $user->streak,
+                'avatar'       => $user->avatar,
+                'is_premium'   => $user->is_premium,
+                'device_limit' => $user->deviceLimit(),
+            ]
+        ]);
+    }
+
+    // ==========================================
     // UPDATE NAME
     // ==========================================
     #[OA\Patch(
@@ -471,28 +505,6 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Boshqa barcha qurilmalardan chiqildi'
-        ]);
-    }
-
-    // ==========================================
-    // GET PROFILE (for /api/user)
-    // ==========================================
-    #[OA\Get(
-        path: '/api/user/profile',
-        summary: 'Profil ma\'lumotlarini olish',
-        description: 'Joriy foydalanuvchining to\'liq profil ma\'lumotlarini qaytaradi.',
-        tags: ['User Profile'],
-        security: [['bearerAuth' => []]],
-        responses: [
-            new OA\Response(response: 200, description: 'Profil ma\'lumotlari'),
-            new OA\Response(response: 401, description: 'Autentifikatsiya talab qilinadi'),
-        ]
-    )]
-    public function getProfile(Request $request)
-    {
-        return response()->json([
-            'success' => true,
-            'user'    => $request->user(),
         ]);
     }
 }
