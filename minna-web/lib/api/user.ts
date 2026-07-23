@@ -7,6 +7,23 @@ export const userAPI = {
   getStreaks: (year?: number, month?: number): Promise<AxiosResponse> =>
     apiClient.get("/user/streaks", { params: { year, month } }),
 
+  // Kunlik check-in (har kuni 1 marta chaqiriladi)
+  checkIn: (): Promise<AxiosResponse> => apiClient.post("/user/check-in"),
+
+  // ==========================================
+  // AVATAR
+  // ==========================================
+  uploadAvatar: (formData: FormData): Promise<AxiosResponse> => 
+    apiClient.post("/user/avatar", formData, {
+      headers: { "Content-Type": "multipart/form-data" }
+    }),
+    
+  revertAvatar: (): Promise<AxiosResponse> => 
+    apiClient.post("/user/avatar/default"),
+
+  updateName: (name: string): Promise<AxiosResponse> => 
+    apiClient.patch("/user/name", { name }),
+
   getTests: (level?: string): Promise<AxiosResponse> =>
     apiClient.get("/user/tests", { params: { level } }),
 
@@ -119,4 +136,14 @@ export const userAPI = {
     data: { answers: any[] }
   ): Promise<AxiosResponse> =>
     apiClient.post(`/articles/${id}/submit-quiz`, data),
+
+    // AI bilan suhbatlashish (Voice/Text Chat) xabarlarini jo'natish
+  sendAiChatMessage: (data: {
+    message: string;
+    lang: string;
+    topic: string;
+    level: string;
+    history: { role: string; content: string }[];
+  }): Promise<AxiosResponse> => 
+    apiClient.post("/ai/chat", data),
 }

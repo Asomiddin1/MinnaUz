@@ -25,8 +25,6 @@ class AiController extends Controller
             // Frontenddan kelayotgan parametrlar
             $topic = $request->input('topic', 'Erkin');
             $level = $request->input('level', 'N5');
-            // $history = $request->input('history', []);
-            // Yaxshiroq:
             $history = is_array($request->input('history')) ? $request->input('history') : [];
 
             // Darajaga qarab qoidalar
@@ -55,7 +53,7 @@ class AiController extends Controller
                 'message' => $userMessage
             ]);
 
-           // MAVZU QOIDASI
+            // MAVZU QOIDASI
             $topicRule = "";
             switch($topic) {
                 case 'Tanishtiruv':
@@ -74,29 +72,47 @@ class AiController extends Controller
                     $topicRule = "Foydalanuvchi 'Erkin mavzu' ni tanlagan. Hech qanday qoliplarsiz, u nimani xohlasa shu haqida tabiiy, qiziqarli suhbat qur.";
             }
                 
-            // ASOSIY SYSTEM PROMPT (Qoidalar to'plami) - Sintaksis xatosi to'g'rilandi
-            // ASOSIY SYSTEM PROMPT
-            $systemPrompt = "Sen 'Kitsune-sensei' ismli yapon tili o'qituvchisisan. Sen o'zbek tilida gapirasan.
-                   
-SUHBAT VA XOTIRA QOIDALARI:
-1. XOTIRANI TEKSHIR: Suhbat tarixida (history) foydalanuvchi o'z ismini aytgan bo'lsa, ASLO o'zingni qayta tanishtirma va ismini qayta so'rama! To'g'ridan-to'g'ri mavzuga o't: {$topicRule}
-2. TANISHUV: Agar foydalanuvchi ismini hali umuman aytmagan bo'lsagina, o'zingни tanishtir va ismini so'ra.
-3. MULOQOT: Yapon tilini o'rgatuvchi mehribon o'qituvchi kabi muloqot qil.
+            // ==========================================
+            // SYSTEM PROMPT — YAPONCHA JAVOB + O'ZBEKCHA XAQORAT
+            // ==========================================
+            $systemPrompt = "You are Aiko, an AI Japanese conversation partner on MinnaUz, a speaking-practice platform built for Uzbek-speaking learners of Japanese.
 
-YAPONCHA SO'ZLARNI YOZISH UCHUN QAT'IY TEMIR QOIDA (BUNI BUZISH TAQIQLANADI!):
-1. Yaponcha so'zlarni FAKAT VA FAKAT asl yapon alifbosida (Hiragana, Katakana yoki Kanji) yozishing SHART! 
-2. Hech qanday qavslar, Romaji (lotin harflari) yoki o'zbekcha tarjimalarni ishlata ko'rma! Yaponcha so'zlar faqat toza yaponcha yozuvda bo'lsin.
-3. TO'G'RI MISOL: こんにちは！お元気ですか？
-4. XATO MISOL: こんにちは (Konnichiwa - Salom) -> Bu mutlaqo xato, chunki qavslar, romaji va tarjima aralashtirilgan! Faqat yaponchasini qoldir.
+## Your two language roles (never mix these)
+1. JAPANESE — the target language. All conversational turns, questions, and roleplay dialogue happen in natural, level-appropriate Japanese.
+2. UZBEK — the coaching language. All corrections, encouragement, grammar explanations, and meta-comments happen in natural, warm Uzbek.
+Never explain Japanese grammar in Japanese. Never make small talk in Uzbek.
 
-DARAJA QOIDASI:
-1. {$level} darajasi tushunchalari asosida javob ber. {$levelInstructions}";
+## Learner level
+The learner's current level is {$level}. {$levelInstructions}
+
+## Conversation behavior
+- Keep Japanese turns short (1-3 sentences) — this is spoken practice, not a lecture.
+- Ask natural follow-up questions, like a curious conversation partner.
+- Match vocabulary/grammar complexity to the learner's level.
+- If the learner is clearly lost, simplify your Japanese.
+- Correct at most 1-2 errors per turn — the ones that most affect meaning or fit the learner's level. Don't overwhelm.
+- Tone: patient, warm, encouraging — never clinical or exam-like here.
+- Topic Rule: {$topicRule}
+- Remember previous context of the conversation. Do not repeat introductions if the user already introduced themselves.
+
+## Output format
+Respond with valid JSON only, nothing outside the object:
+{
+  \"japanese_reply\": \"your next line of dialogue in Japanese\",
+  \"japanese_reply_romaji\": \"romaji transliteration, for lower levels\",
+  \"feedback_uz\": \"1-3 warm sentences in Uzbek: what went well, what to notice\",
+  \"corrections\": [
+    {\"learner_said\": \"...\", \"better_form\": \"...\", \"why_uz\": \"short explanation in Uzbek\"}
+  ]
+}
+If there is nothing to correct, return an empty corrections array — don't invent issues just to fill the field.";
+
+
             // Xabarlar ro'yxatini yig'ish
             $messagesArray = [
                 ["role" => "system", "content" => $systemPrompt]
             ];
 
-            // Frontenddan kelgan tarixni qo'shish
             // Frontenddan kelgan tarixni qo'shish
             $hasCurrentMessage = false;
             if (is_array($history) && count($history) > 0) {
@@ -131,32 +147,93 @@ DARAJA QOIDASI:
                     "model" => "llama-3.3-70b-versatile",
                     "messages" => $messagesArray,
                     "temperature" => 0.6,
+                    "response_format" => [ "type" => "json_object" ]
                 ]);
 
             if ($response->successful()) {
-                $reply = $response->json()['choices'][0]['message']['content'];
+                $rawReply = $response->json()['choices'][0]['message']['content'];
                 
+                $reply = "";
+                $feedbackUz = "";
+                $correctionsArray = [];
+                $correctionTextForAudio = "";
+
+                // JSON parse qilishga urinish
+                $jsonData = json_decode($rawReply, true);
+                if ($jsonData) {
+                    $reply = $jsonData['japanese_reply'] ?? ($jsonData['reply'] ?? '');
+                    $feedbackUz = $jsonData['feedback_uz'] ?? '';
+                    $correctionsArray = $jsonData['corrections'] ?? [];
+                    
+                    if (!empty($feedbackUz) || !empty($correctionsArray)) {
+                        $correctionTextForAudio = $feedbackUz;
+                        if (!empty($correctionsArray) && is_array($correctionsArray)) {
+                            foreach ($correctionsArray as $corr) {
+                                $learnerSaid = $corr['learner_said'] ?? '';
+                                $betterForm = $corr['better_form'] ?? '';
+                                $whyUz = $corr['why_uz'] ?? '';
+                                if ($learnerSaid || $betterForm) {
+                                    $correctionTextForAudio .= ". Siz " . $learnerSaid . " dedingiz, lekin " . $betterForm . " bo'lishi kerak. Sababi: " . $whyUz;
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // Bazaga saqlash
                 ChatMessage::create([
                     'user_id' => $user->id, 
-                    'role' => 'assistant', // Odatda 'ai' o'rniga standard 'assistant' ishlatiladi 
+                    'role' => 'assistant',
                     'message' => $reply
                 ]);
 
-                // Matndagi ortiqcha belgilarni (jumladan yaponcha qavslarni ham) tozalash (audio uchun)
-                $cleanText = preg_replace('/[*#_()（）]/u', '', $reply);
+                // Matndagi ortiqcha belgilarni tozalash (audio uchun)
+                $cleanReply = preg_replace('/[*#_()（）「」『』【】]/u', '', $reply);
                 $audioBase64 = null;
+                $correctionAudioBase64 = null;
 
-                // Google Translate TTS
-                $langCode = ($language === 'ja-JP') ? 'ja' : 'uz';
-                $textToSpeech = urlencode(mb_substr($cleanText, 0, 180));
-                $tts = Http::withoutVerifying()->get("https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q={$textToSpeech}&tl={$langCode}");
-                
-                if ($tts->successful()) {
-                    $audioBase64 = base64_encode($tts->body());
+                // 1. YAPONCHA JAVOB UCHUN AUDIO (faqat reply bo'sh bo'lmaganda)
+                if (!empty(trim($cleanReply))) {
+                    $textToSpeech = urlencode(mb_substr($cleanReply, 0, 180));
+                    $tts = Http::withoutVerifying()->get("https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&q={$textToSpeech}&tl=ja");
+                    
+                    if ($tts->successful()) {
+                        $audioBase64 = base64_encode($tts->body());
+                    }
                 }
 
-                return response()->json(['reply' => $reply, 'audio' => $audioBase64]);
+                // 2. O'ZBEKCHA CORRECTION UCHUN AUDIO (Microsoft Edge TTS — sifatli!)
+                if ($correctionTextForAudio) {
+                    $cleanCorrection = preg_replace('/[❌✅🔴🟢]/u', '', $correctionTextForAudio);
+                    $cleanCorrection = trim($cleanCorrection);
+                    
+                    if (!empty($cleanCorrection)) {
+                        // Vaqtinchalik fayl yaratish
+                        $tempFile = storage_path('app/tts_' . uniqid() . '.mp3');
+                        
+                        // Edge TTS orqali audio generatsiya (uz-UZ-SardorNeural — erkak ovoz, yoki qiz bola ovozi uchun MadinaNeural ishlatish mumkin. Aiko nomi qiz bola, keling MadinaNeural qilamiz)
+                        $escapedText = str_replace('"', '\\"', $cleanCorrection);
+                        $command = 'edge-tts --voice uz-UZ-MadinaNeural --text "' . $escapedText . '" --write-media "' . $tempFile . '" 2>&1';
+                        
+                        exec($command, $output, $returnCode);
+                        
+                        if ($returnCode === 0 && file_exists($tempFile)) {
+                            $correctionAudioBase64 = base64_encode(file_get_contents($tempFile));
+                            unlink($tempFile); // Vaqtinchalik faylni o'chirish
+                        } else {
+                            Log::warning("Edge TTS xatosi: " . implode("\n", $output));
+                        }
+                    }
+                }
+
+                return response()->json([
+                    'reply' => $reply, 
+                    'audio' => $audioBase64,
+                    'feedback' => $feedbackUz,
+                    'corrections' => $correctionsArray,
+                    'correction' => $correctionTextForAudio, // For legacy frontend compatibility if needed
+                    'correction_audio' => $correctionAudioBase64,
+                ]);
             }
             
             Log::error("Groq API xatosi: " . $response->body());

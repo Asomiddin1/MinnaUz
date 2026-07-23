@@ -116,6 +116,15 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/devices/{id}', [UserProfileController::class, 'logoutDevice']); 
         // ==========================
 
+        // ===== AVATAR =====
+        Route::post('/avatar', [UserProfileController::class, 'uploadAvatar']);
+        Route::post('/avatar/default', [UserProfileController::class, 'revertToDefaultAvatar']);
+        // ==========================
+
+        // ===== NAME UPDATE =====
+        Route::patch('/name', [UserProfileController::class, 'updateName']);
+        // ==========================
+
         // ===== DAILY CHECK-IN =====
         Route::post('/check-in', [UserProfileController::class, 'checkIn']);
         // ==========================

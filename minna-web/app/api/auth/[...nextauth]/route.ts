@@ -65,7 +65,17 @@ export const authOptions: NextAuthOptions = {
   ],
 
   callbacks: {
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
+      // Session yangilanishi uchun qo'shildi
+      if (trigger === "update") {
+        if (session?.image && token.user) {
+          (token.user as any).image = session.image
+        }
+        if (session?.name && token.user) {
+          (token.user as any).name = session.name
+        }
+      }
+
       if (account && user) {
         // ===================================
         // GOOGLE UCHUN QISMI

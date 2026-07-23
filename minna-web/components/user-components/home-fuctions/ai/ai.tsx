@@ -2,12 +2,9 @@
 
 import { useState, useEffect, useRef, useMemo } from "react"
 import { useSession } from "next-auth/react"
-import { useRouter } from "next/navigation"
 import { Canvas, useFrame } from "@react-three/fiber"
+import { userAPI } from "@/lib/api/user"
 
-// ==========================================
-// 1. 3D PARTICLE SPHERE KOMPONENTI
-// ==========================================
 function ParticleSphere({
   isListening,
   isSpeaking,
@@ -83,39 +80,35 @@ function ParticleSphere({
   )
 }
 
-// ==========================================
-// 2. ASOSIY VOICE CHAT KOMPONENTI
-// ==========================================
 export default function AiComponent() {
-  const [statusText, setStatusText] = useState("Ovozli yordamchi tayyor")
+  const [statusText, setStatusText] = useState("Tayyor")
   const [isListening, setIsListening] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
-
-  // UI va Sozlamalar
   const [topic, setTopic] = useState("Erkin")
   const [level, setLevel] = useState("N5")
-  const [subtitle, setSubtitle] = useState("")
-
-  // Suhbat xotirasi
-  const [chatHistory, setChatHistory] = useState<
-    { role: string; content: string }[]
-  >([])
+  const [chatHistory, setChatHistory] = useState<{ role: string; content: string }[]>([])
 
   const recognitionRef = useRef<any>(null)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const correctionAudioRef = useRef<HTMLAudioElement | null>(null)
+  const japaneseAudioRef = useRef<HTMLAudioElement | null>(null)
 
-  const { data: session, status } = useSession()
-  const router = useRouter()
+  const { data: session } = useSession()
 
-  // Tozalash
   useEffect(() => {
     return () => handleStopAll()
   }, [])
 
   const handleStopAll = () => {
     if (recognitionRef.current) recognitionRef.current.stop()
-    if (audioRef.current) audioRef.current.pause()
+    if (japaneseAudioRef.current) {
+      japaneseAudioRef.current.pause()
+      japaneseAudioRef.current = null
+    }
+    if (correctionAudioRef.current) {
+      correctionAudioRef.current.pause()
+      correctionAudioRef.current = null
+    }
     window.speechSynthesis.cancel()
     setIsListening(false)
     setIsSpeaking(false)
@@ -140,7 +133,6 @@ export default function AiComponent() {
         (window as any).webkitSpeechRecognition ||
         (window as any).SpeechRecognition
       const recognition = new SpeechRecognition()
-
       recognition.continuous = false
       recognition.interimResults = false
 
@@ -148,19 +140,13 @@ export default function AiComponent() {
         setIsListening(true)
         setIsSpeaking(false)
         setStatusText("Eshitmoqdaman...")
-        setSubtitle("...")
       }
 
       recognition.onresult = (event: any) => {
         const text = event.results[0][0].transcript
         setIsListening(false)
-        setSubtitle(`Siz: ${text}`)
 
-        if (
-          status === "authenticated" &&
-          (session as any)?.accessToken &&
-          !isProcessing
-        ) {
+        if (session && (session as any)?.accessToken && !isProcessing) {
           setStatusText("Javob tayyorlanmoqda...")
           sendToAi(text)
         }
@@ -177,11 +163,10 @@ export default function AiComponent() {
 
       recognitionRef.current = recognition
     }
-  }, [status, session, isProcessing, topic, level, chatHistory])
+  }, [session, isProcessing, topic, level, chatHistory])
 
   const handleStartListening = () => {
     if (isProcessing || isSpeaking) return
-
     handleStopAll()
 
     const unlockMsg = new SpeechSynthesisUtterance("")
@@ -199,7 +184,6 @@ export default function AiComponent() {
 
   const handleClearMemory = () => {
     setChatHistory([])
-    setSubtitle("")
     setStatusText("Xotira tozalandi. Tayyor")
     handleStopAll()
   }
@@ -210,52 +194,61 @@ export default function AiComponent() {
     setChatHistory(newHistory)
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ai/chat`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${(session as any)?.accessToken}`,
-        },
-        body: JSON.stringify({
-          message: text,
-          lang: "ja-JP",
-          topic: topic,
-          level: level,
-          history: newHistory,
-        }),
+      const res = await userAPI.sendAiChatMessage({
+        message: text,
+        lang: "ja-JP",
+        topic: topic,
+        level: level,
+        history: newHistory,
       })
-      const data = await res.json()
-      if (res.ok) {
-        const aiReply = data.reply
-        setSubtitle(`Sensei: ${aiReply}`)
-        setChatHistory((prev) => [
-          ...prev,
-          { role: "assistant", content: aiReply },
-        ])
 
-        if (data.audio) {
+      const data = res.data
+
+      if (res.status === 200 || res.status === 201) {
+        const aiReply = data.reply || ""
+
+        if (aiReply.trim()) {
+          setChatHistory((prev) => [
+            ...prev,
+            { role: "assistant", content: aiReply },
+          ])
+        }
+
+        if (aiReply.trim() && data.audio) {
+          // Yaponcha javob audio
           setStatusText("Gapirmoqda...")
-          playAudio(data.audio)
-        } else if (aiReply) {
-          setStatusText("Gapirmoqda...")
-          speak(aiReply)
+          playJapaneseAudio(data.audio)
+        } else if (data.correction_audio) {
+          // Xato bo'lsa - o'zbekcha haqoratli tuzatish
+          setStatusText("Xatongizni tuzatmoqda...")
+          playCorrectionOnly(data.correction_audio)
+        } else {
+          setIsProcessing(false)
+          setStatusText("Tayyor")
         }
       } else {
         setStatusText("Javob olinmadi.")
         setIsProcessing(false)
       }
     } catch (e) {
+      console.error(e)
       setStatusText("Ulanishda xatolik!")
       setIsProcessing(false)
     }
   }
 
-  const playAudio = (base64Audio: string) => {
-    if (audioRef.current) audioRef.current.pause()
+  const playJapaneseAudio = (base64Audio: string) => {
+    if (japaneseAudioRef.current) {
+      japaneseAudioRef.current.pause()
+    }
     const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`)
     audio.playbackRate = 0.9
-    audioRef.current = audio
-    audio.onplay = () => setIsSpeaking(true)
+    japaneseAudioRef.current = audio
+
+    audio.onplay = () => {
+      setIsSpeaking(true)
+      setStatusText("Gapirmoqda...")
+    }
     audio.onended = () => {
       setIsSpeaking(false)
       setIsProcessing(false)
@@ -264,54 +257,36 @@ export default function AiComponent() {
     audio.play()
   }
 
-  const speak = (text: string) => {
-    if (typeof window === "undefined") return
-    window.speechSynthesis.cancel()
-    const cleanText = text.replace(/[*#_()]/g, "").trim()
-    const u = new SpeechSynthesisUtterance(cleanText)
-    u.lang = "ja-JP"
-    u.rate = 0.8
-    u.onstart = () => setIsSpeaking(true)
-    u.onend = () => {
+  const playCorrectionOnly = (base64Audio: string) => {
+    if (correctionAudioRef.current) {
+      correctionAudioRef.current.pause()
+    }
+    const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`)
+    audio.playbackRate = 1.0
+    correctionAudioRef.current = audio
+
+    audio.onplay = () => {
+      setIsSpeaking(true)
+      setStatusText("Xatongizni tuzatmoqda...")
+    }
+    audio.onended = () => {
       setIsSpeaking(false)
       setIsProcessing(false)
       setStatusText("Tayyor")
     }
-    window.speechSynthesis.speak(u)
+    audio.play()
   }
 
   return (
     <div className="relative flex h-[calc(100dvh-80px)] w-full flex-col overflow-hidden bg-white font-sans dark:bg-[#0a0a0a]">
-      {/* Yuqori Panel (Nav) */}
+      {/* Yuqori Panel - faqat mavzu/daraja va xotira tozalash */}
       <div className="z-20 flex w-full shrink-0 items-center justify-between border-b border-gray-100 bg-white/80 px-6 py-4 backdrop-blur-md dark:border-gray-900 dark:bg-[#0a0a0a]/80">
-        {/* Matnli Chatga o'tish tugmasi */}
-        <button
-          onClick={() => router.push("/dashboard/ai/text")}
-          className="-ml-2 flex items-center gap-2 p-2 text-gray-500 transition hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-        >
-          <svg
-            className="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-            />
-          </svg>
-          <span className="hidden text-sm font-medium sm:block">
-            Matnli rejim
-          </span>
-        </button>
-
+        {/* Mavzu va Daraja - chap tomonda */}
         <div className="flex gap-4">
           <select
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
-            className="cursor-pointer border-0 bg-transparent text-center text-sm font-medium text-gray-700 outline-none focus:ring-0 dark:text-gray-300"
+            className="cursor-pointer border-0 bg-transparent text-sm font-medium text-gray-700 outline-none focus:ring-0 dark:text-gray-300"
           >
             <option value="Erkin">Erkin</option>
             <option value="Tanishtiruv">Tanishtiruv</option>
@@ -325,64 +300,44 @@ export default function AiComponent() {
           <select
             value={level}
             onChange={(e) => setLevel(e.target.value)}
-            className="cursor-pointer border-0 bg-transparent text-center text-sm font-medium text-gray-700 outline-none focus:ring-0 dark:text-gray-300"
+            className="cursor-pointer border-0 bg-transparent text-sm font-medium text-gray-700 outline-none focus:ring-0 dark:text-gray-300"
           >
-            <option value="N5">N5 Daraja</option>
-            <option value="N4">N4 Daraja</option>
-            <option value="N3">N3 Daraja</option>
-            <option value="N2">N2 Daraja</option>
+            <option value="N5">N5</option>
+            <option value="N4">N4</option>
+            <option value="N3">N3</option>
+            <option value="N2">N2</option>
           </select>
         </div>
 
+        {/* Xotira tozalash - o'ng tomonda */}
         <button
           onClick={handleClearMemory}
           title="Xotirani tozalash"
-          className="-mr-2 p-2 text-gray-400 transition hover:text-gray-900 dark:hover:text-white"
+          className="p-2 text-gray-400 transition hover:text-gray-900 dark:hover:text-white"
         >
-          <svg
-            className="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-            />
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
           </svg>
         </button>
       </div>
 
-      <div className="flex w-full flex-1 flex-col overflow-y-auto">
-        <div className="m-auto flex min-h-max w-full max-w-3xl flex-col items-center justify-center px-4 py-8">
-          <div
-            className="z-10 flex aspect-square w-full max-w-[180px] shrink-0 cursor-pointer items-center justify-center md:max-w-[240px]"
-            onClick={handleStartListening}
-          >
-            <Canvas camera={{ position: [0, 0, 4] }}>
-              <ParticleSphere
-                isListening={isListening}
-                isSpeaking={isSpeaking}
-              />
-            </Canvas>
-          </div>
-
-          <div className="mt-8 flex w-full flex-col items-center">
-            <p className="mb-3 text-center text-xs font-medium tracking-wider text-gray-400 uppercase md:text-sm dark:text-gray-500">
-              {statusText}
-            </p>
-
-            {subtitle && (
-              <p className="max-w-2xl text-center text-[16px] leading-relaxed font-medium text-gray-800 md:text-[18px] dark:text-gray-200">
-                {subtitle}
-              </p>
-            )}
-          </div>
+      {/* Asosiy maydon - FAQAT 3D SFERA + STATUS */}
+      <div className="flex w-full flex-1 flex-col items-center justify-center">
+        <div
+          className="flex aspect-square w-full max-w-[200px] cursor-pointer items-center justify-center md:max-w-[260px]"
+          onClick={handleStartListening}
+        >
+          <Canvas camera={{ position: [0, 0, 4] }}>
+            <ParticleSphere isListening={isListening} isSpeaking={isSpeaking} />
+          </Canvas>
         </div>
+
+        <p className="mt-8 text-center text-sm font-medium tracking-wider text-gray-400 uppercase dark:text-gray-500">
+          {statusText}
+        </p>
       </div>
 
+      {/* Pastki tugmalar */}
       <div className="flex w-full shrink-0 justify-center gap-4 border-t border-transparent bg-white px-4 pt-2 pb-24 md:pb-8 dark:bg-[#0a0a0a]">
         <button
           onClick={handleStartListening}
