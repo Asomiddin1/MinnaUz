@@ -1,0 +1,2549 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "MinnaUz API",
+        "description": "MinnaUz — yapon tili o'quv platformasi uchun REST API hujjatlari.",
+        "contact": {
+            "email": "support@minnauz.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "API Server"
+        }
+    ],
+    "paths": {
+        "/api/admin/modules": {
+            "get": {
+                "tags": [
+                    "Admin — Modules"
+                ],
+                "summary": "Barcha modullarni olish",
+                "operationId": "7111aaceed3d484a2d09508e89062439",
+                "responses": {
+                    "200": {
+                        "description": "Modullar ro'yxati"
+                    },
+                    "401": {
+                        "description": "Autentifikatsiya talab qilinadi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin — Modules"
+                ],
+                "summary": "Yangi modul yaratish",
+                "operationId": "7d12be64776308361b3dad20c5199717",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "level_id",
+                                    "title"
+                                ],
+                                "properties": {
+                                    "level_id": {
+                                        "type": "integer"
+                                    },
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "order": {
+                                        "type": "integer",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Modul yaratildi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/modules/{module}": {
+            "get": {
+                "tags": [
+                    "Admin — Modules"
+                ],
+                "summary": "Modulni ko'rish",
+                "operationId": "c727b441cf763e00587d0854ccb819cc",
+                "parameters": [
+                    {
+                        "name": "module",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Modul ma'lumotlari"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin — Modules"
+                ],
+                "summary": "Modulni yangilash",
+                "operationId": "845d4e85ef2047506e03210284ff4e9d",
+                "parameters": [
+                    {
+                        "name": "module",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "level_id": {
+                                        "type": "integer"
+                                    },
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "order": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Modul yangilandi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin — Modules"
+                ],
+                "summary": "Modulni o'chirish",
+                "operationId": "15791de9c28827f7f8779c2b504d76a0",
+                "parameters": [
+                    {
+                        "name": "module",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Modul o'chirildi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/questions": {
+            "get": {
+                "tags": [
+                    "Admin — Questions"
+                ],
+                "summary": "Savollar ro'yxati",
+                "operationId": "f9ffc13c0a549270ff2bce1994051cd1",
+                "responses": {
+                    "200": {
+                        "description": "Savollar ro'yxati"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin — Questions"
+                ],
+                "summary": "Savol yaratish",
+                "operationId": "1a048f4b829c650cd1cb80583132863a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "test_id": {
+                                        "type": "integer"
+                                    },
+                                    "content": {
+                                        "type": "string"
+                                    },
+                                    "type": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Savol yaratildi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/questions/{question}": {
+            "get": {
+                "tags": [
+                    "Admin — Questions"
+                ],
+                "summary": "Savolni ko'rish",
+                "operationId": "8e8b48737c35a44a47df9a796e041ada",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Savol ma'lumoti"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin — Questions"
+                ],
+                "summary": "Savolni yangilash",
+                "operationId": "4bb4aa19a41495607784698d9f94d441",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Savol yangilandi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin — Questions"
+                ],
+                "summary": "Savolni o'chirish",
+                "operationId": "1d541fd7832f5fe3a5612ba06d97eb75",
+                "parameters": [
+                    {
+                        "name": "question",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Savol o'chirildi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/tests": {
+            "get": {
+                "tags": [
+                    "Admin — Tests"
+                ],
+                "summary": "Testlar ro'yxati",
+                "operationId": "12249d548a0f02e7e81d1548da043438",
+                "responses": {
+                    "200": {
+                        "description": "Testlar ro'yxati"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin — Tests"
+                ],
+                "summary": "Test yaratish",
+                "operationId": "911459ba71d565d806d2e49d9298cc11",
+                "responses": {
+                    "201": {
+                        "description": "Test yaratildi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/tests/{testId}/questions": {
+            "get": {
+                "tags": [
+                    "Admin — Tests"
+                ],
+                "summary": "Testning savollarini olish",
+                "operationId": "bb4daadc34bc9b6916c538ffdeabe13f",
+                "parameters": [
+                    {
+                        "name": "testId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Test savollari"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/tests/{test}": {
+            "get": {
+                "tags": [
+                    "Admin — Tests"
+                ],
+                "summary": "Testni ko'rish",
+                "operationId": "a1aeb2ac53930687eaf4a12da0df54b8",
+                "parameters": [
+                    {
+                        "name": "test",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Test ma'lumoti"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin — Tests"
+                ],
+                "summary": "Testni yangilash",
+                "operationId": "9c2ed5343d338069fdaf85b9b7625a6d",
+                "parameters": [
+                    {
+                        "name": "test",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Test yangilandi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin — Tests"
+                ],
+                "summary": "Testni o'chirish",
+                "operationId": "75b759c36864ac834a1cce4ae0dc0b53",
+                "parameters": [
+                    {
+                        "name": "test",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Test o'chirildi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/users": {
+            "get": {
+                "tags": [
+                    "Admin — Users"
+                ],
+                "summary": "Foydalanuvchilar ro'yxati",
+                "operationId": "1b8d8b479d292efc744ede2c3cbd9bac",
+                "responses": {
+                    "200": {
+                        "description": "Foydalanuvchilar ro'yxati"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/users/{user}": {
+            "get": {
+                "tags": [
+                    "Admin — Users"
+                ],
+                "summary": "Foydalanuvchini ko'rish",
+                "operationId": "63dc40804e6651a1f1962ad87b10f122",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Foydalanuvchi ma'lumoti"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin — Users"
+                ],
+                "summary": "Foydalanuvchini yangilash",
+                "operationId": "ad16187717037f22f2e4cee7db3c3b21",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Foydalanuvchi yangilandi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin — Users"
+                ],
+                "summary": "Foydalanuvchini o'chirish",
+                "operationId": "d57f59c5f8a0e35066d464e7966a6de6",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Foydalanuvchi o'chirildi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/users/{id}/toggle-premium": {
+            "post": {
+                "tags": [
+                    "Admin — Users"
+                ],
+                "summary": "Premium statusini o'zgartirish",
+                "operationId": "7aaea53932acbea05434bf1caa701d6d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Premium statusi yangilandi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/videos": {
+            "get": {
+                "tags": [
+                    "Admin — Videos"
+                ],
+                "summary": "Video darslar ro'yxati",
+                "operationId": "b3cf02425bf5bf86a6515b5872180b99",
+                "responses": {
+                    "200": {
+                        "description": "Videolar ro'yxati"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin — Videos"
+                ],
+                "summary": "Video dars yaratish",
+                "operationId": "47e07d5d1f484b48a3ad498d53748cd8",
+                "responses": {
+                    "201": {
+                        "description": "Video dars yaratildi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/videos/fetch-youtube": {
+            "post": {
+                "tags": [
+                    "Admin — Videos"
+                ],
+                "summary": "YouTube orqali video dars yaratish",
+                "operationId": "6f55ea641c3d6b938e14ae8933cfe699",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "youtube_url": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Video muvaffaqiyatli tortib olindi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/videos/{video}": {
+            "get": {
+                "tags": [
+                    "Admin — Videos"
+                ],
+                "summary": "Video darsni ko'rish",
+                "operationId": "d3b1b2fc0c42dda0488054dcbd4ce42b",
+                "parameters": [
+                    {
+                        "name": "video",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Video ma'lumoti"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin — Videos"
+                ],
+                "summary": "Video darsni yangilash",
+                "operationId": "ae1fc658eefda4bb2bc15dcaaf7cdca7",
+                "parameters": [
+                    {
+                        "name": "video",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Video yangilandi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin — Videos"
+                ],
+                "summary": "Video darsni o'chirish",
+                "operationId": "73d5acf38f0e85fbebbadc5659b14555",
+                "parameters": [
+                    {
+                        "name": "video",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Video o'chirildi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/vocabularies": {
+            "get": {
+                "tags": [
+                    "Admin — Vocabulary"
+                ],
+                "summary": "Lug'at ro'yxati",
+                "operationId": "de27dbe8b031c24b1b40544852bb5a8d",
+                "responses": {
+                    "200": {
+                        "description": "Lug'at ro'yxati"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin — Vocabulary"
+                ],
+                "summary": "Lug'at so'zini yaratish",
+                "operationId": "589c7b5e7dd532e403eff7ea3c3020b9",
+                "responses": {
+                    "201": {
+                        "description": "Lug'at so'zi yaratildi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/admin/vocabularies/{vocabulary}": {
+            "get": {
+                "tags": [
+                    "Admin — Vocabulary"
+                ],
+                "summary": "Lug'at so'zini ko'rish",
+                "operationId": "2ec77d3857500978acf7974c2e2d791d",
+                "parameters": [
+                    {
+                        "name": "vocabulary",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lug'at so'zi ma'lumoti"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin — Vocabulary"
+                ],
+                "summary": "Lug'at so'zini yangilash",
+                "operationId": "ae8b3c767e29e62408cfcb54e69d005e",
+                "parameters": [
+                    {
+                        "name": "vocabulary",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lug'at so'zi yangilandi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin — Vocabulary"
+                ],
+                "summary": "Lug'at so'zini o'chirish",
+                "operationId": "7092893cf3dbf0f12ec1994604ae524e",
+                "parameters": [
+                    {
+                        "name": "vocabulary",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lug'at so'zi o'chirildi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/tests": {
+            "get": {
+                "tags": [
+                    "Tests / JLPT"
+                ],
+                "summary": "Testlar ro'yxatini olish",
+                "description": "JLPT testlari ro'yxati. Premium testlar faqat premium foydalanuvchilarga ochiq.",
+                "operationId": "073e8acb21175c7aa1d923f31a6a2ba0",
+                "parameters": [
+                    {
+                        "name": "level",
+                        "in": "query",
+                        "description": "JLPT darajasi (N5, N4, N3, N2, N1)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "N5"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Testlar ro'yxati",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "title": {
+                                                "type": "string",
+                                                "example": "JLPT N5 Mock Test 1"
+                                            },
+                                            "level": {
+                                                "type": "string",
+                                                "example": "N5"
+                                            },
+                                            "time": {
+                                                "description": "Daqiqalarda",
+                                                "type": "integer",
+                                                "example": 110
+                                            },
+                                            "pass_score": {
+                                                "type": "integer",
+                                                "example": 55
+                                            },
+                                            "is_premium": {
+                                                "type": "boolean",
+                                                "example": false
+                                            },
+                                            "locked": {
+                                                "type": "boolean",
+                                                "example": false
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Autentifikatsiya talab qilinadi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/tests/{id}": {
+            "get": {
+                "tags": [
+                    "Tests / JLPT"
+                ],
+                "summary": "Test batafsil ma'lumoti",
+                "description": "Bitta testning barcha bo'limlari va savollari bilan batafsil ma'lumoti. To'g'ri javoblar yashirilgan.",
+                "operationId": "b4ceb0516c3e1994c89d1f046f74e89b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Test ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Test ma'lumotlari"
+                    },
+                    "403": {
+                        "description": "Premium test — obuna talab qilinadi"
+                    },
+                    "404": {
+                        "description": "Test topilmadi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/tests/{id}/submit": {
+            "post": {
+                "tags": [
+                    "Tests / JLPT"
+                ],
+                "summary": "Testni topshirish",
+                "description": "Foydalanuvchi javoblarini yuboradi va natija hisoblanadi. Har bir savol uchun `question_id` va `selected_option` talab qilinadi.",
+                "operationId": "63b72be4b5cb9c0fc6eb9d3b0edc2f33",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Test ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "answers"
+                                ],
+                                "properties": {
+                                    "answers": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "question_id": {
+                                                    "type": "integer",
+                                                    "example": 42
+                                                },
+                                                "selected_option": {
+                                                    "type": "string",
+                                                    "example": "A",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "time_spent": {
+                                        "description": "Sarflangan vaqt (soniyada)",
+                                        "type": "integer",
+                                        "example": 3600
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Test topshirildi, natija qaytarildi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Test topshirildi"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "score": {
+                                                    "type": "integer",
+                                                    "example": 72
+                                                },
+                                                "passed": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "correct_count": {
+                                                    "type": "integer",
+                                                    "example": 36
+                                                },
+                                                "wrong_count": {
+                                                    "type": "integer",
+                                                    "example": 14
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Premium talab qilinadi"
+                    },
+                    "422": {
+                        "description": "Validatsiya xatosi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/results/{resultId}": {
+            "get": {
+                "tags": [
+                    "Tests / JLPT"
+                ],
+                "summary": "Test natijasini batafsil ko'rish",
+                "description": "Bitta test natijasining to'liq ko'rinishi — har bir savol, tanlangan javob va to'g'ri javob bilan.",
+                "operationId": "f98d3328694bc5167fdac043223836d2",
+                "parameters": [
+                    {
+                        "name": "resultId",
+                        "in": "path",
+                        "description": "Natija ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Natija batafsil"
+                    },
+                    "404": {
+                        "description": "Natija topilmadi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/results": {
+            "get": {
+                "tags": [
+                    "Tests / JLPT"
+                ],
+                "summary": "Test natijalari tarixi",
+                "description": "Foydalanuvchining so'nggi 7 ta test natijasi. Eskilari avtomatik o'chiriladi.",
+                "operationId": "be86862d7e2a7cf57fcd2b5002449cba",
+                "responses": {
+                    "200": {
+                        "description": "Natijalar tarixi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/ai/chat": {
+            "post": {
+                "tags": [
+                    "AI Chat"
+                ],
+                "summary": "AI suhbat — yapon tili repetitori",
+                "description": "Yapon tilida muloqot qilish uchun AI-ga xabar yuboradi. AI yapon tilida javob beradi, o'zbek tilida fikr-mulohaza bildiradi. Har bir xabar chat tarixi bilan birgalikda yuboriladi.",
+                "operationId": "6ab89b22a8953bf28b83e90346da15d7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "message"
+                                ],
+                                "properties": {
+                                    "message": {
+                                        "description": "Foydalanuvchi xabari (yapon yoki o'zbek tilida)",
+                                        "type": "string",
+                                        "example": "こんにちは！"
+                                    },
+                                    "topic": {
+                                        "description": "Suhbat mavzusi",
+                                        "type": "string",
+                                        "example": "Tanishish"
+                                    },
+                                    "level": {
+                                        "description": "JLPT darajasi",
+                                        "type": "string",
+                                        "example": "N5"
+                                    },
+                                    "lang": {
+                                        "description": "Til (TTS uchun)",
+                                        "type": "string",
+                                        "example": "uz-UZ"
+                                    },
+                                    "history": {
+                                        "description": "Chat tarixi (oxirgi 10 ta xabar)",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "user",
+                                                    "enum": [
+                                                        "user",
+                                                        "assistant"
+                                                    ]
+                                                },
+                                                "content": {
+                                                    "type": "string",
+                                                    "example": "こんにちは！"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "AI javobi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "japanese_reply": {
+                                            "type": "string",
+                                            "example": "こんにちは！お元気ですか？"
+                                        },
+                                        "uzbek_feedback": {
+                                            "type": "string",
+                                            "example": "Juda yaxshi! Salomlashdingiz."
+                                        },
+                                        "corrections": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "audio_base64": {
+                                            "description": "TTS audio (base64 MP3)",
+                                            "type": "string",
+                                            "nullable": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Autentifikatsiya talab qilinadi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/ai/history": {
+            "get": {
+                "tags": [
+                    "AI Chat"
+                ],
+                "summary": "AI chat tarixini olish",
+                "description": "Foydalanuvchining AI bilan suhbat tarixini qaytaradi.",
+                "operationId": "992929f1828f17045de115144adede5d",
+                "responses": {
+                    "200": {
+                        "description": "Chat tarixi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/levels": {
+            "get": {
+                "tags": [
+                    "Levels & Modules"
+                ],
+                "summary": "Kurs darajalari ro'yxati (ochiq)",
+                "description": "Barcha kurs darajalari ro'yxatini qaytaradi. Autentifikatsiya talab qilinmaydi.",
+                "operationId": "0afe939a6ec33fa5ca357d1524c35b86",
+                "responses": {
+                    "200": {
+                        "description": "Darajalar ro'yxati"
+                    }
+                }
+            }
+        },
+        "/api/levels/{slug}": {
+            "get": {
+                "tags": [
+                    "Levels & Modules"
+                ],
+                "summary": "Daraja batafsil ma'lumoti (ochiq)",
+                "description": "Slug orqali bitta darajaning modullari va darslari bilan batafsil ma'lumoti.",
+                "operationId": "bc6ea4f7813ab04d6d73fd6d25ea35ed",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "Daraja slugi",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "n5-basics"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Daraja ma'lumotlari"
+                    },
+                    "404": {
+                        "description": "Daraja topilmadi"
+                    }
+                }
+            }
+        },
+        "/api/levels/{slug}/grammars": {
+            "get": {
+                "tags": [
+                    "Materials"
+                ],
+                "summary": "Grammar ro'yxati",
+                "description": "Berilgan daraja (slug) uchun grammatika qoidalari ro'yxati.",
+                "operationId": "236f66e8a09ad8b71bda46e1cf605349",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "n5-basics"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Grammar ro'yxati"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/levels/{slug}/kanjis": {
+            "get": {
+                "tags": [
+                    "Materials"
+                ],
+                "summary": "Kanji ro'yxati",
+                "description": "Berilgan daraja uchun kanji belgilari ro'yxati.",
+                "operationId": "dcb2385409493cbe33c77678fd38af2a",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "n5-basics"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Kanji ro'yxati"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/levels/{slug}/vocabularies": {
+            "get": {
+                "tags": [
+                    "Materials"
+                ],
+                "summary": "Vocabulary (lug'at) ro'yxati",
+                "description": "Berilgan daraja uchun so'z boyligi ro'yxati.",
+                "operationId": "7ba99a256eae7134b70b9a372a838dd4",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "n5-basics"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Vocabulary ro'yxati"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/search": {
+            "get": {
+                "tags": [
+                    "Search"
+                ],
+                "summary": "Umumiy qidiruv",
+                "description": "Grammar, Kanji, Vocabulary bo'yicha umumiy qidiruv.",
+                "operationId": "677cd39242f0563d62478d050558b00d",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Qidiruv so'zi",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "食べる"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Qidiruv natijalari"
+                    },
+                    "422": {
+                        "description": "Qidiruv so'zi talab qilinadi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/videos": {
+            "get": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Video darslar ro'yxati",
+                "description": "Barcha video darslar ro'yxatini qaytaradi.",
+                "operationId": "080372b0061996e46877ab0588c287b3",
+                "responses": {
+                    "200": {
+                        "description": "Video darslar ro'yxati"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/videos/{id}": {
+            "get": {
+                "tags": [
+                    "Videos"
+                ],
+                "summary": "Video darsi batafsil",
+                "operationId": "2fce59217a5fc8f8e7944cfee8bc58f3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Video darsi ma'lumotlari"
+                    },
+                    "404": {
+                        "description": "Video topilmadi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/articles": {
+            "get": {
+                "tags": [
+                    "Articles / Dokkai"
+                ],
+                "summary": "Maqolalar ro'yxati (Dokkai)",
+                "operationId": "acada26991578db7cc619ccf10714cbb",
+                "responses": {
+                    "200": {
+                        "description": "Maqolalar ro'yxati"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/articles/{id}": {
+            "get": {
+                "tags": [
+                    "Articles / Dokkai"
+                ],
+                "summary": "Maqola batafsil",
+                "operationId": "599bf1693a3fcbcf6a6d89e14665489f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Maqola ma'lumotlari va quiz savollari"
+                    },
+                    "404": {
+                        "description": "Maqola topilmadi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/articles/{id}/submit-quiz": {
+            "post": {
+                "tags": [
+                    "Articles / Dokkai"
+                ],
+                "summary": "Maqola quizini topshirish",
+                "operationId": "5de15ad6e21f3eed473c1c16eb5ce805",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "answers": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Quiz natijasi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/lessons/{lesson}/like": {
+            "post": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Darsga like bosish / olib tashlash (toggle)",
+                "operationId": "266f6ebe95790b7251b420eab0049e2e",
+                "parameters": [
+                    {
+                        "name": "lesson",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Like holati yangilandi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/lessons/{lesson}/comments": {
+            "post": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Darsga izoh qoldirish",
+                "operationId": "7080fe1fb9156f5ca55c1f94c861a970",
+                "parameters": [
+                    {
+                        "name": "lesson",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "body"
+                                ],
+                                "properties": {
+                                    "body": {
+                                        "type": "string",
+                                        "example": "Juda foydali dars edi!"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Izoh qo'shildi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user": {
+            "get": {
+                "tags": [
+                    "User Profile"
+                ],
+                "summary": "Joriy foydalanuvchi ma'lumotlari",
+                "description": "Bearer token orqali tizimga kirgan foydalanuvchining to'liq ma'lumotlarini qaytaradi.",
+                "operationId": "f75664f7b4e0d185d43ae0576e095280",
+                "responses": {
+                    "200": {
+                        "description": "Muvaffaqiyatli",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Asomiddin"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "user@example.com"
+                                        },
+                                        "avatar": {
+                                            "type": "string",
+                                            "nullable": true
+                                        },
+                                        "role": {
+                                            "type": "string",
+                                            "example": "user"
+                                        },
+                                        "coins": {
+                                            "type": "integer",
+                                            "example": 100
+                                        },
+                                        "streak": {
+                                            "type": "integer",
+                                            "example": 5
+                                        },
+                                        "is_premium": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Autentifikatsiya talab qilinadi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/google": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Google orqali kirish",
+                "description": "Google ID token orqali tizimga kirish yoki yangi hisob yaratish. Muvaffaqiyatli bo'lganda Sanctum access token qaytaradi.",
+                "operationId": "e72396dc428fa410a4dc84bea1b4ac22",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "token"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "description": "Google OAuth ID token",
+                                        "type": "string",
+                                        "example": "eyJhbGci..."
+                                    },
+                                    "device_name": {
+                                        "description": "Qurilma nomi (ixtiyoriy)",
+                                        "type": "string",
+                                        "example": "Windows • Chrome"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Muvaffaqiyatli kirish",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "1|abc123..."
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Asomiddin"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "user@gmail.com"
+                                                },
+                                                "avatar": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "user"
+                                                },
+                                                "is_premium": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token noto'g'ri yoki muddati o'tgan"
+                    }
+                }
+            }
+        },
+        "/api/auth/send-otp": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "OTP kodni emailga yuborish",
+                "description": "Berilgan email manziliga 6 xonali OTP tasdiqlash kodi yuboradi. Kod 10 daqiqa amal qiladi.",
+                "operationId": "36706e5fd6ab9128a3a9e8cdcc77ff58",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Kod muvaffaqiyatli yuborildi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Kod emailga yuborildi"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validatsiya xatosi"
+                    }
+                }
+            }
+        },
+        "/api/auth/verify-otp": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "OTP kodni tekshirish va kirish",
+                "description": "Email va OTP kodni tekshiradi. To'g'ri bo'lsa foydalanuvchi yaratiladi (yoki topiladi) va Sanctum access token qaytaradi.",
+                "operationId": "b2478ec530345cf8b5080c59860e1879",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "otp_code"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "otp_code": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    },
+                                    "device_name": {
+                                        "description": "Qurilma nomi (ixtiyoriy)",
+                                        "type": "string",
+                                        "example": "Android • Chrome"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Muvaffaqiyatli kirish",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "2|xyz789..."
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "user"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "user@example.com"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "user"
+                                                },
+                                                "is_premium": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "OTP noto'g'ri yoki muddati tugagan"
+                    }
+                }
+            }
+        },
+        "/api/user/profile": {
+            "get": {
+                "tags": [
+                    "User Profile"
+                ],
+                "summary": "Profil ma'lumotlarini olish",
+                "description": "Joriy foydalanuvchining to'liq profil ma'lumotlarini qaytaradi.",
+                "operationId": "b34b5e8513cc57e75e88fa8b837763cf",
+                "responses": {
+                    "200": {
+                        "description": "Profil ma'lumotlari"
+                    },
+                    "401": {
+                        "description": "Autentifikatsiya talab qilinadi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/name": {
+            "patch": {
+                "tags": [
+                    "User Profile"
+                ],
+                "summary": "Foydalanuvchi ismini yangilash",
+                "description": "Joriy foydalanuvchining to'liq ismini o'zgartiradi. Min 2, max 100 belgi.",
+                "operationId": "2aaca7588519605925e17ed78cedb8d4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Asomiddin Nazarov",
+                                        "maxLength": 100,
+                                        "minLength": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Ism muvaffaqiyatli yangilandi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Ism muvaffaqiyatli yangilandi"
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "Asomiddin Nazarov"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Autentifikatsiya talab qilinadi"
+                    },
+                    "422": {
+                        "description": "Validatsiya xatosi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/avatar": {
+            "post": {
+                "tags": [
+                    "Avatar"
+                ],
+                "summary": "Profil rasmini yuklash",
+                "description": "Foydalanuvchi o'z profiliga yangi rasm yuklaydi. Faqat bitta rasm saqlanadi — oldingi mahalliy rasm o'chib ketadi. Max hajm: 2MB.",
+                "operationId": "ae841b7ca43603d3404ebed5f1bf215d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "avatar"
+                                ],
+                                "properties": {
+                                    "avatar": {
+                                        "description": "Rasm fayli (jpeg, png, jpg, gif, webp — max 2MB)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Rasm muvaffaqiyatli yuklandi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Avatar muvaffaqiyatli yuklandi"
+                                        },
+                                        "avatar": {
+                                            "type": "string",
+                                            "example": "/storage/avatars/abc123.jpg"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Autentifikatsiya talab qilinadi"
+                    },
+                    "422": {
+                        "description": "Fayl noto'g'ri format yoki hajmi katta"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/avatar/default": {
+            "post": {
+                "tags": [
+                    "Avatar"
+                ],
+                "summary": "Google rasmiga qaytish",
+                "description": "Foydalanuvchi maxsus yuklagan rasmini o'chirib, asl Google profilidagi rasmiga qaytadi. Faqat Google orqali kirgan foydalanuvchilar uchun ishlaydi.",
+                "operationId": "65df4f479ce6f9d225f88acdda6b7919",
+                "responses": {
+                    "200": {
+                        "description": "Google rasmiga muvaffaqiyatli qaytildi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Default Google rasmiga qaytildi"
+                                        },
+                                        "avatar": {
+                                            "type": "string",
+                                            "example": "https://lh3.googleusercontent.com/..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Google avatar topilmadi (Google orqali kirmagansiz)"
+                    },
+                    "401": {
+                        "description": "Autentifikatsiya talab qilinadi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/check-in": {
+            "post": {
+                "tags": [
+                    "User Profile"
+                ],
+                "summary": "Kunlik check-in",
+                "description": "Foydalanuvchi har kuni bir marta check-in qiladi. Agar bugun allaqachon check-in qilingan bo'lsa, streak o'zgarmaydi.",
+                "operationId": "47e822971d3189c8d2ec8f0dd09c7a73",
+                "responses": {
+                    "200": {
+                        "description": "Check-in natijasi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "streak": {
+                                            "type": "integer",
+                                            "example": 7
+                                        },
+                                        "checked_in": {
+                                            "description": "true — yangi check-in, false — bugun allaqachon bajarilgan",
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Autentifikatsiya talab qilinadi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/streaks": {
+            "get": {
+                "tags": [
+                    "User Profile"
+                ],
+                "summary": "Streak kalendarini olish",
+                "description": "Berilgan yil va oy uchun foydalanuvchi kirgan kunlar ro'yxatini qaytaradi (streak calendar uchun).",
+                "operationId": "c0ccc528793f4e64e51c8931cd0ac19a",
+                "parameters": [
+                    {
+                        "name": "year",
+                        "in": "query",
+                        "description": "Yil (default: joriy yil)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 2026
+                        }
+                    },
+                    {
+                        "name": "month",
+                        "in": "query",
+                        "description": "Oy (1-12, default: joriy oy)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 7
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Kirish sanalari ro'yxati",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string",
+                                                "example": "2026-07-15"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Autentifikatsiya talab qilinadi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/devices": {
+            "get": {
+                "tags": [
+                    "Devices"
+                ],
+                "summary": "Faol qurilmalar ro'yxati",
+                "description": "Joriy foydalanuvchining barcha faol sessiyalari (qurilmalari) ro'yxatini qaytaradi. Joriy sessiya `is_current: true` bilan belgilanadi.",
+                "operationId": "d773c2d71a8c559347269de5c06a0504",
+                "responses": {
+                    "200": {
+                        "description": "Qurilmalar ro'yxati",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 5
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Windows • Chrome"
+                                                    },
+                                                    "last_used_at": {
+                                                        "type": "string",
+                                                        "example": "2026-07-23T12:00:00Z",
+                                                        "nullable": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "example": "2026-07-20T08:00:00Z"
+                                                    },
+                                                    "is_current": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Autentifikatsiya talab qilinadi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/devices/{id}": {
+            "delete": {
+                "tags": [
+                    "Devices"
+                ],
+                "summary": "Bitta qurilmadan chiqish",
+                "description": "Berilgan token ID ga tegishli sessiyani (qurilmani) o'chirib, o'sha qurilmadan chiqadi. Faqat o'z tokenini o'chirishga ruxsat beriladi.",
+                "operationId": "f472953ab3afc622514977c19df416b8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Token ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Qurilmadan chiqildi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Qurilmadan muvaffaqiyatli chiqildi"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Autentifikatsiya talab qilinadi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/devices/logout-others": {
+            "delete": {
+                "tags": [
+                    "Devices"
+                ],
+                "summary": "Boshqa barcha qurilmalardan chiqish",
+                "description": "Joriy sessiyadan tashqari barcha boshqa faol sessiyalarni (qurilmalarni) o'chiradi.",
+                "operationId": "e3a68e73484822f88974e4fd78c8c16e",
+                "responses": {
+                    "200": {
+                        "description": "Boshqa qurilmalardan chiqildi",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Boshqa barcha qurilmalardan chiqildi"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Autentifikatsiya talab qilinadi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Sanctum Bearer token",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            },
+            "sanctum": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Sanctum Bearer token. /api/auth/google yoki /api/auth/verify-otp dan oling."
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Google va OTP autentifikatsiya"
+        },
+        {
+            "name": "User Profile",
+            "description": "Foydalanuvchi profili"
+        },
+        {
+            "name": "Lessons",
+            "description": "Darslar"
+        },
+        {
+            "name": "AI Chat",
+            "description": "AI yapon tili repetitori"
+        },
+        {
+            "name": "Admin — Modules",
+            "description": "Admin — Modules"
+        },
+        {
+            "name": "Admin — Questions",
+            "description": "Admin — Questions"
+        },
+        {
+            "name": "Admin — Tests",
+            "description": "Admin — Tests"
+        },
+        {
+            "name": "Admin — Users",
+            "description": "Admin — Users"
+        },
+        {
+            "name": "Admin — Videos",
+            "description": "Admin — Videos"
+        },
+        {
+            "name": "Admin — Vocabulary",
+            "description": "Admin — Vocabulary"
+        },
+        {
+            "name": "Tests / JLPT",
+            "description": "Tests / JLPT"
+        },
+        {
+            "name": "Levels & Modules",
+            "description": "Levels & Modules"
+        },
+        {
+            "name": "Materials",
+            "description": "Materials"
+        },
+        {
+            "name": "Search",
+            "description": "Search"
+        },
+        {
+            "name": "Videos",
+            "description": "Videos"
+        },
+        {
+            "name": "Articles / Dokkai",
+            "description": "Articles / Dokkai"
+        },
+        {
+            "name": "Avatar",
+            "description": "Avatar"
+        },
+        {
+            "name": "Devices",
+            "description": "Devices"
+        }
+    ]
+}

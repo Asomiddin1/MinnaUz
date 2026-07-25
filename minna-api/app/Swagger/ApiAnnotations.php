@@ -9,7 +9,7 @@ use OpenApi\Attributes as OA;
  * TESTS / JLPT
  * ============================================================
  */
-class TestsSwagger
+class ApiAnnotations
 {
     #[OA\Get(
         path: '/api/user/tests',
@@ -42,7 +42,7 @@ class TestsSwagger
             new OA\Response(response: 401, description: 'Autentifikatsiya talab qilinadi'),
         ]
     )]
-    public function index() {}
+    public function index_1() {}
 
     #[OA\Get(
         path: '/api/user/tests/{id}',
@@ -59,7 +59,7 @@ class TestsSwagger
             new OA\Response(response: 404, description: 'Test topilmadi'),
         ]
     )]
-    public function show() {}
+    public function show_2() {}
 
     #[OA\Post(
         path: '/api/user/tests/{id}/submit',
@@ -112,7 +112,7 @@ class TestsSwagger
             new OA\Response(response: 422, description: 'Validatsiya xatosi'),
         ]
     )]
-    public function submit() {}
+    public function submit_3() {}
 
     #[OA\Get(
         path: '/api/user/results/{resultId}',
@@ -128,7 +128,7 @@ class TestsSwagger
             new OA\Response(response: 404, description: 'Natija topilmadi'),
         ]
     )]
-    public function result() {}
+    public function result_4() {}
 
     #[OA\Get(
         path: '/api/user/results',
@@ -140,16 +140,8 @@ class TestsSwagger
             new OA\Response(response: 200, description: 'Natijalar tarixi'),
         ]
     )]
-    public function history() {}
-}
+    public function history_5() {}
 
-/**
- * ============================================================
- * AI CHAT
- * ============================================================
- */
-class AiSwagger
-{
     #[OA\Post(
         path: '/api/ai/chat',
         summary: 'AI suhbat — yapon tili repetitori',
@@ -195,7 +187,7 @@ class AiSwagger
             new OA\Response(response: 401, description: 'Autentifikatsiya talab qilinadi'),
         ]
     )]
-    public function chat() {}
+    public function chat_6() {}
 
     #[OA\Get(
         path: '/api/ai/history',
@@ -207,16 +199,8 @@ class AiSwagger
             new OA\Response(response: 200, description: 'Chat tarixi'),
         ]
     )]
-    public function history() {}
-}
+    public function history_7() {}
 
-/**
- * ============================================================
- * LEVELS & MODULES & LESSONS
- * ============================================================
- */
-class LevelsSwagger
-{
     #[OA\Get(
         path: '/api/levels',
         summary: 'Kurs darajalari ro\'yxati (ochiq)',
@@ -226,7 +210,7 @@ class LevelsSwagger
             new OA\Response(response: 200, description: 'Darajalar ro\'yxati'),
         ]
     )]
-    public function index() {}
+    public function index_8() {}
 
     #[OA\Get(
         path: '/api/levels/{slug}',
@@ -241,16 +225,8 @@ class LevelsSwagger
             new OA\Response(response: 404, description: 'Daraja topilmadi'),
         ]
     )]
-    public function show() {}
-}
+    public function show_9() {}
 
-/**
- * ============================================================
- * MATERIALS
- * ============================================================
- */
-class MaterialsSwagger
-{
     #[OA\Get(
         path: '/api/levels/{slug}/grammars',
         summary: 'Grammar ro\'yxati',
@@ -264,7 +240,7 @@ class MaterialsSwagger
             new OA\Response(response: 200, description: 'Grammar ro\'yxati'),
         ]
     )]
-    public function grammars() {}
+    public function grammars_10() {}
 
     #[OA\Get(
         path: '/api/levels/{slug}/kanjis',
@@ -279,7 +255,7 @@ class MaterialsSwagger
             new OA\Response(response: 200, description: 'Kanji ro\'yxati'),
         ]
     )]
-    public function kanjis() {}
+    public function kanjis_11() {}
 
     #[OA\Get(
         path: '/api/levels/{slug}/vocabularies',
@@ -294,16 +270,8 @@ class MaterialsSwagger
             new OA\Response(response: 200, description: 'Vocabulary ro\'yxati'),
         ]
     )]
-    public function vocabularies() {}
-}
+    public function vocabularies_12() {}
 
-/**
- * ============================================================
- * SEARCH
- * ============================================================
- */
-class SearchSwagger
-{
     #[OA\Get(
         path: '/api/search',
         summary: 'Umumiy qidiruv',
@@ -318,16 +286,8 @@ class SearchSwagger
             new OA\Response(response: 422, description: 'Qidiruv so\'zi talab qilinadi'),
         ]
     )]
-    public function search() {}
-}
+    public function search_13() {}
 
-/**
- * ============================================================
- * VIDEOS
- * ============================================================
- */
-class VideosSwagger
-{
     #[OA\Get(
         path: '/api/videos',
         summary: 'Video darslar ro\'yxati',
@@ -338,7 +298,7 @@ class VideosSwagger
             new OA\Response(response: 200, description: 'Video darslar ro\'yxati'),
         ]
     )]
-    public function index() {}
+    public function index_14() {}
 
     #[OA\Get(
         path: '/api/videos/{id}',
@@ -353,16 +313,8 @@ class VideosSwagger
             new OA\Response(response: 404, description: 'Video topilmadi'),
         ]
     )]
-    public function show() {}
-}
+    public function show_15() {}
 
-/**
- * ============================================================
- * ARTICLES / DOKKAI
- * ============================================================
- */
-class ArticlesSwagger
-{
     #[OA\Get(
         path: '/api/articles',
         summary: 'Maqolalar ro\'yxati (Dokkai)',
@@ -372,7 +324,7 @@ class ArticlesSwagger
             new OA\Response(response: 200, description: 'Maqolalar ro\'yxati'),
         ]
     )]
-    public function index() {}
+    public function index_16() {}
 
     #[OA\Get(
         path: '/api/articles/{id}',
@@ -387,7 +339,7 @@ class ArticlesSwagger
             new OA\Response(response: 404, description: 'Maqola topilmadi'),
         ]
     )]
-    public function show() {}
+    public function show_17() {}
 
     #[OA\Post(
         path: '/api/articles/{id}/submit-quiz',
@@ -409,16 +361,8 @@ class ArticlesSwagger
             new OA\Response(response: 200, description: 'Quiz natijasi'),
         ]
     )]
-    public function submitQuiz() {}
-}
+    public function submitQuiz_18() {}
 
-/**
- * ============================================================
- * LESSONS — INTERACTIONS
- * ============================================================
- */
-class InteractionsSwagger
-{
     #[OA\Post(
         path: '/api/user/lessons/{lesson}/like',
         summary: 'Darsga like bosish / olib tashlash (toggle)',
@@ -431,7 +375,7 @@ class InteractionsSwagger
             new OA\Response(response: 200, description: 'Like holati yangilandi'),
         ]
     )]
-    public function toggleLike() {}
+    public function toggleLike_19() {}
 
     #[OA\Post(
         path: '/api/user/lessons/{lesson}/comments',
@@ -454,5 +398,5 @@ class InteractionsSwagger
             new OA\Response(response: 201, description: 'Izoh qo\'shildi'),
         ]
     )]
-    public function addComment() {}
+    public function addComment_20() {}
 }
