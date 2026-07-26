@@ -32,7 +32,7 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
-  const t = useTranslations("Dashboard") // Dashboard tarjimalarini yuklaymiz
+  const t = useTranslations("Dashboard")
 
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
@@ -41,10 +41,11 @@ export default function DashboardLayout({
     setMounted(true)
   }, [])
 
-  const isActive = (path: string) =>
-    pathname === path || pathname.startsWith(path + "/")
+  const isHome = pathname === "/dashboard"
+  const isVideo = pathname === "/dashboard/video" || pathname.startsWith("/dashboard/video/")
+  const isJlpt = pathname === "/dashboard/jlpt" || pathname.startsWith("/dashboard/jlpt/")
+  const isPremium = pathname === "/dashboard/premium" || pathname.startsWith("/dashboard/premium/")
 
-  // Tema variantlari
   const themeOptions = [
     { value: "light", label: t("light"), icon: Sun },
     { value: "dark", label: t("dark"), icon: Moon },
@@ -53,28 +54,26 @@ export default function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <div className="relative flex h-[100dvh] w-full overflow-hidden bg-[#F8FAFC] transition-colors duration-300 dark:bg-slate-900">
+      <div className="relative flex h-[100dvh] w-full overflow-hidden bg-[#F8FAFC] transition-colors duration-300 dark:bg-slate-950">
         <div className="z-20 hidden h-full md:block">
           <UserSidebar />
         </div>
 
-        <main className="relative z-10 flex h-full w-full flex-1 flex-col overflow-y-auto pb-[90px] md:pb-0">
+        <main className="relative z-10 flex h-full w-full flex-1 flex-col overflow-y-auto pb-[110px] md:pb-0">
           <header className="sticky top-0 z-30 hidden items-center justify-between border-b border-slate-200 bg-white/80 px-6 py-3 backdrop-blur-md md:flex dark:border-slate-800 dark:bg-slate-900/80">
             <div className="group relative w-full max-w-md">
               <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-blue-500 dark:text-slate-500 dark:group-focus-within:text-blue-400" />
               <input
                 type="text"
-                placeholder={t("search")} // Dinamik tarjima
+                placeholder={t("search")}
                 className="w-full rounded-full border border-slate-200 bg-[#F8FAFC] py-2 pr-4 pl-10 text-sm shadow-sm transition-all focus:ring-2 focus:ring-blue-500/50 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-blue-500/30"
               />
             </div>
 
             <div className="flex items-center gap-3">
               <LanguageSwitcher />
-
               <div className="mx-1 h-5 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
 
-              {/* TEMA TANLASH (shadcn DropdownMenu) */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -116,80 +115,80 @@ export default function DashboardLayout({
           <div className="flex-1">{children}</div>
         </main>
 
-        {/* MOBIL TAB BAR */}
-        <nav className="pb-safe fixed right-0 bottom-0 left-0 z-50 rounded-t-[24px] border-t border-slate-100/80 bg-white/95 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl md:hidden dark:border-slate-800/80 dark:bg-slate-900/95 dark:shadow-[0_-8px_30px_rgba(0,0,0,0.4)]">
-          <div className="flex h-[72px] items-center justify-around px-2">
-
+        
+        {/* 🪄 SIRG'ALIB O'TUVCHI PRO TAB BAR */}
+       <div className="fixed bottom-4 left-9 right-6 z-50 flex justify-center md:hidden">
+         <nav className="relative flex h-[70px] w-full max-w-md items-center justify-between rounded-[45px] border border-white/60 bg-white/30 px-3 py-2 shadow-[0_10px_40px_rgba(0,0,0,0.1)] backdrop-blur-3xl dark:border-white/10 dark:bg-slate-900/40 dark:shadow-[0_10px_40px_rgba(0,0,0,0.6)]">
             {/* Home */}
             <Link
               href="/dashboard"
-              className={`flex w-full flex-col items-center justify-center gap-1 transition-all ${
-                isActive("/dashboard") ? "text-blue-600 dark:text-blue-400" : "text-slate-400"
+              className={`group relative flex h-full flex-1 flex-col items-center justify-center gap-1 rounded-[24px] transition-all duration-300 ease-out active:scale-90 ${
+                isHome 
+                  ? "bg-violet-100 text-violet-700 shadow-md shadow-violet-500/25 dark:bg-violet-300/10 dark:text-violet-100" 
+                  : "bg-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
               }`}
             >
-              <div
-                className={`rounded-full p-2 ${
-                  isActive("/dashboard") ? "bg-blue-50/80 dark:bg-blue-500/20" : ""
-                }`}
-              >
-                <Home className="h-6 w-6" strokeWidth={isActive("/dashboard") ? 2.5 : 2} />
+              <div className={`relative flex items-center justify-center transition-transform duration-300 ${isHome ? "-translate-y-0.5 scale-110" : "group-hover:scale-105"}`}>
+                <Home className="h-6 w-6 drop-shadow-sm" strokeWidth={isHome ? 2.5 : 2} />
               </div>
-              <span className="text-[10px] leading-none font-semibold">{t("home")}</span>
+              <span className={`text-[11px] leading-none tracking-wide ${isHome ? "font-bold" : "font-medium"}`}>
+                {t("home")}
+              </span>
             </Link>
 
             {/* Video */}
             <Link
               href="/dashboard/video"
-              className={`flex w-full flex-col items-center justify-center gap-1 transition-all ${
-                isActive("/dashboard/video") ? "text-blue-600 dark:text-blue-400" : "text-slate-400"
+              className={`group relative flex h-full flex-1 flex-col items-center justify-center gap-1 rounded-[24px] transition-all duration-300 ease-out active:scale-90 ${
+                isVideo 
+                  ? "bg-violet-100 text-violet-700 shadow-md shadow-violet-500/25 dark:bg-violet-500/30 dark:text-violet-300" 
+                  : "bg-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
               }`}
             >
-              <div
-                className={`rounded-full p-2 ${
-                  isActive("/dashboard/video") ? "bg-blue-50/80 dark:bg-blue-500/20" : ""
-                }`}
-              >
-                <PlaySquare className="h-6 w-6" strokeWidth={isActive("/dashboard/video") ? 2.5 : 2} />
+              <div className={`relative flex items-center justify-center transition-transform duration-300 ${isVideo ? "-translate-y-0.5 scale-110" : "group-hover:scale-105"}`}>
+                <PlaySquare className="h-6 w-6 drop-shadow-sm" strokeWidth={isVideo ? 2.5 : 2} />
               </div>
-              <span className="text-[10px] leading-none font-semibold">{t("video")}</span>
+              <span className={`text-[11px] leading-none tracking-wide ${isVideo ? "font-bold" : "font-medium"}`}>
+                {t("video")}
+              </span>
             </Link>
 
             {/* JLPT */}
             <Link
               href="/dashboard/jlpt"
-              className={`flex w-full flex-col items-center justify-center gap-1 transition-all ${
-                isActive("/dashboard/jlpt") ? "text-blue-600 dark:text-blue-400" : "text-slate-400"
+              className={`group relative flex h-full flex-1 flex-col items-center justify-center gap-1 rounded-[24px] transition-all duration-300 ease-out active:scale-90 ${
+                isJlpt 
+                  ? "bg-violet-100 text-violet-700 shadow-md shadow-violet-500/25 dark:bg-violet-500/30 dark:text-violet-300" 
+                  : "bg-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
               }`}
             >
-              <div
-                className={`rounded-full p-2 ${
-                  isActive("/dashboard/jlpt") ? "bg-blue-50/80 dark:bg-blue-500/20" : ""
-                }`}
-              >
-                <GraduationCap className="h-6 w-6" strokeWidth={isActive("/dashboard/jlpt") ? 2.5 : 2} />
+              <div className={`relative flex items-center justify-center transition-transform duration-300 ${isJlpt ? "-translate-y-0.5 scale-110" : "group-hover:scale-105"}`}>
+                <GraduationCap className="h-6 w-6 drop-shadow-sm" strokeWidth={isJlpt ? 2.5 : 2} />
               </div>
-              <span className="text-[10px] leading-none font-semibold">{t("jlpt")}</span>
+              <span className={`text-[11px] leading-none tracking-wide ${isJlpt ? "font-bold" : "font-medium"}`}>
+                {t("jlpt")}
+              </span>
             </Link>
 
             {/* Premium */}
             <Link
               href="/dashboard/premium"
-              className={`flex w-full flex-col items-center justify-center gap-1 transition-all ${
-                isActive("/dashboard/premium") ? "text-amber-500 dark:text-amber-400" : "text-slate-400"
+              className={`group relative flex h-full flex-1 flex-col items-center justify-center gap-1 rounded-[24px] transition-all duration-300 ease-out active:scale-90 ${
+                isPremium 
+                  ? "bg-violet-100 text-violet-700 shadow-md shadow-violet-500/25 dark:bg-violet-500/30 dark:text-violet-300" 
+                  : "bg-transparent text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
               }`}
             >
-              <div
-                className={`rounded-full p-2 ${
-                  isActive("/dashboard/premium") ? "bg-amber-50/80 dark:bg-amber-500/20" : ""
-                }`}
-              >
-                <Gem className="h-6 w-6" strokeWidth={isActive("/dashboard/premium") ? 2.5 : 2} />
+              <div className={`relative flex items-center justify-center transition-transform duration-300 ${isPremium ? "-translate-y-0.5 scale-110" : "group-hover:scale-105"}`}>
+                <Gem className="h-6 w-6 drop-shadow-sm" strokeWidth={isPremium ? 2.5 : 2} />
               </div>
-              <span className="text-[10px] leading-none font-semibold">{t("premium")}</span>
+              <span className={`text-[11px] leading-none tracking-wide ${isPremium ? "font-bold" : "font-medium"}`}>
+                {t("premium")}
+              </span>
             </Link>
 
-          </div>
-        </nav>
+          </nav>
+        </div>
       </div>
     </SidebarProvider>
   )

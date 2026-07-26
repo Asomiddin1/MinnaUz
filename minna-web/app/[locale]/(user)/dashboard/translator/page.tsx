@@ -1,7 +1,5 @@
-const TranslatorPage = () => {
-  return (
-    <div>TranslatorPage</div>
-  )
-}
+import TranslatorBox from "@/components/user-components/home-fuctions/translate/translate"
 
-export default TranslatorPage
+export default function Page() {
+  return <TranslatorBox />
+}
