@@ -35,8 +35,13 @@ class DashboardController extends Controller
         // 4. Foydalanuvchilar o'sishi (oxirgi 6 oy)
         $sixMonthsAgo = now()->subMonths(5)->startOfMonth();
         
+        $driver = DB::connection()->getDriverName();
+        $dateExpression = $driver === 'sqlite' 
+            ? "strftime('%Y-%m', created_at)" 
+            : "DATE_FORMAT(created_at, '%Y-%m')";
+        
         $monthlyUsers = User::select(
-            DB::raw("strftime('%Y-%m', created_at) as month"),
+            DB::raw("$dateExpression as month"),
             DB::raw('COUNT(*) as count')
         )
         ->where('created_at', '>=', $sixMonthsAgo)
