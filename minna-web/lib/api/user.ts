@@ -149,3 +149,13 @@ export const userAPI = {
   }): Promise<AxiosResponse> => 
     apiClient.post("/ai/chat", data),
 }
+
+export const getAvatarUrl = (url?: string) => {
+  if (!url) return ""
+  if (url.startsWith("http")) return url
+  
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"
+  const rootUrl = apiUrl.replace(/\/api\/?$/, "").replace(/\/$/, "")
+  
+  return `${rootUrl}${url}`
+}

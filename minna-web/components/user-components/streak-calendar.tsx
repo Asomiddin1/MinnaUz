@@ -9,13 +9,13 @@ import { useTranslations } from "next-intl"
 export function StreakCalendar() {
   const t = useTranslations("StreakCalendar")
   const [isMounted, setIsMounted] = React.useState(false)
-  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date())
   const [currentMonth, setCurrentMonth] = React.useState<Date>(new Date())
   const [streakDates, setStreakDates] = React.useState<Date[]>([])
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
   // Hydration xatosini oldini olish uchun
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true)
   }, [])
 

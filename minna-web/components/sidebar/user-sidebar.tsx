@@ -27,6 +27,7 @@ import { signOut, useSession } from "next-auth/react"
 import Image from "next/image"
 import logoImg from "./logo.png"
 import { useTranslations } from "next-intl"
+import { getAvatarUrl } from "@/lib/api/user"
 
 export function UserSidebar() {
   const pathname = usePathname()
@@ -47,14 +48,6 @@ export function UserSidebar() {
   const userName = session?.user?.name || "Guest User"
   const userEmail = session?.user?.email || ""
 
-  const getAvatarUrl = (url?: string | null) => {
-    if (!url) return ""
-    if (url.startsWith("http")) return url
-    
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"
-    const rootUrl = apiUrl.replace(/\/api\/?$/, "").replace(/\/$/, "")
-    return `${rootUrl}${url}`
-  }
 
   return (
     <Sidebar

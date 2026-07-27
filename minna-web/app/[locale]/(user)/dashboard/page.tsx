@@ -16,6 +16,7 @@ import {
 import { Link, useRouter } from "@/src/i18n/navigation"
 import { useSession } from "next-auth/react"
 import { useTranslations } from "next-intl"
+import { getAvatarUrl } from "@/lib/api/user"
 
 // Komponentlarni import qilish
 import dynamic from "next/dynamic"
@@ -214,7 +215,7 @@ export default function DashboardPage() {
                 <div className="h-[46px] w-[46px] flex-shrink-0 overflow-hidden rounded-full border-2 border-white bg-blue-100 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
                   {session?.user?.image && (
                     <img
-                      src={session.user.image}
+                      src={getAvatarUrl(session.user.image)}
                       alt="Avatar"
                       className="h-full w-full object-cover"
                     />

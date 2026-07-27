@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\Admin\GroqController;
 use App\Http\Controllers\Api\Admin\LevelController as AdminLevelController;
 use App\Http\Controllers\Api\Admin\ModuleController as AdminModuleController;
 use App\Http\Controllers\Api\Admin\LessonController as AdminLessonController;
+use App\Http\Controllers\Api\Admin\DashboardController;
 
 use App\Http\Controllers\Api\User\LevelController as UserLevelController;
 use App\Http\Controllers\Api\User\InteractionController;
@@ -150,6 +151,8 @@ Route::middleware('auth:sanctum')->group(function () {
 */
 Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
     // Admin user va test boshqaruvi
+    Route::get('/dashboard/stats', [DashboardController::class, 'index']);
+    
     Route::apiResource('users', AdminUserController::class)->except(['store']);
     Route::post('/users/{id}/toggle-premium', [AdminUserController::class, 'togglePremium']);
     Route::apiResource('tests', AdminTestController::class);
