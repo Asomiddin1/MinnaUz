@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react"
 import { adminAPI } from "@/lib/api/admin"
+import { userAPI, getAvatarUrl } from "@/lib/api/user"
 import { useSession } from "next-auth/react"
 
 import {
@@ -51,8 +52,12 @@ const UsersPage = () => {
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [totalUsers, setTotalUsers] = useState(0)
 
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+
   const [formData, setFormData] = useState({
     name: "",
+    email: "",
     role: "",
     coins: 0,
     is_premium: false,
@@ -61,27 +66,25 @@ const UsersPage = () => {
   // =====================
   // FETCH USERS (Laravel Paginate moslashgan)
   // =====================
-  const fetchUsers = useCallback(async (search = "") => {
+  const fetchUsers = useCallback(async (page = 1, search = "") => {
     try {
       setLoading(true)
-      const response = await adminAPI.getAllUsers(1, search)
-
-      // 🚩 BU YERDA KONSOLNI KO'RING
-      console.log("Response Data:", response.data)
+      const response = await adminAPI.getAllUsers(page, search)
 
       // Agar ma'lumot response.data.data ichida bo'lsa (Laravel pagination)
       if (response.data && response.data.data) {
-        console.log("Pagination massivi topildi:", response.data.data)
         setUsers(response.data.data)
         setTotalUsers(response.data.total ?? response.data.data.length ?? 0)
+        setTotalPages(response.data.last_page ?? 1)
+        setCurrentPage(response.data.current_page ?? 1)
       }
       // Agar ma'lumot to'g'ridan-to'g'ri massiv bo'lib kelsa
       else if (Array.isArray(response.data)) {
-        console.log("Oddiy massiv topildi:", response.data)
         setUsers(response.data)
         setTotalUsers(response.data.length)
+        setTotalPages(1)
+        setCurrentPage(1)
       } else {
-        console.log("Ma'lumot massiv emas!")
         setUsers([])
         setTotalUsers(0)
       }
@@ -95,11 +98,11 @@ const UsersPage = () => {
   useEffect(() => {
     if (status === "authenticated") {
       const delay = setTimeout(() => {
-        fetchUsers(searchQuery)
+        fetchUsers(currentPage, searchQuery)
       }, 500)
       return () => clearTimeout(delay)
     }
-  }, [searchQuery, status, fetchUsers])
+  }, [searchQuery, currentPage, status, fetchUsers])
 
   // =====================
   // TOGGLE PREMIUM (API orqali)
@@ -113,7 +116,7 @@ const UsersPage = () => {
       setFormData((prev) => ({ ...prev, is_premium: !prev.is_premium }))
 
       // Ro'yxatni yangilash
-      fetchUsers(searchQuery)
+      fetchUsers(currentPage, searchQuery)
     } catch (error) {
       toast.error("Statusni o'zgartirib bo'lmadi")
     }
@@ -126,6 +129,7 @@ const UsersPage = () => {
     setEditingUser(user)
     setFormData({
       name: user.name,
+      email: user.email,
       role: user.role,
       coins: user.coins,
       is_premium: user.is_premium,
@@ -138,7 +142,7 @@ const UsersPage = () => {
       await adminAPI.updateUser(editingUser.id, formData)
       toast.success("Foydalanuvchi yangilandi")
       setEditingUser(null)
-      fetchUsers(searchQuery)
+      fetchUsers(currentPage, searchQuery)
     } catch {
       toast.error("Yangilashda xatolik yuz berdi")
     }
@@ -201,7 +205,7 @@ const UsersPage = () => {
         <Button
           variant="outline"
           size="icon"
-          onClick={() => fetchUsers(searchQuery)}
+          onClick={() => fetchUsers(currentPage, searchQuery)}
         >
           <RefreshCcw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
         </Button>
@@ -243,7 +247,7 @@ const UsersPage = () => {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar>
-                          <AvatarImage src={user.avatar} />
+                          <AvatarImage src={getAvatarUrl(user.avatar)} />
                           <AvatarFallback>
                             {user.name?.charAt(0)}
                           </AvatarFallback>
@@ -306,6 +310,29 @@ const UsersPage = () => {
         </div>
       )}
 
+      {/* PAGINATION */}
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-center gap-2">
+          <Button
+            variant="outline"
+            disabled={currentPage === 1 || loading}
+            onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+          >
+            Oldingi
+          </Button>
+          <span className="text-sm text-slate-500">
+            Sahifa {currentPage} / {totalPages}
+          </span>
+          <Button
+            variant="outline"
+            disabled={currentPage === totalPages || loading}
+            onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+          >
+            Keyingi
+          </Button>
+        </div>
+      )}
+
       {/* EDIT MODAL */}
       <Dialog open={!!editingUser} onOpenChange={() => setEditingUser(null)}>
         <DialogContent className="sm:max-w-[400px]">
@@ -322,6 +349,31 @@ const UsersPage = () => {
                   setFormData({ ...formData, name: e.target.value })
                 }
               />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Email</label>
+              <Input
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Rol</label>
+              <select
+                className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={formData.role}
+                onChange={(e) =>
+                  setFormData({ ...formData, role: e.target.value })
+                }
+              >
+                <option value="user">Foydalanuvchi</option>
+                <option value="admin">Admin</option>
+                <option value="teacher">O'qituvchi</option>
+              </select>
             </div>
 
             <div className="space-y-2">

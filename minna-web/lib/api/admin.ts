@@ -2,6 +2,9 @@ import { AxiosResponse } from "axios"
 import apiClient from "./axios"
 
 export const adminAPI = {
+  /* --- DASHBOARD --- */
+  getDashboardStats: (): Promise<AxiosResponse> => apiClient.get("/admin/dashboard/stats"),
+
   /* --- USERS MANAGEMENT --- */
   getAllUsers: (page = 1, search = "", role = ""): Promise<AxiosResponse> =>
     apiClient.get(`/admin/users`, { params: { page, search, role } }),

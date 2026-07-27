@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react"
 import { useSession, signOut } from "next-auth/react"
-import { userAPI } from "@/lib/api/user"
+import { userAPI, getAvatarUrl } from "@/lib/api/user"
 import {
   Crown,
   RefreshCcw,
@@ -332,25 +332,6 @@ export default function ProfilePage() {
     }
   }
 
-  // ========================================
-  // TO'G'RILANGAN FUNKSIYA
-  // ========================================
-  const getAvatarUrl = (url?: string) => {
-    if (!url) return ""
-    if (url.startsWith("http")) return url
-    
-    // NEXT_PUBLIC_API_URL muhit o'zgaruvchisidan API URL'ni olish
-    // Masalan: https://api.minna.uz/api yoki http://localhost:8000/api
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api"
-    
-    // API prefix'ni (/api) olib tashlab, root URL'ni olish
-    // https://api.minna.uz/api -> https://api.minna.uz
-    const rootUrl = apiUrl.replace(/\/api\/?$/, "").replace(/\/$/, "")
-    
-    // Root URL + storage yo'li
-    // https://api.minna.uz + /storage/avatars/file.jpg = https://api.minna.uz/storage/avatars/file.jpg
-    return `${rootUrl}${url}`
-  }
 
   function timeAgo(dateString: string | null) {
     if (!dateString) return t("unknownDevice")

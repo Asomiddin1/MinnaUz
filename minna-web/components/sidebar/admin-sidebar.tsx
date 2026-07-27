@@ -27,6 +27,7 @@ import {
 } from "lucide-react"
 import { signOut, useSession } from "next-auth/react"
 import { useTranslations } from "next-intl"
+import { getAvatarUrl } from "@/lib/api/user"
 
 export function AdminSidebar() {
   const pathname = usePathname()
@@ -153,7 +154,7 @@ export function AdminSidebar() {
               <>
                 {session?.user?.image ? (
                   <img
-                    src={session.user.image}
+                    src={getAvatarUrl(session.user.image)}
                     alt="avatar"
                     className="h-9 w-9 rounded-full border object-cover"
                   />

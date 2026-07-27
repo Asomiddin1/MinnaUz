@@ -14,15 +14,24 @@ class UserController extends Controller
      * Barcha foydalanuvchilarni qidiruv va paginatsiya bilan olish.
      */
     public function index(Request $request)
-{
-    // Hammasini olish uchun paginate emas, get() qilib ko'ring (vaqtinchalik tekshirish uchun)
-    $users = User::latest()->get(); 
-    return response()->json($users);
-    
-    // Yoki pagination bo'lsa:
-    // $users = User::latest()->paginate(15);
-    // return response()->json($users);
-}
+    {
+        $query = User::query();
+
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+        
+        if ($request->has('role') && !empty($request->role)) {
+            $query->where('role', $request->role);
+        }
+
+        $users = $query->latest()->paginate(50);
+        return response()->json($users);
+    }
 
     /**
      * Muayyan foydalanuvchi ma'lumotlarini ko'rish.
@@ -51,6 +60,11 @@ class UserController extends Controller
 
         if (isset($data['password'])) {
             $data['password'] = Hash::make($data['password']);
+        }
+
+        // O'zini o'zi adminlikdan olib tashlashni taqiqlash
+        if (auth()->id() == $user->id && isset($data['role']) && $data['role'] !== 'admin') {
+            return response()->json(['message' => 'O‘zingizning adminlik huquqingizni bekor qila olmaysiz!'], 403);
         }
 
         $user->update($data);
