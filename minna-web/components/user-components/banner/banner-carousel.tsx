@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react'
-import Image from "next/image" // <-- 1. Next.js Image import qilindi
+import Image from "next/image"
 import {
   Carousel,
   CarouselContent,
@@ -9,61 +9,45 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
-import Banner1 from "./images/banner1.jpg"
-import { StreakCalendar } from '../streak-calendar'
+import Banner1 from "./images/banner2.png"
 import { useCheckIn } from '@/hooks/useCheckIn'
 
 const BannerCarousel = () => {
-  // Kunlik check-in — dashboard ochilganda 1 marta ishlaydi
   useCheckIn()
 
   const banners = [
     { 
       id: 1, 
-      imageUrl: Banner1, // <-- Import qilingan rasmni o'zini beramiz
-      alt: "Banner 1" 
+      imageUrl: Banner1, 
+      alt: "Banner2" 
     }
   ]
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto p-4 md:p-6">
-      
-      <div className="grid grid-cols-1 lg:grid-cols-10 gap-8 items-stretch">
-        <div className="lg:col-span-7 w-full">
-          <Carousel className="w-full h-full">
-            <CarouselContent className="h-full">
-              {banners.map((banner) => (
-                <CarouselItem key={banner.id} className="h-full">
-                  {/* min-h-[200px] karusel balandligini ushlab turadi */}
-                  <div className="relative w-full h-full min-h-[200px] md:min-h-[300px] overflow-hidden rounded-xl shadow-md">
-                    
-                    {/* 2. Oddiy <img> o'rniga Next.js <Image /> ishlatildi */}
-                    <Image 
-                      src={banner.imageUrl} 
-                      alt={banner.alt} 
-                      fill // <-- absolute inset-0 w-full h-full o'rnini bosadi
-                      className="object-cover" 
-                      priority={banner.id === 1} // Birinchi rasm tez yuklanishi uchun priority beramiz
-                      placeholder="blur" // Rasm yuklanguncha xira fon chiqib turishi uchun
-                    />
-
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <div className="hidden md:block">
-              <CarouselPrevious className="left-4" />
-              <CarouselNext className="right-4" />
-            </div>
-          </Carousel>
+    <div className="w-full">
+      <Carousel className="w-full">
+        <CarouselContent>
+          {banners.map((banner) => (
+            <CarouselItem key={banner.id}>
+              <div className="relative w-full overflow-hidden rounded-2xl shadow-sm">
+                <Image 
+                  src={banner.imageUrl} 
+                  alt={banner.alt} 
+                  width={1200}
+                  height={600}
+                  className="w-full h-auto object-contain rounded-2xl" 
+                  priority={banner.id === 1}
+                  placeholder="blur"
+                />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <div className="hidden md:block">
+          <CarouselPrevious className="left-4" />
+          <CarouselNext className="right-4" />
         </div>
-
-        {/* O'NG TARAF: Calendar (Katta ekranda 30% yoki 3 ta ustunни egallaydi) */}
-        <div className="hidden lg:block lg:col-span-3 w-full">
-          <StreakCalendar />
-        </div>
-
-      </div>
+      </Carousel>
     </div>
   )
 }

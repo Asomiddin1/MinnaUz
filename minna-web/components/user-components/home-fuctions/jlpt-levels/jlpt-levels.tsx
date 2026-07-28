@@ -14,7 +14,7 @@ const levelsData = [
   {
     id: "hira-kata",
     title: "Hiragana/Katakana",
-    image: "hira-kata.jpg",
+    image: "N.png",
     grammar: 0,
     vocab: 0,
     kanji: 0,
@@ -22,15 +22,15 @@ const levelsData = [
   {
     id: "n5",
     title: "N5",
-    image: "N5.jpg",
+    image: "N5.png",
     grammar: 90,
     vocab: 610,
     kanji: 102,
   },
-  { id: "n4", title: "N4", image: "N4.jpg", grammar: 0, vocab: 0, kanji: 0 },
-  { id: "n3", title: "N3", image: "N3.jpg", grammar: 0, vocab: 0, kanji: 0 },
-  { id: "n2", title: "N2", image: "N2.jpg", grammar: 0, vocab: 0, kanji: 0 },
-  { id: "n1", title: "N1", image: "N1.jpg", grammar: 0, vocab: 0, kanji: 0 },
+  { id: "n4", title: "N4", image: "N4.png", grammar: 0, vocab: 0, kanji: 0 },
+  { id: "n3", title: "N3", image: "N3.png", grammar: 0, vocab: 0, kanji: 0 },
+  { id: "n2", title: "N2", image: "N2.png", grammar: 0, vocab: 0, kanji: 0 },
+  { id: "n1", title: "N1", image: "N1.png", grammar: 0, vocab: 0, kanji: 0 },
 ]
 
 export default function JlptLevels() {

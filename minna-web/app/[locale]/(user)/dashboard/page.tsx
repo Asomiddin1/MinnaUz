@@ -1,4 +1,5 @@
 "use client"
+
 import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
@@ -12,6 +13,8 @@ import {
   Gem,
   Layers,
   Maximize,
+  Clock,
+  ChevronDown,
 } from "lucide-react"
 import { Link, useRouter } from "@/src/i18n/navigation"
 import { useSession } from "next-auth/react"
@@ -22,8 +25,10 @@ import { getAvatarUrl } from "@/lib/api/user"
 import dynamic from "next/dynamic"
 import BannerCarousel from "@/components/user-components/banner/banner-carousel"
 import JlptLevels from "@/components/user-components/home-fuctions/jlpt-levels/jlpt-levels"
+import { StreakCalendar } from "@/components/user-components/streak-calendar"
+import { QuickCategories } from "@/components/user-components/home-fuctions/quick-categories"
 
-// Lazy-loaded tab components — загружаются только при клике на вкладку
+// Lazy-loaded tab components
 const GamesList = dynamic(
   () => import("@/components/user-components/home-fuctions/games/games"),
   { ssr: false }
@@ -60,7 +65,7 @@ const Premium = dynamic(
 
 export default function DashboardPage() {
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
   const t = useTranslations("Dashboard")
 
   const MENU_ITEMS = [
@@ -123,17 +128,14 @@ export default function DashboardPage() {
     },
   ]
 
-  // State'lar
   const [isMounted, setIsMounted] = useState(false)
   const [activeTab, setActiveTab] = useState("jlpt")
   const [showNav, setShowNav] = useState(true)
 
-  // Hydration error oldini olish
   useEffect(() => {
     setIsMounted(true)
   }, [])
 
-  // 🚀 YAKUNIY YECHIM: Eng chaqqon va sezgir scroll mantiqi
   useEffect(() => {
     let lastScrollY = window.scrollY
     let ticking = false
@@ -143,16 +145,11 @@ export default function DashboardPage() {
         window.requestAnimationFrame(() => {
           const currentScrollY = window.scrollY
 
-          // 1. Ekranning eng tepasida turganda (yoki tortilganda) doim ko'rsatish
           if (currentScrollY <= 10) {
             setShowNav(true)
-          }
-          // 2. Pastga aylantirganda (Yashirish)
-          else if (currentScrollY > lastScrollY) {
+          } else if (currentScrollY > lastScrollY) {
             setShowNav(false)
-          }
-          // 3. Tepaga salgina o'tsa ham (Darhol tushib kelish)
-          else if (currentScrollY < lastScrollY) {
+          } else if (currentScrollY < lastScrollY) {
             setShowNav(true)
           }
 
@@ -200,7 +197,7 @@ export default function DashboardPage() {
           📱 MOBIL KO'RINISh
       ======================== */}
       <div className="flex w-full flex-col md:hidden">
-        {/* MOBIL UCHUN SEZGIR NAVBAR */}
+        <div className="w-full bg-[#021120] dark:bg-[#090D16]"></div>
         <div
           className={`sticky top-0 z-50 w-full border-b border-slate-100/50 bg-white/95 pt-3 pb-3 shadow-sm backdrop-blur-xl transition-transform duration-300 ease-in-out dark:border-slate-800/50 dark:bg-slate-950/95 ${
             showNav ? "translate-y-0" : "-translate-y-[110%]"
@@ -243,19 +240,14 @@ export default function DashboardPage() {
           </header>
         </div>
 
-        {/* MOBIL KONTENT */}
         <div className="w-full max-w-[100vw] space-y-4 overflow-hidden px-2 pt-4 pb-10">
-          {/* 🚀 YANGILANGAN PREMIUM BANNER QISMI (Dark Mode bilan) */}
-          <div className="w-full px-2">
-            <div className="relative overflow-hidden rounded-[32px] border border-white/60 bg-white/40 shadow-[0_20px_40px_rgba(0,0,0,0.08)] backdrop-blur-sm transition-all hover:shadow-[0_25px_50px_rgba(0,0,0,0.12)] dark:border-slate-800 dark:bg-slate-900/50">
-              <div className="pointer-events-none absolute inset-0 z-10 rounded-[32px] ring-1 ring-white/30 ring-inset dark:ring-white/5" />
+          <div className="w-full px-1">
+            <div className="w-full overflow-hidden rounded-2xl">
               <BannerCarousel />
             </div>
           </div>
 
-          {/* Tugmalar menyusi */}
           <div className="relative w-full p-4">
-            {/* Orqa tarafdagi "blob" - dark rejimda kamroq ko'rinadi */}
             <div className="absolute top-0 right-0 -z-10 h-48 w-48 rounded-full bg-indigo-500/20 blur-3xl" />
 
             <div className="grid grid-cols-4 gap-x-3 gap-y-6">
@@ -265,7 +257,6 @@ export default function DashboardPage() {
                   onClick={() => router.push(item.href)}
                   className="group flex flex-col items-center gap-2"
                 >
-                  {/* Tugmaning DARK MODE'ga moslashuvchan uslubi */}
                   <div className="flex h-[72px] w-[72px] items-center justify-center rounded-[24px] border border-slate-200/50 bg-white shadow-[5px_5px_10px_rgba(0,0,0,0.05),-5px_-5px_10px_rgba(255,255,255,0.8)] transition-all active:scale-95 dark:border-slate-800 dark:bg-slate-900 dark:shadow-[5px_5px_10px_rgba(0,0,0,0.4),-5px_-5px_10px_rgba(255,255,255,0.02)]">
                     <item.icon
                       className={`h-8 w-8 ${item.color ? item.color : "text-slate-800 dark:text-slate-200"}`}
@@ -280,7 +271,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* JLPT Darajalari qismi */}
           <div className="flex flex-col gap-3">
             <div className="px-2">
               <h1 className="text-[20px] font-semibold text-slate-900 dark:text-white">
@@ -301,7 +291,6 @@ export default function DashboardPage() {
           onValueChange={setActiveTab}
           className="flex w-full flex-col"
         >
-          {/* DESKTOP UCHUN SEZGIR NAVBAR */}
           <div
             className={`sticky top-0 z-40 flex w-full flex-col transition-transform duration-300 ease-in-out ${
               showNav ? "translate-y-0" : "-translate-y-[110%]"
@@ -350,7 +339,6 @@ export default function DashboardPage() {
                   title="Sahifani to'liq ekranda ochish"
                 >
                   <Maximize className="h-4 w-4 transition-transform group-hover:scale-110" />
-
                   {t("expansion")}
                 </button>
               </div>
@@ -358,14 +346,71 @@ export default function DashboardPage() {
           </div>
 
           <div className="relative flex min-h-[500px] w-full flex-1 flex-col bg-white dark:bg-slate-950">
-            <TabsContent value="jlpt" className="mt-0 w-full p-0 outline-none">
-              <div className="flex w-full flex-col">
-                <div className="w-full min-w-0 overflow-hidden">
-                  <BannerCarousel />
+         <TabsContent value="jlpt" className="mt-0 w-full p-0 outline-none">
+              <div className="flex w-full flex-col px-6 py-4 max-w-7xl mx-auto space-y-4">
+                
+                {/* ASOSIY GRID: items-start va sticky mukammal ishlashi uchun */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start w-full">
+                  
+                  {/* CHAP TUSTUN (8 ta ustun): Banner, QuickCategories va JLPT darajalari scroll bo'ladi */}
+                  <div className="lg:col-span-8 w-full flex flex-col gap-4">
+                    <BannerCarousel />
+                    <QuickCategories />
+                    <JlptLevels />
+                  </div>
+                  
+                  {/* O'NG USTUN (4 ta ustun): Kalendar va Umumiy progress (Joyida qotib turadi) */}
+                 <div className="lg:col-span-4 w-full flex flex-col gap-3 sticky top-36 self-start">
+  <StreakCalendar />
+
+  {/* Kunlik o'rganish vaqti / Umumiy progress bloki (Ixchamlashtirilgan) */}
+  <div className="w-full rounded-[24px] border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between">
+    <div className="flex items-center justify-between mb-3">
+      <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+        Umumiy progress
+      </h3>
+      <button className="flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
+        Haftalik <ChevronDown className="h-3 w-3" />
+      </button>
+    </div>
+
+    <div className="flex items-baseline justify-between mb-4">
+      <div>
+        <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-0.5">
+          O'rganish vaqti
+        </p>
+        <span className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
+          12so 45d
+        </span>
+      </div>
+      <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-md">
+        +2so 30d
+      </span>
+    </div>
+
+    {/* Diagramma ustunlari (Bo'yi va oralig'i qisqartirildi) */}
+    <div className="grid grid-cols-7 gap-1.5 items-end h-20 pt-1">
+      {[
+        { day: "Du", h: "h-8" },
+        { day: "Se", h: "h-6" },
+        { day: "Ch", h: "h-10" },
+        { day: "Pa", h: "h-12" },
+        { day: "Ju", h: "h-14" },
+        { day: "Sh", h: "h-16" },
+        { day: "Ya", h: "h-20 bg-gradient-to-t from-indigo-600 to-indigo-400 text-white shadow-sm" },
+      ].map((item, idx) => (
+        <div key={idx} className="flex flex-col items-center gap-1 h-full justify-end group cursor-pointer">
+          <div className={`w-full max-w-[24px] rounded-lg bg-slate-100 dark:bg-slate-800 ${item.h} transition-all duration-300 group-hover:bg-indigo-200 dark:group-hover:bg-slate-700`} />
+          <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+            {item.day}
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
                 </div>
-                <div className="w-full px-4 pt-4 pb-6">
-                  <JlptLevels />
-                </div>
+
               </div>
             </TabsContent>
 
