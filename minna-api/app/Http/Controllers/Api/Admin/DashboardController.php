@@ -77,6 +77,14 @@ class DashboardController extends Controller
             ['name' => 'Lug\'at', 'value' => $totalVocabularies]
         ];
 
+        // 6. Platformadan o'rtacha kunlik foydalanish (bugun)
+        $today = now()->toDateString();
+        $totalUsageToday = \App\Models\UserActivityLog::where('date', $today)->sum('duration_minutes');
+        $activeUsersToday = \App\Models\UserActivityLog::where('date', $today)->count();
+        $avgUsageTodayMinutes = $activeUsersToday > 0 ? floor($totalUsageToday / $activeUsersToday) : 0;
+        
+        $avgUsageTodayFormatted = floor($avgUsageTodayMinutes / 60) . 'so ' . ($avgUsageTodayMinutes % 60) . 'd';
+
         // Natija
         return response()->json([
             'status' => 'success',
@@ -90,6 +98,8 @@ class DashboardController extends Controller
                     'standardUsers' => $standardUsers,
                     'totalTests' => $totalTests,
                     'totalVideos' => $totalVideos,
+                    'todayActiveUsers' => $activeUsersToday,
+                    'avgUsageToday' => $avgUsageTodayFormatted,
                 ],
                 'userGrowth' => $userGrowthChart,
                 'materialsDistribution' => $materialsDistribution

@@ -27,6 +27,7 @@ import BannerCarousel from "@/components/user-components/banner/banner-carousel"
 import JlptLevels from "@/components/user-components/home-fuctions/jlpt-levels/jlpt-levels"
 import { StreakCalendar } from "@/components/user-components/streak-calendar"
 import { QuickCategories } from "@/components/user-components/home-fuctions/quick-categories"
+import { UmumiyProgress } from "@/components/user-components/umumiy-progress"
 
 // Lazy-loaded tab components
 const GamesList = dynamic(
@@ -361,53 +362,12 @@ export default function DashboardPage() {
                   
                   {/* O'NG USTUN (4 ta ustun): Kalendar va Umumiy progress (Joyida qotib turadi) */}
                  <div className="lg:col-span-4 w-full flex flex-col gap-3 sticky top-36 self-start">
-  <StreakCalendar />
-
-  {/* Kunlik o'rganish vaqti / Umumiy progress bloki (Ixchamlashtirilgan) */}
-  <div className="w-full rounded-[24px] border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 flex flex-col justify-between">
-    <div className="flex items-center justify-between mb-3">
-      <h3 className="text-sm font-bold text-slate-900 dark:text-white">
-        Umumiy progress
-      </h3>
-      <button className="flex items-center gap-1 rounded-lg bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700 transition-colors hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
-        Haftalik <ChevronDown className="h-3 w-3" />
-      </button>
-    </div>
-
-    <div className="flex items-baseline justify-between mb-4">
-      <div>
-        <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-0.5">
-          O'rganish vaqti
-        </p>
-        <span className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
-          12so 45d
-        </span>
-      </div>
-      <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-md">
-        +2so 30d
-      </span>
-    </div>
-
-    {/* Diagramma ustunlari (Bo'yi va oralig'i qisqartirildi) */}
-    <div className="grid grid-cols-7 gap-1.5 items-end h-20 pt-1">
-      {[
-        { day: "Du", h: "h-8" },
-        { day: "Se", h: "h-6" },
-        { day: "Ch", h: "h-10" },
-        { day: "Pa", h: "h-12" },
-        { day: "Ju", h: "h-14" },
-        { day: "Sh", h: "h-16" },
-        { day: "Ya", h: "h-20 bg-gradient-to-t from-indigo-600 to-indigo-400 text-white shadow-sm" },
-      ].map((item, idx) => (
-        <div key={idx} className="flex flex-col items-center gap-1 h-full justify-end group cursor-pointer">
-          <div className={`w-full max-w-[24px] rounded-lg bg-slate-100 dark:bg-slate-800 ${item.h} transition-all duration-300 group-hover:bg-indigo-200 dark:group-hover:bg-slate-700`} />
-          <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-            {item.day}
-          </span>
-        </div>
-      ))}
-    </div>
+  <div className="w-full">
+    <StreakCalendar />
   </div>
+
+  {/* Kunlik o'rganish vaqti / Umumiy progress bloki (Dinamik) */}
+  <UmumiyProgress />
 </div>
                 </div>
 
