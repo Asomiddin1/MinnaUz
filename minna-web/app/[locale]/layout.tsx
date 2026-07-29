@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { AuthProvider } from "@/components/providers/AuthProvider"
+import { ActivityTracker } from "@/components/providers/activity-tracker"
 import { Metadata } from "next"
 import { NextIntlClientProvider, hasLocale } from "next-intl"
 import { getMessages } from "next-intl/server"
@@ -99,7 +100,10 @@ export default async function LocaleLayout({
             disableTransitionOnChange
           >
             <TooltipProvider>
-              <AuthProvider>{children}</AuthProvider>
+              <AuthProvider>
+                <ActivityTracker />
+                {children}
+              </AuthProvider>
             </TooltipProvider>
           </ThemeProvider>
         </NextIntlClientProvider>

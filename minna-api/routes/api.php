@@ -132,6 +132,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/check-in', [UserProfileController::class, 'checkIn']);
         // ==========================
 
+        // ===== ACTIVITY TRACKING =====
+        Route::post('/activity/ping', [\App\Http\Controllers\Api\User\ActivityController::class, 'ping']);
+        Route::get('/activity/progress', [\App\Http\Controllers\Api\User\ActivityController::class, 'progress']);
+        // ==========================
+
         Route::get('/tests', [UserExamController::class, 'index']);
         Route::get('/tests/{id}', [UserExamController::class, 'show']);
         Route::post('/tests/{id}/submit', [UserExamController::class, 'submit']);

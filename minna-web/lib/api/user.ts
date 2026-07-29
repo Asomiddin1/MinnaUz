@@ -13,6 +13,15 @@ export const userAPI = {
   checkIn: (): Promise<AxiosResponse> => apiClient.post("/user/check-in"),
 
   // ==========================================
+  // ACTIVITY TRACKING
+  // ==========================================
+  pingActivity: (intervalMinutes = 1): Promise<AxiosResponse> =>
+    apiClient.post("/user/activity/ping", { interval_minutes: intervalMinutes }),
+
+  getProgress: (): Promise<AxiosResponse> =>
+    apiClient.get("/user/activity/progress"),
+
+  // ==========================================
   // AVATAR
   // ==========================================
   uploadAvatar: (formData: FormData): Promise<AxiosResponse> => 
