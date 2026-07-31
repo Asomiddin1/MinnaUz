@@ -61,4 +61,45 @@ class InteractionController extends Controller
             'data' => $comment
         ], 201);
     }
+
+    // Izohni o'zgartirish (Update)
+    public function updateComment(Request $request, $commentId)
+    {
+        $request->validate([
+            'comment' => 'required|string|max:1000'
+        ]);
+
+        $comment = Comment::findOrFail($commentId);
+
+        if ($comment->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Ruxsat etilmagan!'], 403);
+        }
+
+        $comment->update([
+            'comment' => $request->comment
+        ]);
+
+        $comment->load('user:id,name');
+
+        return response()->json([
+            'message' => 'Izoh yangilandi',
+            'data' => $comment
+        ]);
+    }
+
+    // Izohni o'chirish (Delete)
+    public function deleteComment($commentId)
+    {
+        $comment = Comment::findOrFail($commentId);
+
+        if ($comment->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Ruxsat etilmagan!'], 403);
+        }
+
+        $comment->delete();
+
+        return response()->json([
+            'message' => 'Izoh o\'chirildi'
+        ]);
+    }
 }

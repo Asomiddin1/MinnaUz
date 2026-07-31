@@ -3,10 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class Level extends Model
 {
+    use HasTranslations;
+
     protected $fillable = ['slug', 'title', 'tags', 'video_count', 'lesson_count', 'description'];
+    
+    public $translatable = ['title', 'description'];
 
     protected $casts = [
         'tags' => 'array',

@@ -20,7 +20,8 @@ class LevelController extends Controller
     {
         $validated = $request->validate([
             'slug' => 'required|string|unique:levels',
-            'title' => 'required|string|max:255',
+            'title' => 'required|array',
+            'title.uz' => 'required|string|max:255',
             'tags' => 'nullable|array',
             'video_count' => 'nullable|string',
             'lesson_count' => 'nullable|integer',
@@ -38,7 +39,7 @@ class LevelController extends Controller
     // Bitta darajani tahrirlash uchun ko'rish
     public function show(Level $level)
     {
-        return response()->json($level->load('modules'));
+        return response()->json($level->load(['modules', 'modules.lessons']));
     }
 
     // Darajani yangilash (Edit)
@@ -46,7 +47,8 @@ class LevelController extends Controller
     {
         $validated = $request->validate([
             'slug' => 'required|string|unique:levels,slug,' . $level->id,
-            'title' => 'required|string|max:255',
+            'title' => 'required|array',
+            'title.uz' => 'required|string|max:255',
             'tags' => 'nullable|array',
             'description' => 'nullable|string'
         ]);

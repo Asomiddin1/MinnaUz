@@ -30,8 +30,9 @@ class ModuleController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'level_id' => 'required|exists:levels,id', // Daraja bazada borligini tekshiradi
-            'title' => 'required|string|max:255',
+            'level_id' => 'required|exists:levels,id',
+            'title' => 'required|array',
+            'title.uz' => 'required|string|max:255',
             'order' => 'nullable|integer'
         ]);
 
@@ -62,7 +63,8 @@ class ModuleController extends Controller
     {
         $validated = $request->validate([
             'level_id' => 'required|exists:levels,id',
-            'title' => 'required|string|max:255',
+            'title' => 'required|array',
+            'title.uz' => 'required|string|max:255',
             'order' => 'required|integer'
         ]);
 

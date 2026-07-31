@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\UserActivityLog;
+use App\Models\UserLessonProgress;
+use App\Models\Level;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -117,5 +119,91 @@ class ActivityController extends Controller
         ];
         
         return $days[$dayOfWeek] ?? '';
+    }
+
+    /**
+     * Mark a lesson as completed
+     */
+    public function markLessonCompleted(Request $request)
+    {
+        $request->validate([
+            'lesson_id' => 'required|exists:lessons,id',
+            'level_id' => 'required|exists:levels,id'
+        ]);
+
+        $user = $request->user();
+
+        $progress = UserLessonProgress::firstOrCreate(
+            [
+                'user_id' => $user->id,
+                'lesson_id' => $request->lesson_id,
+                'level_id' => $request->level_id
+            ],
+            [
+                'is_completed' => true
+            ]
+        );
+
+        // Update the updated_at timestamp even if it exists to track 'last accessed'
+        $progress->touch();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Dars tugatilgan deb belgilandi'
+        ]);
+    }
+
+    /**
+     * Get the latest course progress for sidebar
+     */
+    public function courseProgress(Request $request)
+    {
+        $user = $request->user();
+
+        // Get the most recently interacted lesson
+        $lastProgress = UserLessonProgress::where('user_id', $user->id)
+            ->orderBy('updated_at', 'desc')
+            ->first();
+
+        if (!$lastProgress) {
+            return response()->json([
+                'status' => 'success',
+                'data' => null // No progress yet, hide in UI
+            ]);
+        }
+
+        $level = Level::find($lastProgress->level_id);
+
+        if (!$level) {
+            return response()->json([
+                'status' => 'success',
+                'data' => null
+            ]);
+        }
+
+        // Calculate progress for this level
+        $totalLessons = DB::table('lessons')
+            ->join('modules', 'lessons.module_id', '=', 'modules.id')
+            ->where('modules.level_id', $level->id)
+            ->count();
+
+        $completedLessons = UserLessonProgress::where('user_id', $user->id)
+            ->where('level_id', $level->id)
+            ->where('is_completed', true)
+            ->count();
+
+        $progressPercentage = $totalLessons > 0 ? round(($completedLessons / $totalLessons) * 100) : 0;
+
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'level' => [
+                    'id' => $level->id,
+                    'title' => $level->getTranslation('title', 'uz'),
+                    'slug' => $level->slug
+                ],
+                'progress_percentage' => $progressPercentage
+            ]
+        ]);
     }
 }

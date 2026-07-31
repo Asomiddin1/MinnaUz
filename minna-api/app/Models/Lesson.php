@@ -3,10 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class Lesson extends Model
 {
-    protected $fillable = ['module_id', 'title', 'video_url', 'content', 'duration'];
+    use HasTranslations;
+
+    protected $fillable = ['module_id', 'title', 'video_url', 'content', 'duration', 'is_free'];
+
+    protected $casts = [
+        'is_free' => 'boolean',
+    ];
+
+    public $translatable = ['title', 'content'];
 
     public function module()
     {
