@@ -3,10 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class Module extends Model
 {
+    use HasTranslations;
+
     protected $fillable = ['level_id', 'title', 'order'];
+
+    public $translatable = ['title'];
 
     public function level()
     {

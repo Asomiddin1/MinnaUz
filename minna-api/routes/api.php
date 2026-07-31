@@ -135,6 +135,8 @@ Route::middleware('auth:sanctum')->group(function () {
         // ===== ACTIVITY TRACKING =====
         Route::post('/activity/ping', [\App\Http\Controllers\Api\User\ActivityController::class, 'ping']);
         Route::get('/activity/progress', [\App\Http\Controllers\Api\User\ActivityController::class, 'progress']);
+        Route::get('/activity/course-progress', [\App\Http\Controllers\Api\User\ActivityController::class, 'courseProgress']);
+        Route::post('/activity/mark-lesson-completed', [\App\Http\Controllers\Api\User\ActivityController::class, 'markLessonCompleted']);
         // ==========================
 
         Route::get('/tests', [UserExamController::class, 'index']);
@@ -146,6 +148,10 @@ Route::middleware('auth:sanctum')->group(function () {
         // Darslarga like bosish va izoh yozish
         Route::post('/lessons/{lesson}/like', [InteractionController::class, 'toggleLike']);
         Route::post('/lessons/{lesson}/comments', [InteractionController::class, 'addComment']);
+        
+        // Kommentlarni CRUD (Update va Delete)
+        Route::put('/comments/{comment}', [InteractionController::class, 'updateComment']);
+        Route::delete('/comments/{comment}', [InteractionController::class, 'deleteComment']);
     });
 });
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Lesson;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class LessonController extends Controller
 {
@@ -30,14 +31,27 @@ class LessonController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'module_id' => 'required|exists:modules,id', // Modul rostdan ham borligini tekshirish
-            'title'     => 'required|string|max:255',
-            'video_url' => 'required|url',               // YouTube yoki Vimeo ssilkasi uchun to'g'ri URL format ekanini tekshiradi
-            'content'   => 'nullable|string',            // Agar dars tagiga matnli tushuntirish kerak bo'lsa
-            'duration'  => 'nullable|string'             // Masalan: "12:30"
+            'module_id'  => 'required|exists:modules,id',
+            'title'      => 'required|array',
+            'title.uz'   => 'required|string|max:255',
+            'video_type' => 'required|in:youtube,server',
+            'video_url'  => 'required_if:video_type,youtube|nullable|url',
+            'video_file' => 'required_if:video_type,server|nullable|mimes:mp4,mov,ogg,qt|max:500000', // 500MB gacha
+            'content'    => 'nullable|array',
+            'duration'   => 'nullable|string',
+            'is_free'    => 'nullable|boolean'
         ]);
 
-        $lesson = Lesson::create($validated);
+        $data = $request->only(['module_id', 'title', 'content', 'duration', 'is_free']);
+
+        if ($request->video_type === 'server' && $request->hasFile('video_file')) {
+            $path = $request->file('video_file')->store('lessons/videos', 'public');
+            $data['video_url'] = '/storage/' . $path;
+        } else {
+            $data['video_url'] = $request->video_url;
+        }
+
+        $lesson = Lesson::create($data);
 
         return response()->json([
             'message' => 'Video dars muvaffaqiyatli yaratildi!',
@@ -59,14 +73,34 @@ class LessonController extends Controller
     public function update(Request $request, Lesson $lesson)
     {
         $validated = $request->validate([
-            'module_id' => 'required|exists:modules,id',
-            'title'     => 'required|string|max:255',
-            'video_url' => 'required|url',
-            'content'   => 'nullable|string',
-            'duration'  => 'nullable|string'
+            'module_id'  => 'required|exists:modules,id',
+            'title'      => 'required|array',
+            'title.uz'   => 'required|string|max:255',
+            'video_type' => 'required|in:youtube,server',
+            'video_url'  => 'nullable|url', // youtube tipida faqat kiritilgan bo'lsa
+            'video_file' => 'nullable|mimes:mp4,mov,ogg,qt|max:500000',
+            'content'    => 'nullable|array',
+            'duration'   => 'nullable|string',
+            'is_free'    => 'nullable|boolean'
         ]);
 
-        $lesson->update($validated);
+        $data = $request->only(['module_id', 'title', 'content', 'duration', 'is_free']);
+
+        if ($request->video_type === 'server' && $request->hasFile('video_file')) {
+            // Eski faylni o'chirish
+            if ($lesson->video_url && str_starts_with($lesson->video_url, '/storage/')) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $lesson->video_url));
+            }
+            $path = $request->file('video_file')->store('lessons/videos', 'public');
+            $data['video_url'] = '/storage/' . $path;
+        } elseif ($request->video_type === 'youtube') {
+            if ($lesson->video_url && str_starts_with($lesson->video_url, '/storage/')) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $lesson->video_url));
+            }
+            $data['video_url'] = $request->video_url;
+        }
+
+        $lesson->update($data);
 
         return response()->json([
             'message' => 'Video dars yangilandi!',
@@ -79,6 +113,11 @@ class LessonController extends Controller
      */
     public function destroy(Lesson $lesson)
     {
+        // Agar local video bo'lsa, o'chiramiz
+        if ($lesson->video_url && str_starts_with($lesson->video_url, '/storage/')) {
+            Storage::disk('public')->delete(str_replace('/storage/', '', $lesson->video_url));
+        }
+        
         $lesson->delete();
 
         return response()->json([
