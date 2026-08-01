@@ -22,9 +22,11 @@ use App\Http\Controllers\Api\Admin\LevelController as AdminLevelController;
 use App\Http\Controllers\Api\Admin\ModuleController as AdminModuleController;
 use App\Http\Controllers\Api\Admin\LessonController as AdminLessonController;
 use App\Http\Controllers\Api\Admin\DashboardController;
+use App\Http\Controllers\Api\Admin\BannerController as AdminBannerController;
 
 use App\Http\Controllers\Api\User\LevelController as UserLevelController;
 use App\Http\Controllers\Api\User\InteractionController;
+use App\Http\Controllers\Api\User\BannerController as UserBannerController;
 
 // ==========================================
 // MATERIALLAR VA QIDIRUV CONTROLLERLARI
@@ -108,6 +110,10 @@ Route::middleware('auth:sanctum')->group(function () {
         // ===== PROFILE =====
         Route::get('/profile', [UserProfileController::class, 'getProfile']);
         // ===================
+
+        // ===== BANNERS =====
+        Route::get('/banners', [UserBannerController::class, 'index']);
+        // ===================
         
         // ===== STREAKS =====
         Route::get('/streaks', [UserProfileController::class, 'getStreaks']);
@@ -164,6 +170,8 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(functi
     // Admin user va test boshqaruvi
     Route::get('/dashboard/stats', [DashboardController::class, 'index']);
     
+    Route::apiResource('banners', AdminBannerController::class);
+
     Route::apiResource('users', AdminUserController::class)->except(['store']);
     Route::post('/users/{id}/toggle-premium', [AdminUserController::class, 'togglePremium']);
     Route::apiResource('tests', AdminTestController::class);
