@@ -103,11 +103,24 @@ export const adminAPI = {
   getLessonById: (id: number): Promise<AxiosResponse> =>
     apiClient.get(`/admin/lessons/${id}`),
 
-  createLesson: (data: any): Promise<AxiosResponse> =>
-    apiClient.post("/admin/lessons", data),
+  createLesson: (data: any): Promise<AxiosResponse> => {
+    if (data instanceof FormData) {
+      return apiClient.post("/admin/lessons", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+    }
+    return apiClient.post("/admin/lessons", data)
+  },
 
-  updateLesson: (id: number, data: any): Promise<AxiosResponse> =>
-    apiClient.put(`/admin/lessons/${id}`, data),
+  updateLesson: (id: number, data: any): Promise<AxiosResponse> => {
+    if (data instanceof FormData) {
+      data.append("_method", "PUT")
+      return apiClient.post(`/admin/lessons/${id}`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+    }
+    return apiClient.put(`/admin/lessons/${id}`, data)
+  },
 
   deleteLesson: (id: number): Promise<AxiosResponse> =>
     apiClient.delete(`/admin/lessons/${id}`),

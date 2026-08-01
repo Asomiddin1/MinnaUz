@@ -129,7 +129,7 @@ const ModulesPage = () => {
     setEditingId(mod.id)
     setFormData({
       level_id: String(mod.level_id),
-      title: mod.title,
+      title: typeof mod.title === 'string' ? mod.title : (mod.title as any)?.uz || "",
       order: mod.order || 0,
     })
     setIsModalOpen(true)
@@ -239,7 +239,7 @@ const ModulesPage = () => {
             <SelectItem value="all">Barcha darajalar</SelectItem>
             {levels.map((level) => (
               <SelectItem key={level.id} value={String(level.id)}>
-                {level.title}
+                {typeof level.title === 'string' ? level.title : (level.title as any)?.uz || "Nomsiz"}
               </SelectItem>
             ))}
           </SelectContent>
@@ -267,7 +267,9 @@ const ModulesPage = () => {
                 modules.map((mod) => (
                   <TableRow key={mod.id}>
                     <TableCell className="text-slate-500 font-medium">#{mod.id}</TableCell>
-                    <TableCell className="font-semibold">{mod.title}</TableCell>
+                    <TableCell className="font-semibold">
+                      {typeof mod.title === 'string' ? mod.title : (mod.title as any)?.uz || "Nomsiz"}
+                    </TableCell>
                     <TableCell>
                       {mod.level ? (
                         <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800">
@@ -328,7 +330,7 @@ const ModulesPage = () => {
                 <SelectContent>
                   {levels.map((level) => (
                     <SelectItem key={level.id} value={String(level.id)}>
-                      {level.title}
+                      {typeof level.title === 'string' ? level.title : (level.title as any)?.uz || "Nomsiz"}
                     </SelectItem>
                   ))}
                 </SelectContent>

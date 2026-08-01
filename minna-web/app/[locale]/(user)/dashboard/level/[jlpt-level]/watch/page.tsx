@@ -2,14 +2,17 @@
 
 import { useEffect, useState, use } from "react"
 import BackButton from "@/components/back-button"
-import { Play, Lock, CheckCircle2, FileText, ChevronRight, Video, Bookmark, BookmarkCheck, MessageSquare, Send } from "lucide-react"
-import { userAPI } from "@/lib/api/user"
+import { Play, Lock, CheckCircle2, FileText, ChevronRight, Video, Bookmark, BookmarkCheck, MessageSquare, Send, Sparkles } from "lucide-react"
+import { userAPI, getAvatarUrl } from "@/lib/api/user"
 import { toast } from "sonner"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
 
 interface WatchPageProps {
   params: Promise<{
-    "jlpt-level": string
+    "jlpt-level": string;
+    locale: string;
   }>
 }
 
@@ -26,23 +29,25 @@ interface Comment {
 
 interface Lesson {
   id: number
-  title: string
+  title: any
   video_url: string
   duration?: string
   content?: string
+  is_free?: boolean
   is_favorite?: boolean
+  is_completed?: boolean
   comments?: Comment[] // Darsga tegishli izohlar
 }
 
 // Module va ichidagi darslar
 interface Module {
   id: number
-  title: string
+  title: any
   lessons: Lesson[]
 }
 
 interface LevelData {
-  title: string
+  title: any
   slug: string
   modules: Module[]
 }
@@ -50,17 +55,28 @@ interface LevelData {
 const WatchLevelPage = ({ params }: WatchPageProps) => {
   const resolvedParams = use(params)
   const levelSlug = resolvedParams["jlpt-level"].toLowerCase()
+  const locale = resolvedParams.locale || "uz"
+
+  const getTranslated = (field: any, lang: string) => {
+    if (typeof field === "string") return field;
+    return field?.[lang] || field?.["uz"] || "";
+  }
 
   const [loading, setLoading] = useState(true)
   const [levelData, setLevelData] = useState<LevelData | null>(null)
   const [allLessons, setAllLessons] = useState<Lesson[]>([])
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null)
+  const [isPremium, setIsPremium] = useState(false)
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null)
+  const router = useRouter()
   
   const [likeLoading, setLikeLoading] = useState(false)
   
   // Izoh yozish uchun state'lar
   const [commentText, setCommentText] = useState("")
   const [commentLoading, setCommentLoading] = useState(false)
+  
+  const [completeLoading, setCompleteLoading] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,6 +85,14 @@ const WatchLevelPage = ({ params }: WatchPageProps) => {
         const res = await userAPI.getLevelBySlug(levelSlug)
         const data = res.data
         setLevelData(data)
+
+        try {
+          const userRes = await userAPI.getProfile()
+          setIsPremium(userRes.data?.user?.is_premium || false)
+          setCurrentUserId(userRes.data?.user?.id || null)
+        } catch (err) {
+          console.warn("Profil yuklanmadi")
+        }
 
         let extractedLessons: Lesson[] = []
         if (data.modules && Array.isArray(data.modules)) {
@@ -103,11 +127,37 @@ const WatchLevelPage = ({ params }: WatchPageProps) => {
       const res = await userAPI.toggleLessonLike(currentLesson.id)
       
       setCurrentLesson(prev => prev ? { ...prev, is_favorite: res.data.is_saved } : null)
+      setAllLessons(prev => prev.map(l => l.id === currentLesson.id ? { ...l, is_favorite: res.data.is_saved } : l))
       toast.success(res.data.message)
     } catch (error) {
       toast.error("Darsni saqlashda xatolik yuz berdi")
     } finally {
       setLikeLoading(false)
+    }
+  }
+
+  // Darsni tugatganlikni belgilash
+  const handleMarkCompleted = async () => {
+    if (!currentLesson || !levelData) return
+    try {
+      setCompleteLoading(true)
+      // Level API'sini chaqiramiz (minna-api dagi /activity/mark-lesson-completed)
+      // Lekin LevelData interfeysida level'ning ID'si yo'q, shuning uchun slugs ishlatilyapti.
+      // Modullarning level_id sini olamiz yoki /levels/{slug} orqali kelgan levelData ID'sini.
+      const levelId = (levelData as any).id
+      
+      await userAPI.markLessonCompleted(currentLesson.id, levelId)
+      
+      setCurrentLesson(prev => prev ? { ...prev, is_completed: true } : null)
+      setAllLessons(prev => prev.map(l => l.id === currentLesson.id ? { ...l, is_completed: true } : l))
+      
+      toast.success("Dars tugatilgan deb belgilandi")
+      
+      // Sidebar va boshqa componentlarga yangi progressni bildirish uchun (kerak bo'lsa event chiqarish yoki hook ishlashi mumkin)
+    } catch (error) {
+      toast.error("Darsni tugatilgan deb belgilashda xatolik")
+    } finally {
+      setCompleteLoading(false)
     }
   }
 
@@ -131,12 +181,100 @@ const WatchLevelPage = ({ params }: WatchPageProps) => {
         }
       })
       
+      setAllLessons(prev => prev.map(l => {
+        if (l.id === currentLesson.id) {
+          return {
+             ...l,
+             comments: [newComment, ...(l.comments || [])]
+          }
+        }
+        return l
+      }))
+      
       setCommentText("")
       toast.success("Izoh muvaffaqiyatli qo'shildi!")
     } catch (error) {
       toast.error("Izoh yozishda xatolik yuz berdi")
     } finally {
       setCommentLoading(false)
+    }
+  }
+
+  // Izohni o'chirish
+  const handleDeleteComment = async (commentId: number) => {
+    if (!confirm("Haqiqatan ham bu izohni o'chirmoqchimisiz?")) return
+    try {
+      await userAPI.deleteLessonComment(commentId)
+      
+      setCurrentLesson(prev => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          comments: prev.comments?.filter(c => c.id !== commentId) || []
+        }
+      })
+      
+      setAllLessons(prev => prev.map(l => {
+        if (l.id === currentLesson?.id) {
+          return {
+             ...l,
+             comments: l.comments?.filter(c => c.id !== commentId) || []
+          }
+        }
+        return l
+      }))
+      
+      toast.success("Izoh o'chirildi")
+    } catch (error) {
+      toast.error("Izohni o'chirishda xatolik yuz berdi")
+    }
+  }
+
+  // Izohni tahrirlash uchun state
+  const [editingCommentId, setEditingCommentId] = useState<number | null>(null)
+  const [editCommentText, setEditCommentText] = useState("")
+  const [editCommentLoading, setEditCommentLoading] = useState(false)
+
+  // Izohni tahrirlashni boshlash
+  const startEditingComment = (comment: any) => {
+    setEditingCommentId(comment.id)
+    setEditCommentText(comment.comment)
+  }
+
+  // Izohni tahrirlashni saqlash
+  const handleEditComment = async (commentId: number) => {
+    if (!editCommentText.trim()) return
+    
+    try {
+      setEditCommentLoading(true)
+      const res = await userAPI.updateLessonComment(commentId, editCommentText)
+      
+      const updatedComment = res.data.data
+      
+      setCurrentLesson(prev => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          comments: prev.comments?.map(c => c.id === commentId ? updatedComment : c) || []
+        }
+      })
+      
+      setAllLessons(prev => prev.map(l => {
+        if (l.id === currentLesson?.id) {
+          return {
+             ...l,
+             comments: l.comments?.map(c => c.id === commentId ? updatedComment : c) || []
+          }
+        }
+        return l
+      }))
+      
+      setEditingCommentId(null)
+      toast.success("Izoh yangilandi")
+    } catch (error) {
+      toast.error("Izohni yangilashda xatolik yuz berdi")
+    } finally {
+      setEditCommentLoading(false)
     }
   }
 
@@ -188,7 +326,7 @@ const WatchLevelPage = ({ params }: WatchPageProps) => {
         <div className="mx-auto max-w-7xl px-4 h-14 md:h-16 flex items-center justify-between">
           <BackButton />
           <div className="flex items-center gap-1 md:gap-2">
-            <span className="text-[10px] md:text-sm font-medium text-slate-500 uppercase tracking-widest">{levelData.title}</span>
+            <span className="text-[10px] md:text-sm font-medium text-slate-500 uppercase tracking-widest">{getTranslated(levelData.title, locale)}</span>
             <ChevronRight className="h-3 w-3 md:h-4 text-slate-400" />
             <span className="text-[10px] md:text-sm font-bold text-slate-900 dark:text-white">Video Darslar</span>
           </div>
@@ -205,12 +343,36 @@ const WatchLevelPage = ({ params }: WatchPageProps) => {
             {/* VIDEO PLAYER */}
             <div className="relative aspect-video w-full overflow-hidden rounded-[24px] md:rounded-[32px] bg-[#0F172A] shadow-xl border border-slate-800">
               {currentLesson ? (
-                <iframe 
-                  src={getEmbedUrl(currentLesson.video_url)} 
-                  className="absolute inset-0 w-full h-full border-0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                  allowFullScreen
-                ></iframe>
+                (!isPremium && !currentLesson.is_free) ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900 text-center p-6">
+                    <div className="h-16 w-16 md:h-20 md:w-20 mb-4 md:mb-6 rounded-full bg-amber-500/20 flex items-center justify-center">
+                      <Lock className="h-8 w-8 md:h-10 md:w-10 text-amber-500" />
+                    </div>
+                    <h3 className="text-xl md:text-2xl font-bold text-white mb-3">Premium obuna zarur</h3>
+                    <p className="text-slate-400 max-w-sm text-sm leading-relaxed">
+                      Ushbu darsni ko'rish uchun premium obuna bo'lishingiz kerak. Barcha videolarni cheklovsiz tomosha qiling!
+                    </p>
+                    <Button 
+                      className="mt-6 md:mt-8 h-12 md:h-14 px-6 md:px-8 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white border-0 font-bold text-sm md:text-base rounded-2xl shadow-lg shadow-amber-500/25 transition-all hover:scale-105" 
+                      onClick={() => router.push("/dashboard/premium")}
+                    >
+                      <Sparkles className="mr-2 h-4 w-4 md:h-5 md:w-5" /> Premium sotib olish
+                    </Button>
+                  </div>
+                ) : currentLesson.video_url?.startsWith("/storage") ? (
+                  <video 
+                    src={getAvatarUrl(currentLesson.video_url)} 
+                    controls 
+                    className="absolute inset-0 w-full h-full object-contain"
+                  ></video>
+                ) : (
+                  <iframe 
+                    src={getEmbedUrl(currentLesson.video_url)} 
+                    className="absolute inset-0 w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen
+                  ></iframe>
+                )
               ) : (
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <div className="h-16 w-16 md:h-20 md:w-20 rounded-full bg-blue-600 flex items-center justify-center shadow-3xl shadow-blue-500/50">
@@ -224,7 +386,7 @@ const WatchLevelPage = ({ params }: WatchPageProps) => {
             <div className="bg-white dark:bg-slate-900 rounded-[24px] p-6 md:p-8 border border-slate-100 dark:border-slate-800 shadow-sm">
               <div className="flex justify-between items-start gap-4">
                 <h1 className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">
-                  {currentLesson?.title}
+                  {getTranslated(currentLesson?.title, locale) || "Nomsiz"}
                 </h1>
                 
                 <button 
@@ -241,20 +403,37 @@ const WatchLevelPage = ({ params }: WatchPageProps) => {
                 </button>
               </div>
               
-              <div className="mt-4 flex flex-wrap items-center gap-3">
-                {currentLesson?.duration && (
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  {currentLesson?.duration && (
+                    <span className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400">
+                      <Play className="h-3.5 w-3.5 text-blue-500" /> {currentLesson.duration}
+                    </span>
+                  )}
                   <span className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400">
-                    <Play className="h-3.5 w-3.5 text-blue-500" /> {currentLesson.duration}
+                    <MessageSquare className="h-3.5 w-3.5 text-blue-500" /> {currentLesson?.comments?.length || 0} ta izoh
                   </span>
-                )}
-                <span className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-400">
-                  <MessageSquare className="h-3.5 w-3.5 text-blue-500" /> {currentLesson?.comments?.length || 0} ta izoh
-                </span>
+                </div>
+                
+                {/* DARSNI TUGATDIM TUGMASI */}
+                <Button 
+                  onClick={handleMarkCompleted}
+                  disabled={currentLesson?.is_completed || completeLoading || (!isPremium && !currentLesson?.is_free)}
+                  variant={currentLesson?.is_completed ? "outline" : "default"}
+                  className={`text-sm font-bold gap-2 ${
+                    currentLesson?.is_completed 
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:border-emerald-800/50"
+                      : "bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/25"
+                  }`}
+                >
+                  <CheckCircle2 className={`h-4 w-4 ${currentLesson?.is_completed ? "text-emerald-500" : ""}`} />
+                  {currentLesson?.is_completed ? "O'rganildi" : "Darsni tugatdim"}
+                </Button>
               </div>
 
               {currentLesson?.content && (
                 <div className="mt-6 text-sm md:text-base text-slate-600 dark:text-slate-400 leading-relaxed whitespace-pre-wrap">
-                  {currentLesson.content}
+                  {typeof currentLesson.content === 'string' ? currentLesson.content : (currentLesson.content as any)?.uz || ""}
                 </div>
               )}
             </div>
@@ -292,12 +471,14 @@ const WatchLevelPage = ({ params }: WatchPageProps) => {
               <div className="space-y-6">
                 {currentLesson?.comments && currentLesson.comments.length > 0 ? (
                   currentLesson.comments.map((comment) => (
-                    <div key={comment.id} className="flex gap-4">
-                      <div className="h-10 w-10 shrink-0 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold uppercase">
-                        {comment.user?.name ? comment.user.name.charAt(0) : "A"}
+                    <div key={comment.id} className="flex gap-4 group">
+                      <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/50 dark:to-indigo-900/50 flex items-center justify-center shrink-0 border border-blue-200/50 dark:border-blue-700/50">
+                        <span className="font-bold text-blue-700 dark:text-blue-300">
+                          {comment.user?.name ? comment.user.name.charAt(0).toUpperCase() : "U"}
+                        </span>
                       </div>
-                      <div className="flex-1">
-                        <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl rounded-tl-none">
+                      <div className="flex-1 w-full relative">
+                        <div className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl rounded-tl-none border border-slate-100 dark:border-slate-800">
                           <div className="flex items-center justify-between mb-1">
                             <span className="font-bold text-sm text-slate-900 dark:text-white">
                               {comment.user?.name || "Foydalanuvchi"}
@@ -306,10 +487,59 @@ const WatchLevelPage = ({ params }: WatchPageProps) => {
                               {formatDate(comment.created_at)}
                             </span>
                           </div>
-                          <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
-                            {comment.comment}
-                          </p>
+                          
+                          {editingCommentId === comment.id ? (
+                            <div className="mt-2">
+                              <textarea 
+                                value={editCommentText}
+                                onChange={(e) => setEditCommentText(e.target.value)}
+                                className="w-full bg-white dark:bg-[#0B1120] border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 outline-none resize-none"
+                                rows={2}
+                              ></textarea>
+                              <div className="flex justify-end gap-2 mt-2">
+                                <button 
+                                  onClick={() => setEditingCommentId(null)}
+                                  className="px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                                >
+                                  Bekor qilish
+                                </button>
+                                <button 
+                                  onClick={() => handleEditComment(comment.id)}
+                                  disabled={editCommentLoading}
+                                  className="px-3 py-1.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                                >
+                                  Saqlash
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
+                              {comment.comment}
+                            </p>
+                          )}
                         </div>
+                        
+                        {/* Edit / Delete tugmalari */}
+                        {currentUserId === comment.user_id && editingCommentId !== comment.id && (
+                          <div className="absolute top-2 right-2 flex opacity-0 group-hover:opacity-100 transition-opacity gap-1">
+                            <button 
+                              onClick={() => startEditingComment(comment)}
+                              className="p-1.5 bg-white dark:bg-slate-800 text-slate-500 hover:text-blue-500 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 transition-colors"
+                              title="Tahrirlash"
+                            >
+                              <FileText className="h-3 w-3" />
+                            </button>
+                            <button 
+                              onClick={() => handleDeleteComment(comment.id)}
+                              className="p-1.5 bg-white dark:bg-slate-800 text-slate-500 hover:text-red-500 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 transition-colors"
+                              title="O'chirish"
+                            >
+                              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))
@@ -335,11 +565,12 @@ const WatchLevelPage = ({ params }: WatchPageProps) => {
                 {levelData.modules.map((mod: Module) => (
                   <div key={mod.id} className="mb-2">
                     <div className="bg-slate-50 dark:bg-slate-800/50 px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider sticky top-0 z-10 backdrop-blur-md">
-                      {mod.title}
+                      {getTranslated(mod.title, locale)}
                     </div>
                     
                     {mod.lessons?.map((lesson) => {
                       const isActive = currentLesson?.id === lesson.id;
+                      const isLocked = !isPremium && !lesson.is_free;
                       return (
                         <div 
                           key={lesson.id}
@@ -352,18 +583,30 @@ const WatchLevelPage = ({ params }: WatchPageProps) => {
                             <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
                               isActive ? 'bg-blue-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
                             }`}>
-                              <Play className={`h-3 w-3 ${isActive ? 'fill-white' : 'fill-slate-400'}`} />
+                              {isLocked ? (
+                                <Lock className="h-3.5 w-3.5 text-slate-400" />
+                              ) : (
+                                <Play className={`h-3 w-3 ${isActive ? 'fill-white' : 'fill-slate-400'}`} />
+                              )}
                             </div>
                             <div>
-                              <h4 className={`text-sm font-medium line-clamp-2 ${isActive ? 'text-blue-600' : 'text-slate-700 dark:text-slate-300'}`}>
-                                {lesson.title}
-                              </h4>
+                              <div className="flex items-center gap-2">
+                                <h4 className={`text-sm font-medium line-clamp-2 ${isActive ? 'text-blue-600' : 'text-slate-700 dark:text-slate-300'}`}>
+                                  {getTranslated(lesson.title, locale) || "Nomsiz"}
+                                </h4>
+                                {lesson.is_free && (
+                                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400 flex items-center whitespace-nowrap">
+                                    Tekin
+                                  </span>
+                                )}
+                              </div>
                               {lesson.duration && (
                                 <span className="text-[10px] text-slate-400">{lesson.duration}</span>
                               )}
                             </div>
                           </div>
-                          {isActive && <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 ml-2" />}
+                          {isActive && <CheckCircle2 className="h-4 w-4 text-blue-500 shrink-0 ml-2" />}
+                          {!isActive && lesson.is_completed && <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 ml-2" />}
                         </div>
                       )
                     })}
