@@ -248,4 +248,27 @@ export const adminAPI = {
     apiClient.delete(`/admin/articles/${id}`),
   generateDokkaiContent: (data: { text: string }): Promise<AxiosResponse> =>
     apiClient.post("/admin/groq/dokkai-generate", data),
+
+  // Banners
+  getBanners: (): Promise<AxiosResponse> => apiClient.get("/admin/banners"),
+  getBannerById: (id: number | string): Promise<AxiosResponse> =>
+    apiClient.get(`/admin/banners/${id}`),
+  createBanner: (data: any): Promise<AxiosResponse> => {
+    if (data instanceof FormData) {
+      return apiClient.post("/admin/banners", data, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+    }
+    return apiClient.post("/admin/banners", data);
+  },
+  updateBanner: (id: number | string, data: any): Promise<AxiosResponse> => {
+    if (data instanceof FormData) {
+      return apiClient.post(`/admin/banners/${id}?_method=PUT`, data, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+    }
+    return apiClient.put(`/admin/banners/${id}`, data);
+  },
+  deleteBanner: (id: number | string): Promise<AxiosResponse> =>
+    apiClient.delete(`/admin/banners/${id}`),
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Image from "next/image"
 import {
   Carousel,
@@ -9,35 +9,64 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
-import Banner1 from "./images/banner2.png"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { useCheckIn } from '@/hooks/useCheckIn'
+import { userAPI } from '@/lib/api/user'
+
+type Banner = {
+  id: number
+  title: string | null
+  description: string | null
+  image: string
+}
 
 const BannerCarousel = () => {
   useCheckIn()
 
-  const banners = [
-    { 
-      id: 1, 
-      imageUrl: Banner1, 
-      alt: "Banner2" 
+  const [banners, setBanners] = useState<Banner[]>([])
+  const [selectedBanner, setSelectedBanner] = useState<Banner | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const res = await userAPI.getBanners()
+        if (res.data?.data) {
+          setBanners(res.data.data)
+        }
+      } catch (err) {
+        console.error("Failed to fetch banners", err)
+      }
     }
-  ]
+    fetchBanners()
+  }, [])
+
+  const handleBannerClick = (banner: Banner) => {
+    setSelectedBanner(banner)
+    setIsModalOpen(true)
+  }
+
+  if (banners.length === 0) return null
 
   return (
     <div className="w-full">
       <Carousel className="w-full">
         <CarouselContent>
-          {banners.map((banner) => (
+          {banners.map((banner, index) => (
             <CarouselItem key={banner.id}>
-              <div className="relative w-full overflow-hidden rounded-2xl shadow-sm">
-                <Image 
-                  src={banner.imageUrl} 
-                  alt={banner.alt} 
-                  width={1200}
-                  height={600}
+              <div 
+                className="relative w-full overflow-hidden rounded-2xl shadow-sm cursor-pointer transition-transform hover:scale-[1.01]"
+                onClick={() => handleBannerClick(banner)}
+              >
+                <img 
+                  src={banner.image} 
+                  alt={banner.title || "Banner"}
                   className="w-full h-auto object-contain rounded-2xl" 
-                  priority={banner.id === 1}
-                  placeholder="blur"
                 />
               </div>
             </CarouselItem>
@@ -48,6 +77,28 @@ const BannerCarousel = () => {
           <CarouselNext className="right-4" />
         </div>
       </Carousel>
+
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-[700px] max-h-[85vh] flex flex-col p-0 gap-0">
+          <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
+            <DialogTitle>{selectedBanner?.title || "Banner"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 px-6 pb-6 overflow-y-auto">
+            {selectedBanner?.image && (
+              <img 
+                src={selectedBanner.image} 
+                alt={selectedBanner.title || "Banner"} 
+                className="w-full h-auto rounded-lg object-contain"
+              />
+            )}
+            {selectedBanner?.description && (
+              <p className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
+                {selectedBanner.description}
+              </p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

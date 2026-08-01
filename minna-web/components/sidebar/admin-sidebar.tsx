@@ -24,6 +24,7 @@ import {
   BookMarked,
   PenTool,
   Languages,
+  Image,
 } from "lucide-react"
 import { signOut, useSession } from "next-auth/react"
 import { useTranslations } from "next-intl"
@@ -44,6 +45,7 @@ export function AdminSidebar() {
     { name: t("grammar"), href: "/admin/grammars", icon: Languages },
     { name: t("kanjis"), href: "/admin/kanjis", icon: PenTool },
     { name: t("vocabularies"), href: "/admin/vocabularies", icon: BookMarked },
+    { name: "Banners", href: "/admin/banners", icon: Image },
     { name: t("jlptTests"), href: "/admin/tests", icon: GraduationCap },
     { name: t("users"), href: "/admin/users", icon: Users },
   ]

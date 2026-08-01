@@ -172,6 +172,9 @@ export const userAPI = {
     history: { role: string; content: string }[];
   }): Promise<AxiosResponse> => 
     apiClient.post("/ai/chat", data),
+
+  // Banners
+  getBanners: (): Promise<AxiosResponse> => apiClient.get("/user/banners"),
 }
 
 export const getAvatarUrl = (url?: string) => {

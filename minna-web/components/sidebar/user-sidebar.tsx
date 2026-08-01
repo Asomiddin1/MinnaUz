@@ -188,7 +188,7 @@ export function UserSidebar() {
         {/* PASTKI BLOKLAR (ADMIN PANEL, PROFIL, CHIQISH) */}
         <div className="mt-auto flex flex-col gap-2 p-4 border-t border-slate-200/80 dark:border-[#1F2937]">
           
-          {(session?.user?.role === "admin" || true) && (
+          {session?.user?.role === "admin" && (
             <Link 
               href="/admin" 
               className={`flex items-center gap-3 p-2.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/60 dark:hover:bg-slate-800 transition-colors ${collapsed ? "justify-center" : ""}`}
@@ -196,7 +196,7 @@ export function UserSidebar() {
               <ShieldAlert className="h-5 w-5 text-slate-600 dark:text-slate-300 shrink-0" />
               {!collapsed && (
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">
-                  Panel administratori
+                  {t("adminPanel") || "Panel administratori"}
                 </span>
               )}
             </Link>
