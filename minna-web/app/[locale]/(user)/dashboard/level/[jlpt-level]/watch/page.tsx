@@ -21,6 +21,7 @@ interface Comment {
   id: number
   comment: string
   created_at: string
+  user_id?: number
   user: {
     id: number
     name: string
