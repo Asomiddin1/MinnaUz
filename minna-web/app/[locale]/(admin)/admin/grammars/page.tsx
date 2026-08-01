@@ -654,7 +654,7 @@ export default function AdminGrammarPage() {
                   : ""
               }
             >
-              {level.title}
+              {typeof level.title === 'string' ? level.title : (level.title as any)?.uz || "Nomsiz"}
             </Button>
           ))}
         </div>

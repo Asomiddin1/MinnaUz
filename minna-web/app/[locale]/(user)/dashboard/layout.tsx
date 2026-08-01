@@ -17,7 +17,7 @@ import {
 import { useTheme } from "next-themes"
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
-import LanguageSwitcher from "@/components/minna-uz/LanguageSwitcher"
+import LanguageSwitcher from "@/components/intro/LanguageSwitcher"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,

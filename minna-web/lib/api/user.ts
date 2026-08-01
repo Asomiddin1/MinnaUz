@@ -18,8 +18,14 @@ export const userAPI = {
   pingActivity: (intervalMinutes = 1): Promise<AxiosResponse> =>
     apiClient.post("/user/activity/ping", { interval_minutes: intervalMinutes }),
 
+  markLessonCompleted: (lessonId: number, levelId: number): Promise<AxiosResponse> =>
+    apiClient.post(`/user/activity/mark-lesson-completed`, { lesson_id: lessonId, level_id: levelId }),
+
   getProgress: (): Promise<AxiosResponse> =>
     apiClient.get("/user/activity/progress"),
+
+  getCourseProgress: (): Promise<AxiosResponse> =>
+    apiClient.get("/user/activity/course-progress"),
 
   // ==========================================
   // AVATAR
@@ -128,6 +134,15 @@ export const userAPI = {
     comment: string
   ): Promise<AxiosResponse> =>
     apiClient.post(`/user/lessons/${lessonId}/comments`, { comment }),
+
+  updateLessonComment: (
+    commentId: number,
+    comment: string
+  ): Promise<AxiosResponse> =>
+    apiClient.put(`/user/comments/${commentId}`, { comment }),
+
+  deleteLessonComment: (commentId: number): Promise<AxiosResponse> =>
+    apiClient.delete(`/user/comments/${commentId}`),
 
   // ==========================================
   // DOKKAI (MAQOLALAR) API LARI

@@ -53,11 +53,15 @@ type Module = {
 type Lesson = {
   id: number
   module_id: number
-  title: string
+  title: string | any
   video_url: string
-  content?: string
+  content?: string | any
   duration?: string
   module?: Module
+  translations?: {
+    title: { [key: string]: string }
+    content: { [key: string]: string }
+  }
 }
 
 const LessonsPage = () => {
@@ -71,12 +75,30 @@ const LessonsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    module_id: string
+    title_uz: string
+    title_ru: string
+    title_en: string
+    video_type: "youtube" | "server"
+    video_url: string
+    video_file: File | null
+    duration: string
+    content_uz: string
+    content_ru: string
+    content_en: string
+  }>({
     module_id: "",
-    title: "",
+    title_uz: "",
+    title_ru: "",
+    title_en: "",
+    video_type: "youtube",
     video_url: "",
+    video_file: null,
     duration: "",
-    content: "",
+    content_uz: "",
+    content_ru: "",
+    content_en: "",
   })
 
   // =====================
@@ -131,40 +153,76 @@ const LessonsPage = () => {
     setEditingId(null)
     setFormData({ 
       module_id: filterModuleId !== "all" ? filterModuleId : "", 
-      title: "", 
+      title_uz: "", 
+      title_ru: "", 
+      title_en: "", 
+      video_type: "youtube",
       video_url: "",
+      video_file: null,
       duration: "",
-      content: ""
+      content_uz: "",
+      content_ru: "",
+      content_en: "",
     })
     setIsModalOpen(true)
   }
 
   const openEditModal = (lesson: Lesson) => {
     setEditingId(lesson.id)
+    
+    // Tarjimalarni olish (agar backenddan kelsa)
+    const tTitle = lesson.translations?.title || {}
+    const tContent = lesson.translations?.content || {}
+    
     setFormData({
       module_id: String(lesson.module_id),
-      title: lesson.title,
-      video_url: lesson.video_url,
+      title_uz: tTitle.uz || (typeof lesson.title === 'string' ? lesson.title : ""),
+      title_ru: tTitle.ru || "",
+      title_en: tTitle.en || "",
+      video_type: lesson.video_url?.startsWith("/storage") ? "server" : "youtube",
+      video_url: lesson.video_url?.startsWith("/storage") ? "" : lesson.video_url,
+      video_file: null,
       duration: lesson.duration || "",
-      content: lesson.content || "",
+      content_uz: tContent.uz || (typeof lesson.content === 'string' ? lesson.content : ""),
+      content_ru: tContent.ru || "",
+      content_en: tContent.en || "",
     })
     setIsModalOpen(true)
   }
 
   const handleSubmit = async () => {
     try {
-      if (!formData.title || !formData.module_id || !formData.video_url) {
-        toast.error("Modul, sarlavha va video link kiritilishi shart!")
+      if (!formData.title_uz || !formData.module_id) {
+        toast.error("Modul va O'zbekcha sarlavha kiritilishi shart!")
+        return
+      }
+      if (formData.video_type === 'youtube' && !formData.video_url) {
+        toast.error("Youtube linki kiritilishi shart!")
+        return
+      }
+      if (formData.video_type === 'server' && !formData.video_file && !editingId) {
+        toast.error("Video fayl tanlanishi shart!")
         return
       }
 
-      const payload = {
-        module_id: Number(formData.module_id),
-        title: formData.title,
-        video_url: formData.video_url,
-        duration: formData.duration,
-        content: formData.content,
+      const payload = new FormData()
+      payload.append("module_id", formData.module_id)
+      payload.append("title[uz]", formData.title_uz)
+      if (formData.title_ru) payload.append("title[ru]", formData.title_ru)
+      if (formData.title_en) payload.append("title[en]", formData.title_en)
+      
+      payload.append("video_type", formData.video_type)
+      if (formData.video_type === "youtube") {
+        payload.append("video_url", formData.video_url)
+      } else if (formData.video_type === "server" && formData.video_file) {
+        payload.append("video_file", formData.video_file)
       }
+
+      if (formData.duration) payload.append("duration", formData.duration)
+      
+      if (formData.content_uz) payload.append("content[uz]", formData.content_uz)
+      if (formData.content_ru) payload.append("content[ru]", formData.content_ru)
+      if (formData.content_en) payload.append("content[en]", formData.content_en)
 
       if (editingId) {
         await adminAPI.updateLesson(editingId, payload)
@@ -257,7 +315,7 @@ const LessonsPage = () => {
             <SelectItem value="all">Barcha bo'limlar</SelectItem>
             {modules.map((mod) => (
               <SelectItem key={mod.id} value={String(mod.id)}>
-                {mod.level ? `${mod.level.title} - ` : ""}{mod.title}
+                {mod.level ? `${typeof mod.level.title === 'string' ? mod.level.title : (mod.level.title as any)?.uz || "Nomsiz"} - ` : ""}{typeof mod.title === 'string' ? mod.title : (mod.title as any)?.uz || "Nomsiz"}
               </SelectItem>
             ))}
           </SelectContent>
@@ -285,15 +343,19 @@ const LessonsPage = () => {
                 lessons.map((lesson) => (
                   <TableRow key={lesson.id}>
                     <TableCell className="text-slate-500 font-medium">#{lesson.id}</TableCell>
-                    <TableCell className="font-semibold">{lesson.title}</TableCell>
+                    <TableCell className="font-semibold">
+                      {typeof lesson.title === 'string' 
+                        ? lesson.title 
+                        : (lesson.title?.uz || Object.values(lesson.title || {})[0] || "Nomsiz")}
+                    </TableCell>
                     <TableCell>
                       {lesson.module ? (
                         <div className="flex flex-col">
                           <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">
-                            {lesson.module.title}
+                            {typeof lesson.module.title === 'string' ? lesson.module.title : (lesson.module.title as any)?.uz || "Nomsiz"}
                           </span>
                           <span className="text-[10px] text-slate-400">
-                            {lesson.module.level?.title}
+                            {typeof lesson.module.level?.title === 'string' ? lesson.module.level.title : (lesson.module.level?.title as any)?.uz || "Nomsiz"}
                           </span>
                         </div>
                       ) : (
@@ -364,7 +426,7 @@ const LessonsPage = () => {
                 <SelectContent>
                   {modules.map((mod) => (
                     <SelectItem key={mod.id} value={String(mod.id)}>
-                      {mod.level ? `${mod.level.title} - ` : ""}{mod.title}
+                      {mod.level ? `${typeof mod.level.title === 'string' ? mod.level.title : (mod.level.title as any)?.uz || "Nomsiz"} - ` : ""}{typeof mod.title === 'string' ? mod.title : (mod.title as any)?.uz || "Nomsiz"}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -372,23 +434,68 @@ const LessonsPage = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Dars sarlavhasi <span className="text-red-500">*</span></label>
+              <label className="text-sm font-medium">Sarlavha (O'zbekcha) <span className="text-red-500">*</span></label>
               <Input
                 placeholder="Masalan: 1-dars: Fe'l negizlari"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                value={formData.title_uz}
+                onChange={(e) => setFormData({ ...formData, title_uz: e.target.value })}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Sarlavha (Ruscha) <span className="text-xs text-slate-400">(Ixtiyoriy)</span></label>
+              <Input
+                placeholder="Masalan: Урок 1: Основы глаголов"
+                value={formData.title_ru}
+                onChange={(e) => setFormData({ ...formData, title_ru: e.target.value })}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Sarlavha (Inglizcha) <span className="text-xs text-slate-400">(Ixtiyoriy)</span></label>
+              <Input
+                placeholder="Masalan: Lesson 1: Verb Basics"
+                value={formData.title_en}
+                onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Video URL (Youtube, Vimeo) <span className="text-red-500">*</span></label>
-              <Input
-                type="url"
-                placeholder="https://youtube.com/watch?v=..."
-                value={formData.video_url}
-                onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
-              />
+            <div className="space-y-2 pt-2">
+              <label className="text-sm font-medium">Video Yuklash Turi <span className="text-red-500">*</span></label>
+              <Select 
+                value={formData.video_type} 
+                onValueChange={(val: "youtube" | "server") => setFormData({ ...formData, video_type: val })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Turi" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="youtube">YouTube (Link)</SelectItem>
+                  <SelectItem value="server">Serverga Yuklash (Fayl)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+
+            {formData.video_type === "youtube" ? (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Video URL (Youtube, Vimeo) <span className="text-red-500">*</span></label>
+                <Input
+                  type="url"
+                  placeholder="https://youtube.com/watch?v=..."
+                  value={formData.video_url}
+                  onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                />
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Video Fayl (MP4, Max: 500MB) {editingId && <span className="text-xs text-slate-400">(Faqat almashtirish uchun yuklang)</span>}</label>
+                <Input
+                  type="file"
+                  accept="video/mp4,video/quicktime,video/x-msvideo"
+                  onChange={(e) => setFormData({ ...formData, video_file: e.target.files?.[0] || null })}
+                />
+              </div>
+            )}
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Davomiyligi (Vaqti)</label>
@@ -400,13 +507,32 @@ const LessonsPage = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Dars matni / Qo'shimcha (Ixtiyoriy)</label>
-              {/* Textarea o'rniga oddiy html textarea, agar shadcn dagi Textarea o'rnatilmagan bo'lsa xato bermasligi uchun */}
+              <label className="text-sm font-medium">Dars matni (O'zbekcha)</label>
               <textarea
-                className="flex min-h-[80px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                placeholder="Dars haqida qisqacha ma'lumot yoki qoidalar..."
-                value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                placeholder="Dars haqida qisqacha ma'lumot..."
+                value={formData.content_uz}
+                onChange={(e) => setFormData({ ...formData, content_uz: e.target.value })}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Dars matni (Ruscha)</label>
+              <textarea
+                className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                placeholder="Краткая информация об уроке..."
+                value={formData.content_ru}
+                onChange={(e) => setFormData({ ...formData, content_ru: e.target.value })}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Dars matni (Inglizcha)</label>
+              <textarea
+                className="flex min-h-[60px] w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                placeholder="Brief information about the lesson..."
+                value={formData.content_en}
+                onChange={(e) => setFormData({ ...formData, content_en: e.target.value })}
               />
             </div>
 

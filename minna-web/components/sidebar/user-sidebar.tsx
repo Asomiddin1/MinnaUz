@@ -1,6 +1,7 @@
 "use client"
 
 import { Link, usePathname } from "@/src/i18n/navigation"
+import { useEffect, useState } from "react"
 import {
   Sidebar,
   SidebarContent,
@@ -28,7 +29,7 @@ import { signOut, useSession } from "next-auth/react"
 import Image from "next/image"
 import logoImg from "./logo.png"
 import { useTranslations } from "next-intl"
-import { getAvatarUrl } from "@/lib/api/user"
+import { userAPI, getAvatarUrl } from "@/lib/api/user"
 
 export function UserSidebar() {
   const pathname = usePathname()
@@ -49,6 +50,20 @@ export function UserSidebar() {
 
   const userName = session?.user?.name || "Guest User"
   const userEmail = session?.user?.email || ""
+
+  const [courseProgress, setCourseProgress] = useState<any>(null)
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      userAPI.getCourseProgress()
+        .then(res => {
+          if (res.data?.data) {
+            setCourseProgress(res.data.data)
+          }
+        })
+        .catch(err => console.error("Failed to load course progress", err))
+    }
+  }, [status])
 
 
   return (
@@ -129,7 +144,7 @@ export function UserSidebar() {
         </SidebarMenu>
 
         {/* MAQSADINGIZGA YAQINLASHYAPSIZ KARTACHKASI */}
-        {!collapsed && (
+        {courseProgress && !collapsed && (
           <div className="mx-4 my-3 p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 rounded-3xl shadow-sm relative">
             <div className="flex items-start justify-between gap-2">
               <div className="space-y-1">
@@ -137,22 +152,31 @@ export function UserSidebar() {
                   Maqsadingizga yaqinlashyapsiz!
                 </h4>
                 <p className="text-[11px] text-slate-400">
-                  Daraja: <span className="font-extrabold text-violet-600 dark:text-violet-400">N5</span>
+                  Daraja: <span className="font-extrabold text-violet-600 dark:text-violet-400">{courseProgress.level?.title || "Daraja"}</span>
                 </p>
               </div>
               
-              {/* Doiraviy Progress (68%) */}
+              {/* Doiraviy Progress */}
               <div className="relative flex items-center justify-center shrink-0">
                 <svg className="h-12 w-12 transform -rotate-90">
                   <circle cx="24" cy="24" r="18" stroke="currentColor" strokeWidth="4" className="text-slate-200 dark:text-slate-800 fill-none" />
-                  <circle cx="24" cy="24" r="18" stroke="currentColor" strokeWidth="4" strokeDasharray="113" strokeDashoffset="36" className="text-violet-600 fill-none" />
+                  <circle 
+                    cx="24" 
+                    cy="24" 
+                    r="18" 
+                    stroke="currentColor" 
+                    strokeWidth="4" 
+                    strokeDasharray="113" 
+                    strokeDashoffset={113 - (113 * (courseProgress.progress_percentage || 0)) / 100} 
+                    className="text-violet-600 fill-none transition-all duration-500 ease-in-out" 
+                  />
                 </svg>
-                <span className="absolute text-[10px] font-extrabold text-slate-900 dark:text-white">68%</span>
+                <span className="absolute text-[10px] font-extrabold text-slate-900 dark:text-white">{courseProgress.progress_percentage || 0}%</span>
               </div>
             </div>
 
             <Link 
-              href="/dashboard/jlpt" 
+              href={`/dashboard/level/${courseProgress.level?.slug}/watch`} 
               className="w-full mt-3 py-2.5 rounded-2xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs shadow-md shadow-violet-500/20 transition-all flex items-center justify-center gap-2"
             >
               <span>Davom etish</span>

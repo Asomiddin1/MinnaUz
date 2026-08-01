@@ -40,8 +40,6 @@ export function AdminSidebar() {
     { name: t("dashboard"), href: "/admin", icon: Home },
     { name: t("videos"), href: "/admin/videos", icon: PlayCircle },
     { name: t("levels"), href: "/admin/levels", icon: Layers },
-    { name: t("modules"), href: "/admin/modules", icon: BookOpen },
-    { name: t("videoLessons"), href: "/admin/lessons", icon: PlayCircle },
     { name: t("createDokkai"), href: "/admin/dokkai", icon: Languages },
     { name: t("grammar"), href: "/admin/grammars", icon: Languages },
     { name: t("kanjis"), href: "/admin/kanjis", icon: PenTool },

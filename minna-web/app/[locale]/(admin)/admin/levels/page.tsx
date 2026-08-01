@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { adminAPI } from "@/lib/api/admin" // O'zingizning API yo'lingizni tekshiring
 import { useSession } from "next-auth/react"
+import { Link } from "@/src/i18n/navigation"
 
 import {
   Table,
@@ -33,12 +34,25 @@ import { toast } from "sonner"
 // =====================
 type Level = {
   id: number
-  title: string
+  title: any
   slug: string
   tags: string[]
   lesson_count: number
   video_count: string | null
   modules_count?: number
+}
+
+const getTranslated = (field: any, lang: string) => {
+  if (!field) return "Nomsiz";
+  if (typeof field === "string") {
+    try {
+      const parsed = JSON.parse(field);
+      return parsed[lang] || parsed["uz"] || Object.values(parsed)[0] || field;
+    } catch (e) {
+      return field;
+    }
+  }
+  return field[lang] || field["uz"] || Object.values(field)[0] || "Nomsiz";
 }
 
 const LevelsPage = () => {
@@ -49,7 +63,9 @@ const LevelsPage = () => {
   const [editingId, setEditingId] = useState<number | null>(null)
 
   const [formData, setFormData] = useState({
-    title: "",
+    title_uz: "",
+    title_ru: "",
+    title_en: "",
     slug: "",
     tags: "", // Vergul bilan yoziladi
   })
@@ -89,14 +105,16 @@ const LevelsPage = () => {
   // =====================
   const openCreateModal = () => {
     setEditingId(null)
-    setFormData({ title: "", slug: "", tags: "" })
+    setFormData({ title_uz: "", title_ru: "", title_en: "", slug: "", tags: "" })
     setIsModalOpen(true)
   }
 
   const openEditModal = (level: Level) => {
     setEditingId(level.id)
     setFormData({
-      title: level.title,
+      title_uz: getTranslated(level.title, "uz") !== "Nomsiz" ? getTranslated(level.title, "uz") : "",
+      title_ru: getTranslated(level.title, "ru") !== "Nomsiz" ? getTranslated(level.title, "ru") : "",
+      title_en: getTranslated(level.title, "en") !== "Nomsiz" ? getTranslated(level.title, "en") : "",
       slug: level.slug,
       tags: level.tags ? level.tags.join(", ") : "",
     })
@@ -105,7 +123,7 @@ const LevelsPage = () => {
 
   const handleSubmit = async () => {
     try {
-      if (!formData.title || !formData.slug) {
+      if (!formData.title_uz || !formData.slug) {
         toast.error("Barcha majburiy maydonlarni to'ldiring")
         return
       }
@@ -116,7 +134,15 @@ const LevelsPage = () => {
         .map((t) => t.trim())
         .filter((t) => t.length > 0)
 
-      const payload = { ...formData, tags: tagsArray }
+      const payload = { 
+        title: {
+          uz: formData.title_uz,
+          ru: formData.title_ru,
+          en: formData.title_en,
+        },
+        slug: formData.slug,
+        tags: tagsArray 
+      }
 
       if (editingId) {
         await adminAPI.updateLevel(editingId, payload)
@@ -181,10 +207,10 @@ const LevelsPage = () => {
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <Layers className="h-6 w-6 text-blue-500" />
-            Darajalar (Levels)
+            Kurslar
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            N5, N4 kabi asosiy o'quv dasturlarini boshqarish.
+            Tizimdagi barcha kurslarni boshqarish.
           </p>
         </div>
         
@@ -222,7 +248,9 @@ const LevelsPage = () => {
                 levels.map((level) => (
                   <TableRow key={level.id}>
                     <TableCell className="text-slate-500 font-medium">#{level.id}</TableCell>
-                    <TableCell className="font-semibold">{level.title}</TableCell>
+                    <TableCell className="font-semibold">
+                      {getTranslated(level.title, "uz")}
+                    </TableCell>
                     <TableCell>
                       <Badge variant="outline" className="font-mono text-xs text-slate-500 bg-slate-50 dark:bg-slate-800">
                         /{level.slug}
@@ -242,6 +270,11 @@ const LevelsPage = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
+                        <Link href={`/admin/levels/${level.id}`}>
+                          <Button size="sm" variant="outline" className="text-indigo-600 border-indigo-200 hover:bg-indigo-50 dark:hover:bg-indigo-900/30">
+                            Boshqarish
+                          </Button>
+                        </Link>
                         <Button size="sm" variant="ghost" onClick={() => openEditModal(level)}>
                           <Edit className="h-4 w-4 text-blue-500" />
                         </Button>
@@ -273,11 +306,27 @@ const LevelsPage = () => {
 
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Sarlavha <span className="text-red-500">*</span></label>
+              <label className="text-sm font-medium">Sarlavha (UZ) <span className="text-red-500">*</span></label>
               <Input
-                placeholder="Masalan: JLPT N5 Boshlang'ich"
-                value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Masalan: JLPT N5"
+                value={formData.title_uz}
+                onChange={(e) => setFormData({ ...formData, title_uz: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Sarlavha (RU)</label>
+              <Input
+                placeholder="Например: JLPT N5"
+                value={formData.title_ru}
+                onChange={(e) => setFormData({ ...formData, title_ru: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Sarlavha (EN)</label>
+              <Input
+                placeholder="Example: JLPT N5"
+                value={formData.title_en}
+                onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
               />
             </div>
 
