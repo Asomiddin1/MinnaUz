@@ -151,7 +151,12 @@ export default function VideoDetailPage({ params }: { params: Promise<{ id: stri
 
     const allTimes = new Set<string>();
     selectedLangs.forEach(lang => {
-      (currentVideo.transcript[lang] || []).forEach(line => allTimes.add(line.time));
+      const trans = currentVideo.transcript[lang];
+      if (Array.isArray(trans)) {
+        trans.forEach(line => {
+          if (line && line.time) allTimes.add(line.time);
+        });
+      }
     });
 
     const sortedTimes = Array.from(allTimes).sort((a, b) => timeToSeconds(a) - timeToSeconds(b));
@@ -159,8 +164,11 @@ export default function VideoDetailPage({ params }: { params: Promise<{ id: stri
     return sortedTimes.map(time => {
       const texts: Record<string, string> = {};
       selectedLangs.forEach(lang => {
-        const match = (currentVideo.transcript[lang] || []).find(l => l.time === time);
-        if (match) texts[lang] = match.text;
+        const trans = currentVideo.transcript[lang];
+        if (Array.isArray(trans)) {
+          const match = trans.find(l => l && l.time === time);
+          if (match) texts[lang] = match.text;
+        }
       });
       return { time, texts };
     });

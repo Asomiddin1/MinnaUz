@@ -19,6 +19,7 @@ import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import LanguageSwitcher from "@/components/intro/LanguageSwitcher"
 import { Button } from "@/components/ui/button"
+import { DashboardSearch } from "@/components/user-components/search/DashboardSearch"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -59,16 +60,9 @@ export default function DashboardLayout({
           <UserSidebar />
         </div>
 
-        <main className="relative z-10 flex h-full w-full flex-1 flex-col overflow-y-auto pb-[110px] md:pb-0">
-          <header className="sticky top-0 z-30 hidden items-center justify-between border-b border-slate-200 bg-white/80 px-6 py-3 backdrop-blur-md md:flex dark:border-slate-800 dark:bg-slate-900/80">
-            <div className="group relative w-full max-w-md">
-              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors group-focus-within:text-blue-500 dark:text-slate-500 dark:group-focus-within:text-blue-400" />
-              <input
-                type="text"
-                placeholder={t("search")}
-                className="w-full rounded-full border border-slate-200 bg-[#F8FAFC] py-2 pr-4 pl-10 text-sm shadow-sm transition-all focus:ring-2 focus:ring-blue-500/50 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:focus:ring-blue-500/30"
-              />
-            </div>
+        <main className="relative z-[60] flex h-full w-full flex-1 flex-col overflow-y-auto pb-[110px] md:pb-0">
+          <header className="sticky top-0 z-[70] hidden items-center justify-between border-b border-slate-200 bg-white/80 px-6 py-3 backdrop-blur-md md:flex dark:border-slate-800 dark:bg-slate-900/80">
+            <DashboardSearch />
 
             <div className="flex items-center gap-3">
               <LanguageSwitcher />

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Grammar;
 use App\Models\Kanji;
 use App\Models\Vocabulary;
+use App\Models\VideoLesson;
 
 class SearchController extends Controller
 {
@@ -18,27 +19,41 @@ class SearchController extends Controller
             return response()->json(['data' => []]);
         }
 
-        $grammars = Grammar::where('title', 'LIKE', "%{$query}%")
-            ->orWhere('meaning', 'LIKE', "%{$query}%")
-            ->orWhere('examples', 'LIKE', "%{$query}%") // JSON ichidan ham qidiradi
-            ->get();
+        $limit = 5;
 
-        $kanjis = Kanji::where('character', 'LIKE', "%{$query}%")
+        $grammars = Grammar::with('level:id,slug')
+            ->where('title', 'LIKE', "%{$query}%")
             ->orWhere('meaning', 'LIKE', "%{$query}%")
             ->orWhere('examples', 'LIKE', "%{$query}%")
+            ->take($limit)
             ->get();
 
-        $vocabularies = Vocabulary::where('word', 'LIKE', "%{$query}%")
+        $kanjis = Kanji::with('level:id,slug')
+            ->where('character', 'LIKE', "%{$query}%")
+            ->orWhere('meaning', 'LIKE', "%{$query}%")
+            ->orWhere('examples', 'LIKE', "%{$query}%")
+            ->take($limit)
+            ->get();
+
+        $vocabularies = Vocabulary::with('level:id,slug')
+            ->where('word', 'LIKE', "%{$query}%")
             ->orWhere('meaning', 'LIKE', "%{$query}%")
             ->orWhere('reading', 'LIKE', "%{$query}%")
             ->orWhere('examples', 'LIKE', "%{$query}%")
+            ->take($limit)
+            ->get();
+
+        $videos = VideoLesson::where('title', 'LIKE', "%{$query}%")
+            ->orWhere('description', 'LIKE', "%{$query}%")
+            ->take($limit)
             ->get();
 
         return response()->json([
             'data' => [
                 'grammars' => $grammars,
                 'kanjis' => $kanjis,
-                'vocabularies' => $vocabularies
+                'vocabularies' => $vocabularies,
+                'videos' => $videos,
             ]
         ]);
     }
