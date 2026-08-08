@@ -3,20 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import VideoCard from '@/components/user-components/video-app/video-card';
 import { userAPI } from "@/lib/api/user";
-import { PlayCircle, Sparkles, Eye, Clock, Loader2 } from 'lucide-react';
+import { PlayCircle, Sparkles, Eye, Clock, Loader2, Search } from 'lucide-react';
 
 export default function VideoPage() {
   const t = useTranslations('VideoPage');
-  const [activeFilter, setActiveFilter] = useState("Barchasi");
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
   
   const [allVideos, setAllVideos] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  // Filter categories
   const filters = [
-    { id: "Barchasi", label: t('filters.all') },
+    { id: null, label: t('filters.all') },
     { id: "Anime tili", label: t('filters.anime') },
     { id: "Yaponiyada hayot", label: t('filters.life') },
     { id: "Vloglar", label: t('filters.vlogs') },
@@ -36,7 +37,7 @@ export default function VideoPage() {
           const date = new Date(video.created_at);
           return {
             ...video,
-            postedAt: `${date.getDate()}-${date.toLocaleString('en-US', { month: 'short' })} ${date.getFullYear()}`, 
+            postedAt: `${date.getDate()}-${date.toLocaleString('en-US', { month: 'short' })} ${date.getFullYear()}`,
           };
         });
 
@@ -52,124 +53,174 @@ export default function VideoPage() {
     fetchVideos();
   }, []);
 
-  const filteredVideos = activeFilter === "Barchasi" 
-    ? allVideos.slice(1) 
-    : allVideos.filter((v: any) => v.category === activeFilter);
+  // Filter videos by category and search query
+  const filteredVideos = allVideos.filter((v: any) => {
+    // Category filter
+    if (activeFilter && v.category !== activeFilter) return false;
+    // Search filter
+    if (query.trim()) {
+      const q = query.trim().toLowerCase();
+      const searchText = `${v.title} ${v.category} ${v.description || ''}`.toLowerCase();
+      return searchText.includes(q);
+    }
+    return true;
+  });
 
+  // Featured video (first one)
   const featuredVideo = allVideos.length > 0 ? allVideos[0] : null;
+
+  // Recommended videos (exclude featured)
+  const recommendedVideos = filteredVideos.slice(1);
 
   if (isLoading) {
     return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-violet-600" />
+      <div className="flex h-[60vh] w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-[#007AFF]" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex h-screen w-full items-center justify-center">
+      <div className="flex h-[60vh] w-full items-center justify-center">
         <p className="text-red-500 font-medium">{t('errorMsg')}</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto p-4 md:p-6">
-      
-      {/* Asosiy oq/dark karta konteyneri */}
-      <div className="bg-white dark:bg-[#0B0F19] border border-slate-200/80 dark:border-slate-800 rounded-3xl p-4 md:p-6 lg:p-8 space-y-8 shadow-sm">
-        
-        {/* 1. KATTA BANNER */}
-        {activeFilter === "Barchasi" && featuredVideo && (
-          <div className="relative w-full aspect-[16/9] md:aspect-[2.2/1] overflow-hidden rounded-2xl shadow-md group">
-            <img 
-              src={featuredVideo.thumbnail} 
-              alt={featuredVideo.title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0B0F19] via-[#0B0F19]/60 to-transparent"></div>
-            
-            <div className="absolute bottom-0 left-0 p-6 md:p-8 w-full md:w-3/4 lg:w-2/3 flex flex-col justify-end h-full">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="bg-violet-600/90 backdrop-blur-md text-white px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-lg flex items-center gap-1.5 shadow-sm">
-                  <Sparkles className="w-3.5 h-3.5" /> {t('newLesson')}
-                </span>
-                <span className="text-slate-300 text-xs md:text-sm font-medium">{featuredVideo.category}</span>
-              </div>
-              
-              <h1 className="text-xl md:text-3xl lg:text-4xl font-bold text-white mb-3 leading-tight drop-shadow-lg line-clamp-2">
-                {featuredVideo.title}
-              </h1>
+    <div className="mx-auto max-w-7xl space-y-6 p-4 md:p-6">
+      {/* Header */}
+      <h1 className="headline text-[30px]">{t('title')}</h1>
+      <p className="mt-2 max-w-[56ch] text-[15px] text-muted-foreground">{t('sub')}</p>
 
-              <div className="flex items-center gap-3 mb-4 text-slate-300 text-xs md:text-sm font-medium">
-                <span className="flex items-center gap-1.5 bg-black/30 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-                  <Eye className="w-3.5 h-3.5" /> {featuredVideo.views}
+      {/* Search & Filters */}
+      <div className="mt-6 flex flex-wrap items-center gap-3">
+        <label className="flex h-10 min-w-0 flex-1 items-center gap-3 rounded-full border border-border bg-card px-4 transition-colors duration-300 focus-within:border-[#007AFF]/40 sm:max-w-[320px]">
+          <Search className="h-[17px] w-[17px] shrink-0 text-muted-foreground" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t('search')}
+            className="min-w-0 flex-1 bg-transparent text-[14px] outline-none placeholder:text-muted-foreground"
+          />
+        </label>
+
+        <div className="flex gap-1 rounded-full border border-border p-1 overflow-x-auto">
+          {filters.map((filter) => (
+            <button
+              key={filter.id ?? 'all'}
+              type="button"
+              aria-pressed={filter.id === activeFilter}
+              onClick={() => setActiveFilter(filter.id)}
+              className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-[13px] transition-all duration-300 ${
+                filter.id === activeFilter
+                  ? 'bg-foreground font-medium text-background'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+
+        <span className="text-[13px] text-muted-foreground">
+          {filteredVideos.length} {t('lessons')}
+        </span>
+      </div>
+
+      {filteredVideos.length === 0 ? (
+        <p className="mt-16 text-center text-[14px] text-muted-foreground">{t('empty')}</p>
+      ) : (
+        <div className="mt-6 space-y-8">
+          {/* Featured Video */}
+          {!activeFilter && featuredVideo && (
+            <div className="relative overflow-hidden rounded-[28px] border border-border bg-card transition-all duration-500 hover:shadow-[0_24px_50px_-32px_rgba(0,0,0,0.45)]">
+              <div className="relative aspect-[16/9] overflow-hidden bg-secondary">
+                <img
+                  src={featuredVideo.thumbnail || `https://i.ytimg.com/vi/${featuredVideo.youtubeId}/hqdefault.jpg`}
+                  alt={featuredVideo.title}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                
+                <span className="absolute left-3 top-3 rounded-full bg-background/85 px-2.5 py-1 text-[11px] font-medium backdrop-blur-md">
+                  {featuredVideo.category || 'Yangi'}
                 </span>
-                <span className="flex items-center gap-1.5 bg-black/30 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-                  <Clock className="w-3.5 h-3.5" /> {featuredVideo.postedAt}
+                
+                <span className="absolute bottom-3 right-3 rounded-full bg-background/85 px-2 py-1 text-[11px] tabular-nums backdrop-blur-md">
+                  {featuredVideo.views} {t('views')}
                 </span>
-              </div>
-              
-              <div className="flex items-center gap-4">
-                <Link href={`/dashboard/video/${featuredVideo.id}`} 
-                      className="inline-flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs md:text-sm shadow-md shadow-violet-500/25 transition-all duration-300 w-full sm:w-auto">
-                  <PlayCircle className="w-4 h-4" fill="currentColor" />
-                  {t('watch')}
+                
+                <Link
+                  href={`/dashboard/video/${featuredVideo.id}`}
+                  className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 hover:opacity-100"
+                >
+                  <span className="grid h-16 w-16 place-items-center rounded-full bg-primary text-primary-foreground shadow-xl">
+                    <PlayCircle className="h-8 w-8" fill="currentColor" />
+                  </span>
                 </Link>
               </div>
+              
+              <div className="p-6">
+                <h2 className="text-[22px] font-bold leading-snug">{featuredVideo.title}</h2>
+                <p className="mt-2 text-[14px] text-muted-foreground">
+                  {featuredVideo.description || featuredVideo.category}
+                </p>
+                <div className="mt-4 flex items-center gap-4 text-[13px] text-muted-foreground">
+                  <span className="flex items-center gap-1.5">
+                    <Eye className="h-4 w-4" />
+                    {featuredVideo.views}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="h-4 w-4" />
+                    {featuredVideo.postedAt}
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* 2. ZAMONAVIY FILTRLAR */}
-        <div className="sticky top-0 z-10 bg-white/90 dark:bg-[#0B0F19]/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 -mx-4 px-4 md:-mx-6 md:px-6 lg:-mx-8 lg:px-8 py-2">
-          <div className="flex gap-6 overflow-x-auto snap-x scroll-smooth no-scrollbar items-center">
-            {filters.map((filter, index) => (
-              <button 
-                key={index}
-                onClick={() => setActiveFilter(filter.id)}
-                className={`snap-start whitespace-nowrap py-3 text-xs md:text-sm font-bold transition-all duration-300 relative ${
-                  activeFilter === filter.id 
-                  ? "text-violet-600 dark:text-violet-400" 
-                  : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
-                }`}
+          {/* Video Grid */}
+          <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {(activeFilter ? filteredVideos : recommendedVideos).map((v) => (
+              <Link
+                key={v.id}
+                href={`/dashboard/video/${v.id}`}
+                className="group overflow-hidden rounded-[24px] border border-border bg-card transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_24px_50px_-32px_rgba(0,0,0,0.45)]"
               >
-                {filter.label}
-                {activeFilter === filter.id && (
-                  <span className="absolute bottom-0 left-0 w-full h-[3px] bg-violet-600 dark:bg-violet-400 rounded-t-full shadow-[0_-2px_10px_rgba(124,58,237,0.5)]"></span>
-                )}
-              </button>
+                <div className="relative flex aspect-[16/9] items-center justify-center overflow-hidden bg-secondary">
+                  <img
+                    src={v.thumbnail || `https://i.ytimg.com/vi/${v.youtubeId}/hqdefault.jpg`}
+                    alt=""
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                  />
+                  <span className="absolute left-3 top-3 rounded-full bg-background/85 px-2.5 py-1 text-[11px] font-medium backdrop-blur-md">
+                    {v.category || v.level}
+                  </span>
+                  <span className="absolute bottom-3 right-3 rounded-full bg-background/85 px-2 py-1 text-[11px] tabular-nums backdrop-blur-md">
+                    {v.views} {t('views')}
+                  </span>
+                  <span className="absolute bottom-3 left-3 grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    <PlayCircle className="h-[18px] w-[18px]" fill="currentColor" />
+                  </span>
+                </div>
+                <div className="block px-5 py-4">
+                  <div className="block text-[15px] font-medium leading-snug">{v.title}</div>
+                  <div className="mt-1.5 block text-[13px] leading-relaxed text-muted-foreground">
+                    {v.description || v.category}
+                  </div>
+                  <div className="mt-3 block text-[12px] tabular-nums text-muted-foreground">
+                    {v.views} {t('views')}
+                  </div>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
-
-        {/* 3. VIDEOLAR RO'YXATI (Videolar atrofidagi fon va padding butunlay olib tashlandi) */}
-        <div className="pb-4">
-          <h2 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white mb-6">
-            {activeFilter === "Barchasi" 
-              ? t('recommended') 
-              : t('categoryVideos', { 
-                  category: filters.find(f => f.id === activeFilter)?.label || activeFilter 
-                })}
-          </h2>
-
-          {filteredVideos.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredVideos.map((video: any) => (
-                <div key={video.id} className="w-full">
-                  <VideoCard video={video} />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-20 px-4 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-3xl">
-              <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-400">{t('noVideos')}</h3>
-            </div>
-          )}
-        </div>
-
-      </div>
+      )}
     </div>
   );
 }

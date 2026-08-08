@@ -21,19 +21,20 @@ export function QuickCategories() {
   React.useEffect(() => {
     const fetchUserStats = async () => {
       try {
-        // Misol uchun API chaqiruvi (backenddagi real metod nomiga moslaysiz)
-        const response = await userAPI.getStreaks ? await userAPI.getStreaks(2026, 7) : null;
-        
-        // Agar backenddan ma'lumot kelgan bo'lsa, ularni statega yozamiz
-        // Hozircha mavjud bo'lmasa o'zingizning API strukturangizga moslab o'zgartirasiz:
-        if (response?.data) {
-          setStats({
-            tests: response.data.testsCount || 12,
-            exercises: response.data.exercisesCount || 35,
-            grammar: response.data.grammarCount || 24,
-            words: response.data.wordsCount || 250,
-            statPercent: response.data.totalScore || "78%"
-          })
+        // getProgress() API dan haftalik faollik ma'lumotlarini olamiz
+        const response = await userAPI.getProgress()
+
+        if (response?.data?.status === "success" && response.data?.data) {
+          const progressData = response.data.data
+          // chart data dan haftalik umumiy minutlarni hisoblaymiz
+          const totalMinutes: number = progressData.chart?.reduce(
+            (sum: number, d: { duration_minutes: number }) => sum + (d.duration_minutes || 0),
+            0
+          ) || 0
+          setStats((prev) => ({
+            ...prev,
+            statPercent: `${Math.min(Math.round((totalMinutes / (60 * 10)) * 100), 100)}%`
+          }))
         }
       } catch (error) {
         console.error("Statistikani olishda xatolik:", error)

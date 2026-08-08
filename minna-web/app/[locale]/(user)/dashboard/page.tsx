@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Copy,
   Gamepad2,
@@ -13,8 +12,6 @@ import {
   Gem,
   Layers,
   Maximize,
-  Clock,
-  ChevronDown,
 } from "lucide-react"
 import { Link, useRouter } from "@/src/i18n/navigation"
 import { useSession } from "next-auth/react"
@@ -28,6 +25,7 @@ import JlptLevels from "@/components/user-components/home-fuctions/jlpt-levels/j
 import { StreakCalendar } from "@/components/user-components/streak-calendar"
 import { QuickCategories } from "@/components/user-components/home-fuctions/quick-categories"
 import { UmumiyProgress } from "@/components/user-components/umumiy-progress"
+import React from "react"
 
 // Lazy-loaded tab components
 const GamesList = dynamic(
@@ -69,148 +67,63 @@ export default function DashboardPage() {
   const { data: session } = useSession()
   const t = useTranslations("Dashboard")
 
+  const TABS = [
+    t("main_page"),
+    t("dictionary"),
+    t("games"),
+    t("dokkai"),
+    t("kanji"),
+    t("shop"),
+    t("translator"),
+    t("ai"),
+    t("premium"),
+  ]
+
   const MENU_ITEMS = [
-    {
-      id: "dictionary",
-      label: t("dictionary"),
-      icon: Copy,
-      href: "/dashboard/dictionary",
-      isTab: true,
-    },
-    {
-      id: "games",
-      label: t("games"),
-      icon: Gamepad2,
-      href: "/dashboard/games",
-      isTab: true,
-    },
-    {
-      id: "dokkai",
-      label: t("dokkai"),
-      icon: BookOpen,
-      href: "/dashboard/dokkai",
-      isTab: true,
-    },
-    {
-      id: "kanji",
-      label: t("kanji"),
-      icon: GraduationCap,
-      href: "/dashboard/kanji",
-      isTab: true,
-    },
-    {
-      id: "shop",
-      label: t("shop"),
-      icon: ShoppingCart,
-      href: "/dashboard/shop",
-      isTab: true,
-    },
-    {
-      id: "translator",
-      label: t("translator"),
-      icon: Languages,
-      href: "/dashboard/translator",
-      isTab: true,
-    },
-    {
-      id: "ai",
-      label: t("ai"),
-      icon: Sparkles,
-      href: "/dashboard/ai",
-      isTab: true,
-    },
-    {
-      id: "premium",
-      label: t("premium"),
-      icon: Gem,
-      href: "/dashboard/premium",
-      color: "text-amber-500 dark:text-amber-400",
-      isTab: true,
-    },
+    { id: "dictionary", label: t("dictionary"), icon: Copy, color: "" },
+    { id: "games", label: t("games"), icon: Gamepad2, color: "" },
+    { id: "dokkai", label: t("dokkai"), icon: BookOpen, color: "" },
+    { id: "kanji", label: t("kanji"), icon: GraduationCap, color: "" },
+    { id: "shop", label: t("shop"), icon: ShoppingCart, color: "" },
+    { id: "translator", label: t("translator"), icon: Languages, color: "" },
+    { id: "ai", label: t("ai"), icon: Sparkles, color: "" },
+    { id: "premium", label: t("premium"), icon: Gem, color: "text-amber-500 dark:text-amber-400" },
   ]
 
   const [isMounted, setIsMounted] = useState(false)
-  const [activeTab, setActiveTab] = useState("jlpt")
-  const [showNav, setShowNav] = useState(true)
+  const [activeTab, setActiveTab] = useState(0)
 
   useEffect(() => {
     setIsMounted(true)
   }, [])
 
-  useEffect(() => {
-    let lastScrollY = window.scrollY
-    let ticking = false
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const currentScrollY = window.scrollY
-
-          if (currentScrollY <= 10) {
-            setShowNav(true)
-          } else if (currentScrollY > lastScrollY) {
-            setShowNav(false)
-          } else if (currentScrollY < lastScrollY) {
-            setShowNav(true)
-          }
-
-          lastScrollY = currentScrollY
-          ticking = false
-        })
-        ticking = true
-      }
-    }
-
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
   if (!isMounted) {
     return (
       <div className="flex h-[50vh] w-full items-center justify-center">
-        <div className="text-slate-500">Yuklanmoqda...</div>
+        <div className="text-muted-foreground">{t("loading")}</div>
       </div>
     )
   }
 
-  const handleTabClick = (item: any) => {
-    if (item.isTab) {
-      setActiveTab(item.id)
-    } else {
-      router.push(item.href)
-    }
-  }
-
   const handleExpandPage = () => {
-    if (activeTab === "jlpt") {
+    if (activeTab === 0) {
       router.push("/dashboard")
     } else {
-      const currentTab = MENU_ITEMS.find((item) => item.id === activeTab)
-      if (currentTab && currentTab.href) {
-        router.push(currentTab.href)
-      }
+      const item = MENU_ITEMS[activeTab - 1]
+      router.push(`/dashboard/${item.id}`)
     }
   }
 
   return (
     <div className="w-full">
-      {/* =======================
-          📱 MOBIL KO'RINISh
-      ======================== */}
+      {/* MOBIL KO'RINISh */}
       <div className="flex w-full flex-col md:hidden">
-        <div className="w-full bg-[#021120] dark:bg-[#090D16]"></div>
-        <div
-          className={`sticky top-0 z-50 w-full border-b border-slate-100/50 bg-white/95 pt-3 pb-3 shadow-sm backdrop-blur-xl transition-transform duration-300 ease-in-out dark:border-slate-800/50 dark:bg-slate-950/95 ${
-            showNav ? "translate-y-0" : "-translate-y-[110%]"
-          }`}
-        >
-          <header className="flex flex-col gap-3 px-3">
+        {/* Mobil uchun o'zining ichki headeri top-0 da qolaveradi, chunki bu yerda layout headeri yo'q */}
+        <div className="sticky top-0 z-40 w-full border-b border-border bg-glass px-3 py-3 backdrop-blur-2xl">
+          <header className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <Link
-                href={"/dashboard/profile"}
-                className="flex items-center gap-3"
-              >
-                <div className="h-[46px] w-[46px] flex-shrink-0 overflow-hidden rounded-full border-2 border-white bg-blue-100 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-900">
+              <Link href={"/dashboard/profile"} className="flex items-center gap-3">
+                <div className="h-[46px] w-[46px] shrink-0 overflow-hidden rounded-full border-2 border-border bg-secondary">
                   {session?.user?.image && (
                     <img
                       src={getAvatarUrl(session.user.image)}
@@ -220,20 +133,20 @@ export default function DashboardPage() {
                   )}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                  <span className="text-[11px] font-medium text-muted-foreground">
                     こんにちは
                   </span>
-                  <span className="text-[15px] leading-tight font-bold text-slate-900 dark:text-white">
+                  <span className="text-[15px] font-semibold leading-tight text-foreground">
                     {session?.user?.name || "Foydalanuvchi"}
                   </span>
                 </div>
               </Link>
 
-              <div className="flex items-center gap-1.5 rounded-full border border-slate-100/60 bg-white/80 px-3 py-1.5 shadow-sm backdrop-blur-sm transition-colors dark:border-slate-700/60 dark:bg-slate-900/80">
+              <div className="flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 backdrop-blur-sm">
                 <div className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-[#FFB800] text-[10px] text-white shadow-inner">
                   🪙
                 </div>
-                <span className="text-[13px] font-bold text-slate-800 dark:text-slate-200">
+                <span className="text-[13px] font-semibold text-foreground">
                   1000
                 </span>
               </div>
@@ -249,22 +162,22 @@ export default function DashboardPage() {
           </div>
 
           <div className="relative w-full p-4">
-            <div className="absolute top-0 right-0 -z-10 h-48 w-48 rounded-full bg-indigo-500/20 blur-3xl" />
+            <div className="absolute top-0 right-0 -z-10 h-48 w-48 rounded-full bg-primary/20 blur-3xl" />
 
             <div className="grid grid-cols-4 gap-x-3 gap-y-6">
-              {MENU_ITEMS.map((item) => (
+              {MENU_ITEMS.map((item, index) => (
                 <button
                   key={item.id}
-                  onClick={() => router.push(item.href)}
+                  onClick={() => setActiveTab(index + 1)}
                   className="group flex flex-col items-center gap-2"
                 >
-                  <div className="flex h-[72px] w-[72px] items-center justify-center rounded-[24px] border border-slate-200/50 bg-white shadow-[5px_5px_10px_rgba(0,0,0,0.05),-5px_-5px_10px_rgba(255,255,255,0.8)] transition-all active:scale-95 dark:border-slate-800 dark:bg-slate-900 dark:shadow-[5px_5px_10px_rgba(0,0,0,0.4),-5px_-5px_10px_rgba(255,255,255,0.02)]">
+                  <div className="flex h-[72px] w-[72px] items-center justify-center rounded-[24px] border border-border bg-card transition-all duration-300 hover:bg-secondary active:scale-95">
                     <item.icon
-                      className={`h-8 w-8 ${item.color ? item.color : "text-slate-800 dark:text-slate-200"}`}
+                      className={`h-8 w-8 ${item.color ? item.color : "text-foreground"}`}
                       strokeWidth={1.5}
                     />
                   </div>
-                  <span className="text-center text-[11px] leading-tight font-semibold text-slate-800 dark:text-slate-300">
+                  <span className="text-center text-[11px] font-medium leading-tight text-muted-foreground">
                     {item.label}
                   </span>
                 </button>
@@ -274,8 +187,8 @@ export default function DashboardPage() {
 
           <div className="flex flex-col gap-3">
             <div className="px-2">
-              <h1 className="text-[20px] font-semibold text-slate-900 dark:text-white">
-                Jlpt darajalari
+              <h1 className="text-[20px] font-semibold text-foreground">
+                {t("jlptLevels")}
               </h1>
             </div>
             <JlptLevels />
@@ -283,139 +196,79 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* =======================
-          💻 DESKTOP KO'RINISh
-      ======================== */}
+      {/* DESKTOP KO'RINISh */}
       <div className="relative hidden w-full md:block">
-        <Tabs
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="flex w-full flex-col"
-        >
-          <div
-            className={`sticky top-0 z-40 flex w-full flex-col transition-transform duration-300 ease-in-out ${
-              showNav ? "translate-y-0" : "-translate-y-[110%]"
-            }`}
-          >
-            <div className="flex w-full items-center justify-center border-b border-slate-300 bg-slate-200/95 px-4 py-2 backdrop-blur-md dark:border-slate-800 dark:bg-slate-900/95">
-              <TabsList className="flex h-[5vh] w-full max-w-7xl justify-start gap-2 overflow-x-auto overflow-y-hidden bg-transparent p-0 px-2 [-ms-overflow-style:none] [scrollbar-width:none] lg:justify-center [&::-webkit-scrollbar]:hidden">
-                <TabsTrigger
-                  value="jlpt"
-                  onClick={() => setActiveTab("jlpt")}
-                  className="relative flex min-w-fit shrink-0 items-center justify-center gap-2 rounded-lg px-4 py-1.5 text-[13.5px] font-medium text-slate-600 transition-all outline-none hover:bg-slate-300/60 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:text-slate-400 dark:hover:bg-slate-800/80 dark:data-[state=active]:bg-slate-950 dark:data-[state=active]:text-white"
-                >
-                  <Layers className="h-4 w-4" /> {t("main_page")}
-                </TabsTrigger>
-
-                {MENU_ITEMS.map((tab) => (
-                  <TabsTrigger
-                    key={tab.id}
-                    value={tab.id}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      handleTabClick(tab)
-                    }}
-                    className="relative flex min-w-fit shrink-0 items-center justify-center gap-2 rounded-lg px-4 py-[5px] text-[13.5px] font-medium text-slate-600 transition-all outline-none hover:bg-slate-300/60 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-sm dark:text-slate-400 dark:hover:bg-slate-800/80 dark:data-[state=active]:bg-slate-950 dark:data-[state=active]:text-white"
-                  >
-                    <tab.icon
-                      className={`h-4 w-4 ${tab.color ? tab.color : ""}`}
-                    />
-                    {tab.label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </div>
-
-            <div className="flex w-full items-center justify-between border-b border-slate-200 bg-white/95 px-5 py-3 shadow-sm backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/95">
-              <h1 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
-                {activeTab === "jlpt"
-                  ? `${t("main_page")}`
-                  : MENU_ITEMS.find((i) => i.id === activeTab)?.label}
-              </h1>
-
-              <div className="flex items-center gap-3">
+        
+        {/* SHU YER O'ZGARDI: top-[61px] qilindi. Asosiy Header 61px atrofida joy egallaganligi uchun unga tegib turadi */}
+        <div className="sticky top-[61px] z-30 w-full border-b border-border bg-[#F8FAFC]/90 px-4 py-2 backdrop-blur-xl sm:px-6 dark:bg-slate-950/90">
+          <div className="flex items-center justify-between">
+            <nav className="flex gap-1 overflow-x-auto [scrollbar-width:none]">
+              {TABS.map((label, i) => (
                 <button
-                  onClick={handleExpandPage}
-                  className="group flex items-center gap-2 rounded-md bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-200 hover:text-slate-900 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
-                  title="Sahifani to'liq ekranda ochish"
+                  key={label}
+                  type="button"
+                  onClick={() => setActiveTab(i)}
+                  aria-current={i === activeTab ? 'page' : undefined}
+                  className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-1.5 text-[13px] transition-all duration-300 ${
+                    i === activeTab
+                      ? 'bg-secondary font-medium text-foreground'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
                 >
-                  <Maximize className="h-4 w-4 transition-transform group-hover:scale-110" />
-                  {t("expansion")}
+                  {i === 0 && <Layers className="h-4 w-4" />}
+                  {i > 0 && MENU_ITEMS[i - 1] && (
+                    <span className="flex items-center gap-2">
+                      {React.createElement(MENU_ITEMS[i - 1].icon, { 
+                        className: `h-4 w-4 ${MENU_ITEMS[i - 1].color || ''}` 
+                      })}
+                      {label}
+                    </span>
+                  )}
                 </button>
+              ))}
+            </nav>
+
+            <button
+              onClick={handleExpandPage}
+              className="ml-4 flex shrink-0 items-center gap-2 rounded-full border border-border px-4 py-1.5 text-[13px] font-medium text-muted-foreground transition-all duration-300 hover:bg-secondary hover:text-foreground"
+              title="Sahifani to'liq ekranda ochish"
+            >
+              <Maximize className="h-4 w-4" />
+              <span className="hidden sm:inline">{t("expansion")}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Content Area */}
+        <div className="px-4 py-7 sm:px-6">
+          {activeTab === 0 && (
+            <div className="flex w-full flex-col space-y-4">
+              <div className="grid w-full grid-cols-1 items-start gap-4 lg:grid-cols-12">
+                <div className="flex w-full flex-col gap-4 lg:col-span-8">
+                  <BannerCarousel />
+                  <QuickCategories />
+                  <JlptLevels />
+                </div>
+                {/* O'ng tarafdagi kalendar ham scroll qilinganda qotib turishi uchun top-32 ga tushirildi */}
+                <div className="sticky top-[130px] flex w-full self-start flex-col gap-3 lg:col-span-4">
+                  <div className="w-full">
+                    <StreakCalendar />
+                  </div>
+                  <UmumiyProgress />
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
-          <div className="relative flex min-h-[500px] w-full flex-1 flex-col bg-white dark:bg-slate-950">
-         <TabsContent value="jlpt" className="mt-0 w-full p-0 outline-none">
-              <div className="flex w-full flex-col px-6 py-4 max-w-7xl mx-auto space-y-4">
-                
-                {/* ASOSIY GRID: items-start va sticky mukammal ishlashi uchun */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start w-full">
-                  
-                  {/* CHAP TUSTUN (8 ta ustun): Banner, QuickCategories va JLPT darajalari scroll bo'ladi */}
-                  <div className="lg:col-span-8 w-full flex flex-col gap-4">
-                    <BannerCarousel />
-                    <QuickCategories />
-                    <JlptLevels />
-                  </div>
-                  
-                  {/* O'NG USTUN (4 ta ustun): Kalendar va Umumiy progress (Joyida qotib turadi) */}
-                 <div className="lg:col-span-4 w-full flex flex-col gap-3 sticky top-36 self-start">
-  <div className="w-full">
-    <StreakCalendar />
-  </div>
-
-  {/* Kunlik o'rganish vaqti / Umumiy progress bloki (Dinamik) */}
-  <UmumiyProgress />
-</div>
-                </div>
-
-              </div>
-            </TabsContent>
-
-            <TabsContent value="games" className="mt-0 w-full p-0 outline-none">
-              <GamesList />
-            </TabsContent>
-
-            <TabsContent
-              value="dictionary"
-              className="mt-0 w-full p-0 outline-none"
-            >
-              <Lugat />
-            </TabsContent>
-
-            <TabsContent
-              value="dokkai"
-              className="mt-0 w-full p-0 outline-none"
-            >
-              <Dokkai />
-            </TabsContent>
-
-            <TabsContent value="kanji" className="mt-0 w-full p-0 outline-none">
-              <Kanji />
-            </TabsContent>
-
-            <TabsContent value="shop" className="mt-0 w-full p-0 outline-none">
-              <Shop />
-            </TabsContent>
-
-            <TabsContent
-              value="translator"
-              className="mt-0 w-full p-0 outline-none"
-            >
-              <Translate />
-            </TabsContent>
-
-            <TabsContent value="ai" className="mt-0 w-full p-0 outline-none">
-              <AiComponent />
-            </TabsContent>
-
-            <TabsContent value="premium" className="w-full p-0 outline-none">
-              <Premium />
-            </TabsContent>
-          </div>
-        </Tabs>
+          {activeTab === 1 && <Lugat />}
+          {activeTab === 2 && <GamesList />}
+          {activeTab === 3 && <Dokkai />}
+          {activeTab === 4 && <Kanji />}
+          {activeTab === 5 && <Shop />}
+          {activeTab === 6 && <Translate />}
+          {activeTab === 7 && <AiComponent />}
+          {activeTab === 8 && <Premium />}
+        </div>
       </div>
     </div>
   )

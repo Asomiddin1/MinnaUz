@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { UserSidebar } from "@/components/sidebar/user-sidebar"
 import { Link, usePathname } from "@/src/i18n/navigation"
@@ -11,7 +12,6 @@ import {
   Sun,
   Moon,
   Monitor,
-  Search,
   Check,
 } from "lucide-react"
 import { useTheme } from "next-themes"
@@ -56,63 +56,70 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <div className="relative flex h-[100dvh] w-full overflow-hidden bg-[#F8FAFC] transition-colors duration-300 dark:bg-slate-950">
-        <div className="z-20 hidden h-full md:block">
+        <div className="z-10 hidden h-full md:block">
           <UserSidebar />
         </div>
 
-        <main className="relative z-[60] flex h-full w-full flex-1 flex-col overflow-y-auto pb-[110px] md:pb-0">
-          <header className="sticky top-0 z-[70] hidden items-center justify-between border-b border-slate-200 bg-white/80 px-6 py-3 backdrop-blur-md md:flex dark:border-slate-800 dark:bg-slate-900/80">
+        <main className="relative z-20 flex h-full w-full flex-1 flex-col overflow-y-auto pb-[110px] md:pb-0">
+          {/* Desktop Header */}
+          <header className="sticky top-0 z-30 hidden items-center justify-between border-b border-slate-200 bg-white/80 px-6 py-3 backdrop-blur-md md:flex dark:border-slate-800 dark:bg-slate-900/80">
             <DashboardSearch />
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <LanguageSwitcher />
-              <div className="mx-1 h-5 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
+              
+              <div className="mx-1 h-5 w-[1px] bg-slate-200 dark:bg-slate-700" />
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-9 w-9 rounded-full border-slate-200 dark:border-slate-700 dark:bg-slate-800"
-                    aria-label="Toggle theme"
-                  >
-                    {mounted &&
-                      (theme === "dark" ? (
-                        <Sun className="h-4 w-4 text-slate-200" />
-                      ) : (
-                        <Moon className="h-4 w-4 text-slate-500" />
-                      ))}
-                  </Button>
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent align="end" className="w-40">
-                  {themeOptions.map(({ value, label, icon: Icon }) => (
-                    <DropdownMenuItem
-                      key={value}
-                      onClick={() => setTheme(value)}
-                      className="flex items-center justify-between gap-3 cursor-pointer"
+              {!mounted ? (
+                <div className="h-9 w-9 rounded-full border border-slate-200 dark:border-slate-700" />
+              ) : (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-9 w-9 rounded-full border-slate-200 dark:border-slate-700 dark:bg-slate-800"
+                      aria-label="Toggle theme"
                     >
-                      <span className="flex items-center gap-2">
-                        <Icon className="h-4 w-4" />
-                        {label}
-                      </span>
-                      {mounted && theme === value && (
-                        <Check className="h-4 w-4 text-blue-500" />
+                      {theme === "dark" ? (
+                        <Sun className="h-4 w-4 text-slate-200" />
+                      ) : theme === "light" ? (
+                        <Moon className="h-4 w-4 text-slate-500" />
+                      ) : (
+                        <Monitor className="h-4 w-4 text-slate-500" />
                       )}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    </Button>
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent align="end" className="w-40">
+                    {themeOptions.map(({ value, label, icon: Icon }) => (
+                      <DropdownMenuItem
+                        key={value}
+                        onClick={() => setTheme(value)}
+                        className="flex items-center justify-between gap-3 cursor-pointer"
+                      >
+                        <span className="flex items-center gap-2">
+                          <Icon className="h-4 w-4" />
+                          {label}
+                        </span>
+                        {theme === value && (
+                          <Check className="h-4 w-4 text-blue-500" />
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </header>
 
+          {/* Content */}
           <div className="flex-1">{children}</div>
         </main>
 
-        
-        {/* 🪄 SIRG'ALIB O'TUVCHI PRO TAB BAR */}
-       <div className="fixed bottom-4 left-9 right-6 z-50 flex justify-center md:hidden">
-         <nav className="relative flex h-[70px] w-full max-w-md items-center justify-between rounded-[45px] border border-white/60 bg-white/30 px-3 py-2 shadow-[0_10px_40px_rgba(0,0,0,0.1)] backdrop-blur-3xl dark:border-white/10 dark:bg-slate-900/40 dark:shadow-[0_10px_40px_rgba(0,0,0,0.6)]">
+        {/* Mobile Bottom Tab Bar - Doimiy qotib turadigan (Fixed) holat */}
+        <div className="fixed bottom-4 left-4 right-4 z-50 flex justify-center md:hidden">
+          <nav className="relative flex h-[70px] w-full max-w-md items-center justify-between rounded-[45px] border border-white/60 bg-white/30 px-3 py-2 shadow-[0_10px_40px_rgba(0,0,0,0.1)] backdrop-blur-3xl dark:border-white/10 dark:bg-slate-900/40 dark:shadow-[0_10px_40px_rgba(0,0,0,0.6)]">
             {/* Home */}
             <Link
               href="/dashboard"
@@ -180,7 +187,6 @@ export default function DashboardLayout({
                 {t("premium")}
               </span>
             </Link>
-
           </nav>
         </div>
       </div>

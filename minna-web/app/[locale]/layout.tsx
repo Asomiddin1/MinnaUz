@@ -1,4 +1,4 @@
-import { Space_Grotesk, Geist_Mono } from "next/font/google"
+import { Inter, Geist_Mono } from "next/font/google"
 import "../globals.css"
 
 import { ThemeProvider } from "@/components/theme-provider"
@@ -12,7 +12,7 @@ import { getMessages } from "next-intl/server"
 import { notFound } from "next/navigation"
 import { routing } from "@/src/i18n/routing"
 
-const spaceGrotesk = Space_Grotesk({
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
 })
@@ -88,7 +88,7 @@ export default async function LocaleLayout({
       <body
         className={cn(
           "scroll-smooth font-sans antialiased",
-          spaceGrotesk.variable,
+          inter.variable,
           fontMono.variable
         )}
       >

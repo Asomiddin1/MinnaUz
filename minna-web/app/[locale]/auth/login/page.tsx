@@ -1,61 +1,122 @@
-"use client";
+"use client"
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { getSession, signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useEffect, useRef, useState } from 'react'
+import { Link } from '@/src/i18n/navigation'
+import { useRouter } from 'next/navigation'
+import LanguageSwitcher from '@/components/intro/LanguageSwitcher'
+import Logo, { LogoMark } from '@/components/intro/Logo'
+const t = {
+  auth: {
+    emailInvalid: "Noto'g'ri email",
+    codeIncomplete: "Kodni to'liq kiriting",
+    codeWrong: "Kod noto'g'ri",
+    quote: "Har bir yangi so'z — yangi dunyoga ochilgan eshik.",
+    back: "Orqaga",
+    successTitle: "Muvaffaqiyatli!",
+    successSub: "Tizimga kirilmoqda...",
+    title: "Xush kelibsiz",
+    sub: "Email orqali tizimga kiring yoki ro'yxatdan o'ting.",
+    google: "Google orqali davom etish",
+    or: "yoki",
+    emailLabel: "Email manzil",
+    emailPlaceholder: "Sizning email manzilingiz",
+    sending: "Yuborilmoqda...",
+    sendCode: "Kodni olish",
+    terms: "Tizimga kirish orqali siz bizning qoidalarga rozi bo'lasiz.",
+    codeTitle: "Kodni kiriting",
+    codeSub: "Kod shu manzilga yuborildi:",
+    verifying: "Tekshirilmoqda...",
+    verify: "Tasdiqlash",
+    resendIn: "Qayta yuborish:",
+    seconds: "s",
+    resend: "Kodni qayta yuborish",
+    changeEmail: "Emailni o'zgartirish",
+  },
+  footer: {
+    rights: "© 2026 MinnaUz",
+  },
+}
+import { useTheme } from 'next-themes'
+import { signIn, getSession } from 'next-auth/react'
 
-export default function InteractiveLoginPage() {
-  const router = useRouter();
-  const t = useTranslations("Login");
+type Step = 'email' | 'code' | 'done'
 
-  // --- UI Holatlari (States) ---
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+const CODE_LENGTH = 6
+const RESEND_SECONDS = 45
 
-  // --- Mantiqiy Holatlar (States) ---
-  const [step, setStep] = useState<1 | 2>(1);
-  const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+function GoogleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" aria-hidden>
+      <path
+        fill="#4285F4"
+        d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.46a5.52 5.52 0 0 1-2.4 3.62v3.01h3.88c2.27-2.09 3.58-5.17 3.58-8.82Z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 24c3.24 0 5.96-1.08 7.94-2.91l-3.88-3.01c-1.08.72-2.45 1.15-4.06 1.15-3.12 0-5.77-2.11-6.71-4.95H1.28v3.11A12 12 0 0 0 12 24Z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.29 14.28a7.2 7.2 0 0 1 0-4.56V6.61H1.28a12 12 0 0 0 0 10.78l4.01-3.11Z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 4.75c1.76 0 3.34.61 4.59 1.8l3.44-3.44C17.95 1.18 15.23 0 12 0A12 12 0 0 0 1.28 6.61l4.01 3.11C6.23 6.86 8.88 4.75 12 4.75Z"
+      />
+    </svg>
+  )
+}
 
-  // --- Interaktiv UI Effectlari ---
+export default function Login() {
+  const { theme, setTheme } = useTheme()
+  const router = useRouter()
+  const [mounted, setMounted] = useState(false)
+
+  const [step, setStep] = useState<Step>('email')
+  const [email, setEmail] = useState('')
+  const [code, setCode] = useState<string[]>(Array(CODE_LENGTH).fill(''))
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState<null | 'email' | 'code' | 'google'>(null)
+  const [cooldown, setCooldown] = useState(0)
+
+  const boxes = useRef<(HTMLInputElement | null)[]>([])
+
+  useEffect(() => setMounted(true), [])
+
+  const toggle = () => setTheme(theme === 'dark' ? 'light' : 'dark')
+
   useEffect(() => {
-    setDimensions({ width: window.innerWidth, height: window.innerHeight });
+    if (cooldown <= 0) return
+    const id = window.setTimeout(() => setCooldown((c) => c - 1), 1000)
+    return () => window.clearTimeout(id)
+  }, [cooldown])
 
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
+  useEffect(() => {
+    if (step === 'code') boxes.current[0]?.focus()
+    if (step === 'done') {
+      const finish = async () => {
+        const session = await getSession();
+        if ((session?.user as any)?.role === "admin") {
+          router.push("/admin");
+        } else {
+          router.push("/dashboard");
+        }
+        router.refresh();
+      }
+      const id = window.setTimeout(finish, 1400)
+      return () => window.clearTimeout(id)
+    }
+  }, [step, router])
 
-    const handleResize = () => {
-      setDimensions({ width: window.innerWidth, height: window.innerHeight });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
-
-
-  // --- Mantiqiy Funksiyalar ---
-  // 1. Google orqali kirish
-  const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: "/dashboard" });
-  };
-
-  // 2. Emailga OTP yuborish
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-
+  const submitEmail = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) {
+      setError(t.auth.emailInvalid)
+      return
+    }
+    setError(null)
+    setBusy('email')
+    
     try {
       const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/auth/send-otp", {
         method: "POST",
@@ -66,22 +127,56 @@ export default function InteractiveLoginPage() {
       const data = await res.json();
 
       if (res.ok) {
-        setStep(2);
+        setBusy(null)
+        setStep('code')
+        setCooldown(RESEND_SECONDS)
       } else {
-        setError(data.message || t("errorDefault"));
+        setError(data.message || "Xatolik yuz berdi");
+        setBusy(null)
       }
     } catch (err) {
-      setError(t("errorServer"));
-    } finally {
-      setLoading(false);
+      setError("Server xatosi");
+      setBusy(null)
     }
-  };
+  }
 
-  // 3. Kodni tasdiqlash
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+  const setDigit = (index: number, value: string) => {
+    const digits = value.replace(/\D/g, '')
+    if (!digits) {
+      setCode((c) => c.map((d, i) => (i === index ? '' : d)))
+      return
+    }
+    setCode((c) => {
+      const next = [...c]
+      digits.split('').forEach((d, offset) => {
+        if (index + offset < CODE_LENGTH) next[index + offset] = d
+      })
+      return next
+    })
+    const landed = Math.min(index + digits.length, CODE_LENGTH - 1)
+    boxes.current[landed]?.focus()
+    setError(null)
+  }
+
+  const onDigitKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !code[index] && index > 0) {
+      e.preventDefault()
+      boxes.current[index - 1]?.focus()
+      setCode((c) => c.map((d, i) => (i === index - 1 ? '' : d)))
+    }
+    if (e.key === 'ArrowLeft' && index > 0) boxes.current[index - 1]?.focus()
+    if (e.key === 'ArrowRight' && index < CODE_LENGTH - 1) boxes.current[index + 1]?.focus()
+  }
+
+  const submitCode = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (code.some((d) => !d)) {
+      setError(t.auth.codeIncomplete)
+      return
+    }
+    const otp = code.join('')
+    setError(null)
+    setBusy('code')
 
     try {
       const res = await signIn("credentials", {
@@ -91,161 +186,244 @@ export default function InteractiveLoginPage() {
       });
 
       if (res?.error) {
-        setError(t("errorOtp"));
-        setLoading(false);
+        setError(t.auth.codeWrong);
+        setBusy(null);
       } else {
-        const session = await getSession();
-        
-        // Rolga qarab yo'naltirish
-        if ((session?.user as any)?.role === "admin") {
-          router.push("/admin");
-        } else {
-          router.push("/dashboard");
-        }
-        
-        router.refresh();
+        setBusy(null);
+        setStep('done');
       }
     } catch (err) {
-      setError(t("errorServer"));
-      setLoading(false);
+      setError("Server xatosi");
+      setBusy(null);
     }
-  };
+  }
+
+  const google = () => {
+    setBusy('google')
+    signIn("google", { callbackUrl: "/dashboard" })
+  }
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-[#e0eafc] to-[#cfdef3] p-4 font-sans text-slate-800 relative overflow-hidden">
-      
-      {/* Orqa fondagi bezak shakllar */}
-      <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-      <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+    <div className="grid min-h-screen lg:grid-cols-[1.05fr_1fr] bg-background text-foreground">
+      <aside className="brand-panel relative hidden overflow-hidden p-12 lg:flex lg:flex-col lg:justify-between">
+        {/* Orqa fon rasmi tabiiy rangida */}
+        <div 
+          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/auth-bg.png')" }}
+        />
+        {/* Yozuvlar o'qilishi uchun chapdan o'ngga qoramtir gradient */}
+        <div className="absolute inset-0 z-0 bg-gradient-to-r from-black/95 via-black/50 to-transparent" />
 
-      {/* Orqaga qaytish tugmasi */}
-      <Link href="/" className="absolute top-6 left-6 z-50 p-3 bg-white/50 backdrop-blur-md rounded-full text-slate-500 hover:text-slate-800 hover:bg-white/80 transition-all shadow-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-      </Link>
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-24 top-1/2 z-0 h-[520px] w-[520px] -translate-y-1/2 rounded-full opacity-20"
+          style={{
+            background: 'radial-gradient(circle, rgba(255,255,255,0.7), transparent 70%)',
+          }}
+        />
+        <Link href="/" className="relative z-10 flex items-center gap-2.5">
+          <LogoMark className="h-[26px] w-[26px]" />
+          <span className="headline text-[19px] tracking-[-0.045em]">MinnaUz</span>
+        </Link>
 
-      {/* Asosiy Oyna (Glassmorphism) */}
-      <div className="bg-white/70 backdrop-blur-2xl border border-white/50 rounded-[2.5rem] shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] flex overflow-hidden max-w-5xl w-full min-h-[650px] relative z-10">
-        
-        {/* CHAP TOMON - Interaktiv Rasm qismi */}
-        <div className="hidden md:flex w-1/2 relative items-center justify-center p-12 overflow-hidden bg-gradient-to-br from-blue-50/50 to-indigo-50/50">
-          <div className="relative z-10 flex flex-col items-center justify-center h-full">
-            {/* Parallax Rasm Konteyneri */}
-            
-            
-            <h2 className="mt-12 text-3xl font-extrabold text-center leading-tight tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-500">
-              {t("heroTitle")} <br/>
-              <span className="text-blue-600">{t("heroHighlight")}</span>
-            </h2>
-          </div>
+        <div className="relative z-10">
+          <p className="font-jp text-[clamp(3.4rem,7vw,5.6rem)] leading-[1.05] drop-shadow-md">
+            みんなで
+            <br />
+            まなぶ。
+          </p>
+          <p className="mt-8 max-w-[34ch] text-[17px] leading-relaxed opacity-90 drop-shadow-sm">{t.auth.quote}</p>
         </div>
 
-        {/* O'NG TOMON - Login Formasi */}
-        <div className="flex-1 p-10 sm:p-14 flex flex-col justify-center bg-white/40">
-          <div className="w-full max-w-md mx-auto space-y-8">
-            <div className="text-left">
-              <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight mb-2">
-                {step === 1 ? t("title") : t("verifyTitle")}
-              </h1>
-              <p className="text-slate-500 text-lg">
-                {step === 1 
-                  ? t("welcome") 
-                  : `${email} ${t("otpSent")}`}
-              </p>
-            </div>
+        <p className="relative z-10 text-[13px] opacity-70">{t.footer.rights}</p>
+      </aside>
 
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 text-sm p-4 rounded-2xl mb-4 text-center font-medium shadow-sm">
-                {error}
-              </div>
+      <main className="relative flex flex-col">
+        <header className="flex items-center justify-between px-6 py-5 sm:px-10">
+          <Link href="/" className="lg:hidden">
+            <Logo />
+          </Link>
+          <Link
+            href="/"
+            className="hidden text-[13px] text-muted-foreground transition-colors duration-300 hover:text-foreground lg:block"
+          >
+            ← {t.auth.back}
+          </Link>
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            {mounted && (
+              <button
+                type="button"
+                onClick={toggle}
+                aria-label={theme === 'dark' ? 'Light mode' : 'Dark mode'}
+                className="grid h-9 w-9 place-items-center rounded-full border border-border transition-colors duration-300 hover:bg-secondary"
+              >
+                <span className="text-[14px] leading-none">{theme === 'dark' ? '☾' : '☀'}</span>
+              </button>
             )}
+          </div>
+        </header>
 
-            {step === 1 ? (
-              <form className="space-y-6" onSubmit={handleSendOtp}>
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700 ml-1">{t("email")}</label>
-                  <div className="relative">
-                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-                    <input
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      disabled={loading}
-                      placeholder="name@example.com"
-                      className="w-full pl-12 pr-5 py-4 bg-white/60 border border-slate-200 rounded-2xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-medium text-slate-800 placeholder:text-slate-400 shadow-sm disabled:opacity-60"
-                    />
-                  </div>
+        <div className="flex flex-1 items-center justify-center px-6 py-12 sm:px-10">
+          <div className="w-full max-w-[380px]">
+            {step === 'done' ? (
+              <div className="text-center">
+                <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-primary text-[22px] text-primary-foreground">
+                  ✓
                 </div>
+                <h1 className="headline mt-6 text-[32px]">{t.auth.successTitle}</h1>
+                <p className="mt-2 text-[15px] text-muted-foreground">{t.auth.successSub}</p>
+              </div>
+            ) : step === 'email' ? (
+              <>
+                <h1 className="headline text-[clamp(2rem,4vw,2.6rem)]">{t.auth.title}</h1>
+                <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
+                  {t.auth.sub}
+                </p>
 
-                <button 
-                  type="submit" 
-                  disabled={loading}
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-2xl font-bold text-lg hover:from-blue-700 hover:to-indigo-700 hover:shadow-lg hover:shadow-blue-500/30 transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all disabled:opacity-70 disabled:hover:translate-y-0"
-                >
-                  {loading ? t("sending") : t("getCode")}
-                </button>
-                
-                <div className="relative flex items-center py-2">
-                  <div className="flex-grow border-t border-slate-200"></div>
-                  <span className="flex-shrink-0 mx-4 text-slate-400 text-sm font-medium">{t("or")}</span>
-                  <div className="flex-grow border-t border-slate-200"></div>
-                </div>
-
-                <button 
+                <button
                   type="button"
-                  onClick={handleGoogleSignIn}
-                  disabled={loading}
-                  className="w-full bg-white border border-slate-200 py-4 rounded-2xl font-semibold text-slate-700 flex items-center justify-center gap-3 hover:bg-slate-50 hover:shadow-md transform active:scale-[0.98] transition-all disabled:opacity-70"
+                  onClick={google}
+                  disabled={busy !== null}
+                  className="mt-9 flex w-full items-center justify-center gap-3 rounded-full border border-border bg-card px-6 py-3 text-[15px] font-medium transition-all duration-300 hover:bg-secondary active:scale-[0.98] disabled:opacity-60"
                 >
-                  <svg viewBox="0 0 24 24" className="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                  </svg>
-                  {t("googleLogin")}
+                  <GoogleIcon />
+                  {t.auth.google}
                 </button>
-              </form>
+
+                <div className="my-7 flex items-center gap-4">
+                  <span className="h-px flex-1 bg-border" />
+                  <span className="text-[12px] uppercase tracking-[0.18em] text-muted-foreground">
+                    {t.auth.or}
+                  </span>
+                  <span className="h-px flex-1 bg-border" />
+                </div>
+
+                <form onSubmit={submitEmail} noValidate>
+                  <label
+                    htmlFor="email"
+                    className="text-[12px] uppercase tracking-[0.16em] text-muted-foreground"
+                  >
+                    {t.auth.emailLabel}
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    autoComplete="email"
+                    inputMode="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      setError(null)
+                    }}
+                    placeholder={t.auth.emailPlaceholder}
+                    aria-invalid={Boolean(error)}
+                    className="mt-2 w-full rounded-[16px] border border-border bg-card px-4 py-3 text-[16px] outline-none transition-colors duration-300 placeholder:text-muted-foreground/60 focus:border-foreground/40"
+                  />
+                  {error && <p className="mt-2 text-[13px] text-destructive">{error}</p>}
+
+                  <button
+                    type="submit"
+                    disabled={busy !== null}
+                    className="mt-5 w-full rounded-full bg-foreground px-6 py-3 text-[15px] font-medium text-background transition-all duration-300 hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
+                  >
+                    {busy === 'email' ? t.auth.sending : t.auth.sendCode}
+                  </button>
+                </form>
+
+                <p className="mt-6 text-[12px] leading-relaxed text-muted-foreground">
+                  {t.auth.terms}
+                </p>
+              </>
             ) : (
-              <form className="space-y-6" onSubmit={handleVerifyOtp}>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between ml-1">
-                    <label className="block text-sm font-semibold text-slate-700">{t("verifyCode")}</label>
+              <>
+                <h1 className="headline text-[clamp(2rem,4vw,2.6rem)]">{t.auth.codeTitle}</h1>
+                <p className="mt-3 text-[15px] text-muted-foreground">
+                  {t.auth.codeSub} <span className="text-foreground">{email}</span>
+                </p>
+
+                <form onSubmit={submitCode}>
+                  <div className="mt-8 flex gap-2">
+                    {code.map((digit, i) => (
+                      <input
+                        key={i}
+                        ref={(el) => {
+                          boxes.current[i] = el
+                        }}
+                        value={digit}
+                        onChange={(e) => setDigit(i, e.target.value)}
+                        onKeyDown={(e) => onDigitKeyDown(i, e)}
+                        inputMode="numeric"
+                        autoComplete={i === 0 ? 'one-time-code' : 'off'}
+                        maxLength={CODE_LENGTH}
+                        aria-label={`${i + 1}`}
+                        className="headline h-14 w-full min-w-0 rounded-[14px] border border-border bg-card text-center text-[22px] tabular-nums outline-none transition-colors duration-300 focus:border-foreground/50"
+                      />
+                    ))}
+                  </div>
+                  {error && <p className="mt-3 text-[13px] text-destructive">{error}</p>}
+
+                  <button
+                    type="submit"
+                    disabled={busy !== null}
+                    className="mt-6 w-full rounded-full bg-foreground px-6 py-3 text-[15px] font-medium text-background transition-all duration-300 hover:opacity-90 active:scale-[0.98] disabled:opacity-60"
+                  >
+                    {busy === 'code' ? t.auth.verifying : t.auth.verify}
+                  </button>
+                </form>
+
+                <div className="mt-6 flex flex-col gap-2 text-[13px] text-muted-foreground">
+                  {cooldown > 0 ? (
+                    <span>
+                      {t.auth.resendIn} {cooldown}
+                      {t.auth.seconds}
+                    </span>
+                  ) : (
                     <button
                       type="button"
-                      onClick={() => setStep(1)}
-                      className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                      onClick={async () => {
+                        // Resend logic
+                        setError(null);
+                        try {
+                          const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/auth/send-otp", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json", Accept: "application/json" },
+                            body: JSON.stringify({ email: email }),
+                          });
+                          if (res.ok) {
+                            setCode(Array(CODE_LENGTH).fill(''))
+                            setCooldown(RESEND_SECONDS)
+                            boxes.current[0]?.focus()
+                          } else {
+                            const data = await res.json();
+                            setError(data.message || "Xatolik yuz berdi");
+                          }
+                        } catch (err) {
+                          setError("Server xatosi");
+                        }
+                      }}
+                      className="self-start text-foreground underline underline-offset-4"
                     >
-                      {t("changeEmail")}
+                      {t.auth.resend}
                     </button>
-                  </div>
-                  <div className="relative">
-                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                    <input
-                      type="text"
-                      required
-                      maxLength={6}
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                      disabled={loading}
-                      placeholder="------"
-                      className="w-full pl-12 pr-5 py-4 bg-white/60 border border-slate-200 rounded-2xl focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all font-bold text-center tracking-[0.5em] text-xl text-slate-800 placeholder:text-slate-400 shadow-sm disabled:opacity-60"
-                    />
-                  </div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStep('email')
+                      setCode(Array(CODE_LENGTH).fill(''))
+                      setError(null)
+                    }}
+                    className="self-start transition-colors duration-300 hover:text-foreground"
+                  >
+                    {t.auth.changeEmail}
+                  </button>
                 </div>
-
-                <button 
-                  type="submit" 
-                  disabled={loading || otp.length !== 6}
-                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-2xl font-bold text-lg hover:from-blue-700 hover:to-indigo-700 hover:shadow-lg hover:shadow-blue-500/30 transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all disabled:opacity-70 disabled:hover:translate-y-0"
-                >
-                  {loading ? t("checking") : t("login")}
-                </button>
-              </form>
+              </>
             )}
           </div>
         </div>
-      </div>
+      </main>
     </div>
-  );
+  )
 }

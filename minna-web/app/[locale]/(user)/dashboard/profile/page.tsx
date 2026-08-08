@@ -56,6 +56,9 @@ interface Device {
   is_current: boolean
 }
 
+// Apple primary blue
+const APPLE_BLUE = "#007AFF"
+
 // ============================================================
 // EDIT NAME MODAL
 // ============================================================
@@ -77,7 +80,6 @@ function EditNameModal({
     inputRef.current?.select()
   }, [])
 
-  // ESC bilan yopish
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose()
@@ -103,72 +105,61 @@ function EditNameModal({
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" />
-
-      {/* Modal */}
-      <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-white shadow-2xl dark:border-slate-700/60 dark:bg-[#131929]">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-slate-700/60">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-500/15">
-              <Pencil className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-            </div>
-            <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-              Ismni tahrirlash
-            </h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-
-        {/* Body */}
-        <form onSubmit={handleSubmit} className="p-6">
-          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-            To'liq ism
-          </label>
-          <input
-            ref={inputRef}
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            minLength={2}
-            maxLength={100}
-            required
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition-all focus:border-indigo-400 focus:bg-white focus:ring-2 focus:ring-indigo-400/20 dark:border-slate-600 dark:bg-slate-800/60 dark:text-white dark:focus:border-indigo-500 dark:focus:bg-slate-800 dark:focus:ring-indigo-500/20"
-            placeholder="Ismingizni kiriting..."
-          />
-          <p className="mt-1.5 text-right text-xs text-slate-400">
-            {name.length}/100
-          </p>
-
-          {/* Footer buttons */}
-          <div className="mt-5 flex gap-3">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      <div className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-border bg-glass p-1 shadow-[0_24px_60px_-28px_rgba(0,0,0,0.5)] backdrop-blur-2xl">
+        <div className="rounded-[24px] bg-card p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="headline text-[20px]">Ismni tahrirlash</h2>
             <button
-              type="button"
               onClick={onClose}
-              className="flex-1 rounded-xl border border-slate-200 bg-white py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              className="rounded-full p-2 transition-colors duration-300 hover:bg-secondary"
             >
-              Bekor qilish
-            </button>
-            <button
-              type="submit"
-              disabled={isSaving || name.trim().length < 2}
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 py-2.5 text-sm font-medium text-white transition-all hover:bg-indigo-700 disabled:opacity-50 dark:bg-indigo-500 dark:hover:bg-indigo-600"
-            >
-              {isSaving ? (
-                <RefreshCcw className="h-4 w-4 animate-spin" />
-              ) : (
-                <Check className="h-4 w-4" />
-              )}
-              Saqlash
+              <X className="h-5 w-5" />
             </button>
           </div>
-        </form>
+
+          <form onSubmit={handleSubmit} className="mt-6">
+            <label className="mb-2 block text-[13px] font-medium text-muted-foreground">
+              To'liq ism
+            </label>
+            <input
+              ref={inputRef}
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              minLength={2}
+              maxLength={100}
+              required
+              className="w-full rounded-[16px] border border-border bg-secondary/50 px-4 py-3 text-[14px] text-foreground outline-none transition-all duration-300 focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/20"
+              placeholder="Ismingizni kiriting..."
+            />
+            <p className="mt-1.5 text-right text-[12px] text-muted-foreground">
+              {name.length}/100
+            </p>
+
+            <div className="mt-5 flex gap-3">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 rounded-full border border-border px-6 py-2.5 text-[13px] font-medium transition-colors duration-300 hover:bg-secondary"
+              >
+                Bekor qilish
+              </button>
+              <button
+                type="submit"
+                disabled={isSaving || name.trim().length < 2}
+                className="flex flex-1 items-center justify-center gap-2 rounded-full bg-[#007AFF] py-2.5 text-[13px] font-medium text-white transition-all duration-300 hover:bg-[#0055CC] disabled:opacity-50"
+              >
+                {isSaving ? (
+                  <RefreshCcw className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Check className="h-4 w-4" />
+                )}
+                Saqlash
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   )
@@ -309,6 +300,7 @@ export default function ProfilePage() {
       if (res.data.success) {
         setUser((prev) => (prev ? { ...prev, avatar: res.data.avatar } : prev))
         await update({ image: res.data.avatar })
+        window.location.reload()
       }
     } catch (err: any) {
       console.error(err)
@@ -331,7 +323,6 @@ export default function ProfilePage() {
       alert(err?.response?.data?.message || "Ism yangilashda xatolik yuz berdi")
     }
   }
-
 
   function timeAgo(dateString: string | null) {
     if (!dateString) return t("unknownDevice")
@@ -390,24 +381,24 @@ export default function ProfilePage() {
   if (status === "loading") {
     return (
       <div className="flex h-[60vh] items-center justify-center">
-        <RefreshCcw className="h-8 w-8 animate-spin text-indigo-500" />
+        <RefreshCcw className="h-8 w-8 animate-spin text-[#007AFF]" />
       </div>
     )
   }
 
   if (!user) {
     return (
-      <div className="mt-10 text-center text-slate-500 dark:text-slate-400">
+      <div className="mt-10 text-center text-muted-foreground">
         {t("notFound")}
       </div>
     )
   }
 
   const isPremium = user.is_premium || (session?.user as any)?.is_premium
+  const isAdmin = user.role === "admin" || user.role === "Admin"
 
   return (
     <>
-      {/* Name Edit Modal */}
       {showNameModal && (
         <EditNameModal
           currentName={user.name || ""}
@@ -416,338 +407,305 @@ export default function ProfilePage() {
         />
       )}
 
-      <div className="mx-auto max-w-5xl space-y-6 p-4 md:p-6 lg:p-8">
-
+      <div className="mx-auto max-w-4xl space-y-6 p-4 md:p-6">
         {/* ======================================= */}
-        {/* 1. HEADER CARD                          */}
+        {/* 1. IDENTITY CARD                        */}
         {/* ======================================= */}
-        <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm md:p-8 dark:border-slate-700/50 dark:bg-[#111827]">
-          {/* Background accent */}
-          <div className="pointer-events-none absolute -top-20 -right-20 h-64 w-64 rounded-full bg-indigo-100/50 blur-3xl dark:bg-indigo-900/20" />
-          <div className="pointer-events-none absolute -bottom-10 -left-10 h-48 w-48 rounded-full bg-purple-100/40 blur-3xl dark:bg-purple-900/10" />
-
-          <div className="relative z-10 flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
-            <div className="flex w-full items-center gap-5 md:w-auto">
-
-              {/* AVATAR */}
-              <div className="group relative shrink-0">
-                {user.avatar ? (
-                  <img
-                    src={getAvatarUrl(user.avatar)}
-                    alt="avatar"
-                    className="h-24 w-24 rounded-2xl border-2 border-white object-cover shadow-md transition-all group-hover:border-indigo-200 dark:border-slate-700 dark:group-hover:border-indigo-700"
-                  />
-                ) : (
-                  <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-4xl font-bold text-white shadow-md">
-                    {user.name?.charAt(0).toUpperCase()}
-                  </div>
-                )}
-
-                {/* Upload spinner overlay */}
-                {isUploading && (
-                  <div className="absolute inset-0 z-20 flex items-center justify-center rounded-2xl bg-white/70 backdrop-blur-sm dark:bg-slate-900/70">
-                    <RefreshCcw className="h-6 w-6 animate-spin text-indigo-600 dark:text-indigo-400" />
-                  </div>
-                )}
-
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                  title="Yangi rasm yuklash"
-                  className="absolute -right-2 -bottom-2 z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-indigo-600 text-white shadow-md transition-all hover:bg-indigo-700 hover:scale-110 active:scale-95 disabled:opacity-50 dark:border-slate-900 dark:bg-indigo-500 dark:hover:bg-indigo-600"
-                >
-                  <Camera className="h-3.5 w-3.5" />
-                </button>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleAvatarUpload}
+        <section className="relative rounded-[28px] border border-border bg-card p-6 sm:p-8">
+          <div className="flex flex-wrap items-start gap-6">
+            {/* AVATAR - kattaroq */}
+            <div className="group relative shrink-0">
+              {user.avatar ? (
+                <img
+                  src={getAvatarUrl(user.avatar)}
+                  alt="avatar"
+                  className="h-24 w-24 rounded-full border-2 border-border object-cover transition-all duration-300 group-hover:border-[#007AFF]"
                 />
-              </div>
+              ) : (
+                <span className="headline grid h-24 w-24 shrink-0 place-items-center rounded-full bg-primary text-[32px] text-primary-foreground">
+                  {user.name?.charAt(0).toUpperCase()}
+                </span>
+              )}
 
-              {/* INFO */}
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <h1 className="flex items-center gap-2 text-2xl font-bold text-slate-900 dark:text-white">
-                    <span className="truncate">{user.name}</span>
-                    {isPremium && (
-                      <Crown className="h-5 w-5 shrink-0 fill-amber-400 text-amber-400" />
-                    )}
-                  </h1>
+              {isUploading && (
+                <div className="absolute inset-0 z-20 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm">
+                  <RefreshCcw className="h-6 w-6 animate-spin text-white" />
+                </div>
+              )}
+
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="absolute -right-1 -bottom-1 z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 border-border bg-[#007AFF] text-white shadow-md transition-all duration-300 hover:bg-[#0055CC] hover:scale-110 active:scale-95 disabled:opacity-50"
+              >
+                <Camera className="h-4 w-4" />
+              </button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+              />
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <h2 className="headline text-[24px]">{user.name}</h2>
+                <button
+                  onClick={() => setShowNameModal(true)}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors duration-300 hover:bg-secondary"
+                >
+                  <Pencil className="h-4 w-4 text-muted-foreground" />
+                </button>
+              </div>
+              <p className="mt-1 text-[14px] text-muted-foreground">{user.email}</p>
+
+              {/* Google rasmiga qaytish tugmasi */}
+              {user.avatar && !user.avatar.startsWith("http") && (
+                <div className="mt-3">
                   <button
-                    onClick={() => setShowNameModal(true)}
-                    title="Ismni tahrirlash"
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:hover:bg-slate-800 dark:hover:text-indigo-400"
+                    onClick={handleRevertAvatar}
+                    disabled={isReverting}
+                    className="rounded-full bg-[#007AFF]/10 px-3 py-1.5 text-[12px] font-medium text-[#007AFF] transition-all duration-300 hover:bg-[#007AFF]/20 disabled:opacity-50"
                   >
-                    <Pencil className="h-3.5 w-3.5" />
+                    <RefreshCcw className={`mr-1 inline h-3 w-3 ${isReverting ? "animate-spin" : ""}`} />
+                    Google rasmiga qaytish
                   </button>
                 </div>
+              )}
+            </div>
 
-                <p className="mt-0.5 mb-3 truncate text-sm text-slate-500 dark:text-slate-400">
-                  {user.email}
+            {/* Status badges - o'ng tepa burchak */}
+            <div className="absolute right-6 top-6 flex flex-col items-end gap-1.5">
+              {isAdmin && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-purple-700 dark:bg-purple-500/20 dark:text-purple-400">
+                  <UserIcon className="h-3 w-3" />
+                  Admin
+                </span>
+              )}
+              {isPremium && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:bg-amber-500/20 dark:text-amber-400">
+                  <Crown className="h-3 w-3" />
+                  Premium
+                </span>
+              )}
+              {!isPremium && !isAdmin && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary px-3 py-1 text-[11px] font-medium text-muted-foreground">
+                  <UserIcon className="h-3 w-3" />
+                  User
+                </span>
+              )}
+            </div>
+          </div>
+
+          <dl className="mt-7 grid gap-px overflow-hidden rounded-[20px] border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { label: "Tangalar", value: user.coins ?? 0 },
+              { label: "Kunlik", value: `${user.streak ?? 0} kun` },
+              { label: "Qurilmalar", value: `${devices.length} / ${isPremium ? 5 : 2}` },
+              { label: "Reja", value: isPremium ? "Premium" : "Bepul" },
+            ].map((stat) => (
+              <div key={stat.label} className="bg-card px-5 py-4">
+                <dt className="text-[12px] uppercase tracking-[0.14em] text-muted-foreground">
+                  {stat.label}
+                </dt>
+                <dd className="headline mt-1 text-[24px]">{stat.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        {/* ======================================= */}
+        {/* 2. TEST HISTORY                         */}
+        {/* ======================================= */}
+        <section className="overflow-hidden rounded-[28px] border border-border bg-card">
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-border p-6">
+            <div>
+              <h2 className="headline text-[20px]">{t("history")}</h2>
+              <p className="mt-1 text-[13px] text-muted-foreground">
+                Test natijalaringiz
+              </p>
+            </div>
+            <button
+              onClick={fetchResults}
+              disabled={isFetchingResults}
+              className="text-[13px] text-muted-foreground transition-colors duration-300 hover:text-[#007AFF] disabled:opacity-50"
+            >
+              <RefreshCcw className={`inline h-4 w-4 ${isFetchingResults ? "animate-spin" : ""}`} />
+            </button>
+          </div>
+
+          {results.length === 0 && !isFetchingResults ? (
+            <p className="p-10 text-center text-[14px] text-muted-foreground">
+              {t("noHistory")}
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[720px] text-left">
+                <thead>
+                  <tr className="text-[12px] uppercase tracking-[0.14em] text-muted-foreground">
+                    <th className="px-6 py-4 font-medium">Sana</th>
+                    <th className="px-6 py-4 font-medium">Test</th>
+                    <th className="px-6 py-4 font-medium">Level</th>
+                    <th className="px-6 py-4 font-medium">Natija</th>
+                    <th className="px-6 py-4 font-medium">Holat</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {results.map((result) => (
+                    <tr
+                      key={result.id}
+                      className="cursor-pointer border-t border-border transition-colors duration-300 hover:bg-secondary"
+                      onClick={() =>
+                        (window.location.href = `/dashboard/jlpt/${result.test_id}/result/${result.id}`)
+                      }
+                    >
+                      <td className="whitespace-nowrap px-6 py-4 text-[14px] text-muted-foreground">
+                        {new Date(result.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 text-[14px] font-medium">
+                        {result.test_title}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="rounded-full bg-secondary px-2.5 py-1 text-[12px] font-medium">
+                          {result.level}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <span className="h-[6px] w-20 overflow-hidden rounded-full bg-muted">
+                            <span
+                              className="block h-full rounded-full"
+                              style={{
+                                width: `${result.score}%`,
+                                backgroundColor: result.passed ? "#007AFF" : "#ef4444",
+                              }}
+                            />
+                          </span>
+                          <span className="text-[14px] tabular-nums">{result.score}%</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-medium"
+                          style={{
+                            color: result.passed ? "#007AFF" : "#ef4444",
+                            backgroundColor: result.passed 
+                              ? "rgba(0, 122, 255, 0.12)" 
+                              : "rgba(239, 68, 68, 0.12)",
+                          }}
+                        >
+                          {result.passed ? (
+                            <CheckCircle2 className="h-3 w-3" />
+                          ) : (
+                            <XCircle className="h-3 w-3" />
+                          )}
+                          {result.passed ? "O'tdi" : "Yiqildi"}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+
+        {/* ======================================= */}
+        {/* 3. DEVICES                              */}
+        {/* ======================================= */}
+        <section className="overflow-hidden rounded-[28px] border border-border bg-card">
+          <div className="border-b border-border p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="headline text-[20px]">{t("devicesTitle")}</h2>
+                <p className="mt-1 text-[13px] text-muted-foreground">
+                  {t("devices")}
                 </p>
+              </div>
+              <button
+                onClick={fetchDevices}
+                disabled={isDevicesLoading}
+                className="text-muted-foreground transition-colors duration-300 hover:text-[#007AFF] disabled:opacity-50"
+              >
+                <RefreshCcw className={`h-4 w-4 ${isDevicesLoading ? "animate-spin" : ""}`} />
+              </button>
+            </div>
+          </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                    <UserIcon className="h-3.5 w-3.5" />
-                    {user.role || "user"}
+          <ul>
+            {devices.map((device) => {
+              const Icon = getDeviceIcon(device.name || "")
+              return (
+                <li
+                  key={device.id}
+                  className={`flex flex-wrap items-center gap-4 border-b border-border px-6 py-5 last:border-b-0 transition-colors duration-300 ${
+                    device.is_current ? "bg-[#007AFF]/5" : "hover:bg-secondary"
+                  }`}
+                >
+                  <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-[14px] ${
+                    device.is_current ? "bg-[#007AFF]/10 text-[#007AFF]" : "bg-secondary text-muted-foreground"
+                  }`}>
+                    {Icon}
                   </span>
 
-                  {isPremium && (
-                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-600 dark:bg-amber-400/10 dark:text-amber-400">
-                      <Crown className="h-3.5 w-3.5" />
-                      Premium
-                    </span>
-                  )}
-
-                  {/* Revert to Google avatar */}
-                  {user.avatar && !user.avatar.startsWith("http") && (
-                    <button
-                      onClick={handleRevertAvatar}
-                      disabled={isReverting}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-600 transition-colors hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20"
-                    >
-                      <RefreshCcw className={`h-3.5 w-3.5 ${isReverting ? "animate-spin" : ""}`} />
-                      Google rasmiga qaytish
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Action buttons */}
-            <div className="flex w-full shrink-0 flex-col gap-3 md:w-auto md:flex-row">
-              <button
-                onClick={fetchUser}
-                disabled={isFetching}
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition-all hover:bg-slate-50 disabled:opacity-50 md:w-auto dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
-              >
-                <RefreshCcw className={`h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
-                {t("refreshProfile")}
-              </button>
-              <button
-                onClick={handleMainLogout}
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-100 bg-red-50 px-5 py-2.5 text-sm font-medium text-red-600 transition-all hover:bg-red-100 md:w-auto dark:border-red-900/30 dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20"
-              >
-                <LogOut className="h-4 w-4" />
-                {t("logout")}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* ======================================= */}
-        {/* 2. STATS GRID                           */}
-        {/* ======================================= */}
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {/* Coins */}
-          <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-700/50 dark:bg-[#111827]">
-            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-500 dark:bg-amber-400/10 dark:text-amber-400">
-              <Coins className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                {user.coins !== undefined ? user.coins : <span className="animate-pulse text-slate-400">…</span>}
-              </p>
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t("coins")}</p>
-            </div>
-          </div>
-
-          {/* Streak */}
-          <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-700/50 dark:bg-[#111827]">
-            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-500 dark:bg-orange-400/10 dark:text-orange-400">
-              <Flame className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                {user.streak !== undefined ? user.streak : <span className="animate-pulse text-slate-400">…</span>}
-              </p>
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t("streak")}</p>
-            </div>
-          </div>
-
-          {/* Devices */}
-          <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-700/50 dark:bg-[#111827]">
-            <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-sky-50 text-sky-500 dark:bg-sky-400/10 dark:text-sky-400">
-              <Smartphone className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">
-                {devices.length}
-                <span className="text-base font-normal text-slate-400">
-                  {" "}/ {isPremium ? 5 : 2}
-                </span>
-              </p>
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t("devices")}</p>
-            </div>
-          </div>
-
-          {/* Plan */}
-          <div className="flex flex-col justify-between rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-700/50 dark:bg-[#111827]">
-            <div className="mb-4">
-              <span className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold tracking-wide ${isPremium ? "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400" : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"}`}>
-                {isPremium ? <Crown className="h-3.5 w-3.5" /> : null}
-                {isPremium ? t("premium") : t("free")}
-              </span>
-            </div>
-            <div>
-              <p className="text-lg font-bold text-slate-900 dark:text-white">
-                {isPremium ? t("activePlan") : t("basicPlan")}
-              </p>
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{t("plan")}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* ======================================= */}
-        {/* 3. BOTTOM GRID: Results + Devices       */}
-        {/* ======================================= */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-
-          {/* Test Results History */}
-          <div className="flex flex-col rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm md:p-8 dark:border-slate-700/50 dark:bg-[#111827]">
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="flex items-center gap-2 text-base font-bold text-slate-900 dark:text-white">
-                <History className="h-5 w-5 text-slate-400 dark:text-slate-500" />
-                {t("history")}
-              </h2>
-              <button
-                onClick={fetchResults}
-                disabled={isFetchingResults}
-                className="text-sm text-slate-400 transition-colors hover:text-indigo-600 disabled:opacity-50 dark:hover:text-indigo-400"
-              >
-                {isFetchingResults ? t("refreshing") : t("refresh")}
-              </button>
-            </div>
-
-            {results.length === 0 && !isFetchingResults ? (
-              <div className="flex flex-1 flex-col items-center justify-center py-10 text-center">
-                <History className="mb-3 h-10 w-10 text-slate-200 dark:text-slate-700" />
-                <p className="text-sm text-slate-400 dark:text-slate-500">{t("noHistory")}</p>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {results.map((result) => (
-                  <div
-                    key={result.id}
-                    className="flex cursor-pointer items-center justify-between rounded-xl border border-slate-100 bg-slate-50/50 p-4 transition-colors hover:bg-slate-50 dark:border-slate-700/50 dark:bg-slate-800/30 dark:hover:bg-slate-800/60"
-                    onClick={() =>
-                      (window.location.href = `/dashboard/jlpt/${result.test_id}/result/${result.id}`)
-                    }
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${result.passed ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400" : "bg-red-50 text-red-500 dark:bg-red-500/15 dark:text-red-400"}`}>
-                        {result.passed ? <CheckCircle2 className="h-5 w-5" /> : <XCircle className="h-5 w-5" />}
-                      </div>
-                      <div>
-                        <p className="line-clamp-1 text-sm font-semibold text-slate-800 dark:text-slate-200">
-                          {result.test_title}
-                        </p>
-                        <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                          <span className="font-medium text-slate-600 dark:text-slate-300">{result.level}</span>
-                          <span>•</span>
-                          <span>{new Date(result.created_at).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`text-sm font-bold ${result.passed ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
-                        {result.score}%
-                      </span>
-                      <ChevronRight className="h-4 w-4 text-slate-300 dark:text-slate-600" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Device Manager */}
-          <div className="flex flex-col rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm md:p-8 dark:border-slate-700/50 dark:bg-[#111827]">
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="flex items-center gap-2 text-base font-bold text-slate-900 dark:text-white">
-                <Monitor className="h-5 w-5 text-slate-400 dark:text-slate-500" />
-                {t("devicesTitle")}
-              </h2>
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-slate-400 dark:text-slate-500">
-                  {devices.length} / {isPremium ? 5 : 2}
-                </span>
-                <button
-                  onClick={fetchDevices}
-                  disabled={isDevicesLoading}
-                  className="text-slate-400 transition-colors hover:text-indigo-600 disabled:opacity-50 dark:hover:text-indigo-400"
-                >
-                  <RefreshCcw className={`h-4 w-4 ${isDevicesLoading ? "animate-spin" : ""}`} />
-                </button>
-              </div>
-            </div>
-
-            {isDevicesLoading && devices.length === 0 ? (
-              <div className="flex flex-1 items-center justify-center py-10">
-                <RefreshCcw className="h-6 w-6 animate-spin text-indigo-500" />
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {devices.map((device) => (
-                  <div
-                    key={device.id}
-                    className={`flex items-center justify-between rounded-xl border p-4 ${
-                      device.is_current
-                        ? "border-indigo-200/60 bg-indigo-50/50 dark:border-indigo-700/40 dark:bg-indigo-500/10"
-                        : "border-slate-100 bg-white dark:border-slate-700/50 dark:bg-slate-800/20"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${device.is_current ? "bg-white text-indigo-600 shadow-sm dark:bg-indigo-500/20 dark:text-indigo-400" : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"}`}>
-                        {getDeviceIcon(device.name || "")}
-                      </div>
-                      <div>
-                        <p className="line-clamp-1 text-sm font-semibold text-slate-800 dark:text-slate-200">
-                          {formatDeviceName(device.name)}
-                        </p>
-                        <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                          {device.is_current
-                            ? t("currentSession")
-                            : `${t("lastActivity")} ${timeAgo(device.last_used_at)}`}
-                        </p>
-                      </div>
-                    </div>
-
-                    {device.is_current ? (
-                      <span className="rounded-md bg-indigo-100 px-2.5 py-1 text-xs font-semibold text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400">
-                        {t("active")}
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => handleLogoutDevice(device.id)}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/15 dark:hover:text-red-400"
-                        title={t("logout")}
-                      >
-                        <LogOut className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-
-                {devices.length > 1 && (
-                  <div className="mt-4 border-t border-slate-100 pt-4 text-center dark:border-slate-700/50">
-                    <p className="text-xs text-slate-400 dark:text-slate-500">
-                      {t("logoutOthersDesc")}
+                  <div className="min-w-0 flex-1">
+                    <p className="flex flex-wrap items-center gap-2 text-[15px] font-medium">
+                      {formatDeviceName(device.name)}
+                      {device.is_current && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#007AFF]/10 px-2.5 py-0.5 text-[11px] font-medium text-[#007AFF]">
+                          <Check className="h-3 w-3" />
+                          Hozir
+                        </span>
+                      )}
                     </p>
-                    <button
-                      onClick={handleLogoutOthers}
-                      className="mt-3 w-full rounded-xl border border-red-100 bg-red-50 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-100 dark:border-red-900/30 dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20"
-                    >
-                      {t("logoutOthersBtn")}
-                    </button>
+                    <p className="mt-1 text-[13px] text-muted-foreground">
+                      {device.is_current 
+                        ? "Joriy sessiya" 
+                        : `Oxirgi: ${timeAgo(device.last_used_at)}`}
+                    </p>
                   </div>
-                )}
-              </div>
-            )}
-          </div>
+
+                  {!device.is_current && (
+                    <button
+                      onClick={() => handleLogoutDevice(device.id)}
+                      className="rounded-full border border-border px-4 py-2 text-[13px] text-destructive transition-colors duration-300 hover:bg-destructive/10"
+                    >
+                      Chiqarish
+                    </button>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+
+          {devices.length > 1 && (
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border p-5">
+              <p className="text-[13px] text-muted-foreground">
+                Boshqa barcha qurilmalardan chiqish
+              </p>
+              <button
+                onClick={handleLogoutOthers}
+                className="rounded-full border border-border px-5 py-2 text-[13px] text-destructive transition-colors duration-300 hover:bg-destructive/10"
+              >
+                Hammasini chiqarish
+              </button>
+            </div>
+          )}
+        </section>
+
+        {/* ======================================= */}
+        {/* 4. LOGOUT BUTTON                        */}
+        {/* ======================================= */}
+        <div className="flex justify-center">
+          <button
+            onClick={handleMainLogout}
+            className="flex items-center gap-2 rounded-full border border-destructive/20 px-6 py-3 text-[14px] font-medium text-destructive transition-colors duration-300 hover:bg-destructive/10"
+          >
+            <LogOut className="h-4 w-4" />
+            {t("logout")}
+          </button>
         </div>
       </div>
     </>

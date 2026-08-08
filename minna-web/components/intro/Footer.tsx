@@ -1,79 +1,89 @@
 "use client";
-import { useTranslations } from "next-intl";
+import Image from 'next/image';
+import { CTA, Reveal } from './primitives'
+
+const t = {
+  footer: {
+    heading: "Bugun boshlang va yapon tilini o'rganing",
+    cta1: "Bepul ro'yxatdan o'tish",
+    cta2: "Darajalarni ko'rish",
+    tagline: "Yapon tilini o'rganishning eng yaxshi platformasi — N5 dan N1 gacha.",
+    rights: "© 2026 MinnaUz. Barcha huquqlar himoyalangan.",
+    address: "Toshkent, O'zbekiston",
+    columns: [
+      { title: "Platforma", links: ["Darajalar", "Testlar", "Lug'at", "Video darslar"] },
+      { title: "Kompaniya", links: ["Haqida", "Bog'lanish", "Maxfiylik siyosati"] },
+      { title: "Yordam", links: ["FAQ", "Qo'llab-quvvatlash", "Jamoatchilik"] },
+      { title: "Til", links: ["O'zbekcha", "Русский", "English"] },
+    ],
+  },
+}
 
 export default function Footer() {
-  const t = useTranslations("Footer");
 
   return (
-    <footer className="relative w-full bg-[#f4f7f9] pt-20 overflow-hidden flex flex-col font-sans">
-      {/* 4 Ustunli Menyu */}
-      <div className="relative z-20 max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 px-6 mb-32">
-        {/* 1-ustun */}
-        <div>
-          <h3 className="font-bold text-black mb-6 uppercase tracking-wider text-[15px]">
-            {t("info")}
-          </h3>
-          <ul className="space-y-4 text-[16px] text-gray-800 font-medium">
-            <li className="hover:text-black hover:underline cursor-pointer transition-all">{t("aboutMinna")}</li>
-            <li className="hover:text-black hover:underline cursor-pointer transition-all">{t("mission")}</li>
-            <li className="hover:text-black hover:underline cursor-pointer transition-all">{t("terms")}</li>
-          </ul>
-        </div>
-
-        {/* 2-ustun */}
-        <div>
-          <h3 className="font-bold text-black mb-6 uppercase tracking-wider text-[15px]">
-            {t("learn")}
-          </h3>
-          <ul className="space-y-4 text-[16px] text-gray-800 font-medium">
-            <li className="hover:text-black hover:underline cursor-pointer transition-all">{t("courses")}</li>
-            <li className="hover:text-black hover:underline cursor-pointer transition-all">{t("effectiveness")}</li>
-            <li className="hover:text-black hover:underline cursor-pointer transition-all">{t("publicOffer")}</li>
-          </ul>
-        </div>
-
-        {/* 3-ustun */}
-        <div>
-          <h3 className="font-bold text-black mb-6 uppercase tracking-wider text-[15px]">
-            {t("products")}
-          </h3>
-          <ul className="space-y-4 text-[16px] text-gray-800 font-medium">
-            <li className="hover:text-black hover:underline cursor-pointer transition-all">{t("minnaUz")}</li>
-            <li className="hover:text-black hover:underline cursor-pointer transition-all">{t("forSchools")}</li>
-            <li className="hover:text-black hover:underline cursor-pointer transition-all">{t("forDevelopers")}</li>
-          </ul>
-        </div>
-
-        {/* 4-ustun */}
-        <div>
-          <h3 className="font-bold text-black mb-6 uppercase tracking-wider text-[15px]">
-            {t("help")}
-          </h3>
-          <ul className="space-y-4 text-[16px] text-gray-800 font-medium">
-            <li className="hover:text-black hover:underline cursor-pointer transition-all">{t("supportCenter")}</li>
-            <li className="hover:text-black hover:underline cursor-pointer transition-all">{t("privacy")}</li>
-            <li className="hover:text-black hover:underline cursor-pointer transition-all">{t("account")}</li>
-            <li className="hover:text-black hover:underline cursor-pointer transition-all">{t("payments")}</li>
-          </ul>
-        </div>
+    <footer className="border-t border-border">
+      <div className="mx-auto max-w-[1120px] px-5 py-24 text-center">
+        <Reveal>
+          <p className="font-jp text-[15px] text-muted-foreground">はじめの一歩</p>
+          <h2 className="headline mx-auto mt-4 max-w-[16ch] text-[clamp(2.2rem,6vw,4.2rem)]">
+            {t.footer.heading}
+          </h2>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <CTA href="/auth/login">{t.footer.cta1}</CTA>
+            <CTA href="#levels" variant="ghost">
+              {t.footer.cta2}
+            </CTA>
+          </div>
+        </Reveal>
       </div>
 
-      {/* Pastki qism */}
-      <div className="relative w-full flex justify-center items-end h-32 md:h-48 mt-10">
-        <h1 className="absolute bottom-0 z-0 text-[25vw] font-black text-[#083257]/40 leading-none tracking-tighter uppercase select-none translate-y-[30%] text-center w-full whitespace-nowrap pointer-events-none">
-          MINNA
-        </h1>
+      <div className="border-t border-border">
+        <div className="mx-auto grid max-w-[1120px] gap-10 px-5 py-14 sm:grid-cols-2 lg:grid-cols-5">
+          <div>
+                <Image src="/logo.png" alt="Logo" width={50} height={50} />
+            <p className="mt-3 max-w-[26ch] text-[13px] leading-relaxed text-muted-foreground">
+              {t.footer.tagline}
+            </p>
+            <div className="mt-5 flex gap-2">
+              {['Telegram', 'Instagram'].map((s) => (
+                <a
+                  key={s}
+                  href="#top"
+                  className="rounded-full border border-border px-3 py-1.5 text-[12px] text-muted-foreground transition-colors duration-300 hover:border-foreground/30 hover:text-foreground"
+                >
+                  {s}
+                </a>
+              ))}
+            </div>
+          </div>
 
-        <div className="absolute bottom-6 md:bottom-10 z-20 text-center w-full px-4">
-          <p className="text-white text-[14px] md:text-[16px] font-medium bg-black inline-flex flex-wrap justify-center items-center gap-3 py-3 px-5 rounded-xl shadow-lg">
-            <span>{t("copyright")}</span>
-            <span className="font-light text-gray-400">|</span>
-            <span className="hover:underline cursor-pointer">{t("privacyTerms")}</span>
-            <span className="font-light text-gray-400">|</span>
-            <span>{t("language")}</span>
-          </p>
+          {t.footer.columns.map((col) => (
+            <div key={col.title}>
+              <p className="text-[12px] uppercase tracking-[0.16em] text-muted-foreground">
+                {col.title}
+              </p>
+              <ul className="mt-4 space-y-2.5">
+                {col.links.map((l) => (
+                  <li key={l}>
+                    <a
+                      href="#top"
+                      className="text-[14px] text-foreground/80 transition-colors duration-300 hover:text-foreground"
+                    >
+                      {l}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-3 border-t border-border px-5 py-6 text-[12px] text-muted-foreground">
+          <p>{t.footer.rights}</p>
+          <p>{t.footer.address}</p>
         </div>
       </div>
     </footer>
-  );
+  )
 }
