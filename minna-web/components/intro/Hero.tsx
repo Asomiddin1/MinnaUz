@@ -1,82 +1,98 @@
 "use client";
-import { motion } from "framer-motion";
-import { useTranslations } from "next-intl";
-import { Link } from "@/src/i18n/navigation";
-import Image from "next/image";
+import { CTA, Reveal } from './primitives'
+import { useScrollProgress } from './lib/hooks'
 
-interface HeroProps {
-  isBottom?: boolean;
+const t = {
+  hero: {
+    titleA: "Yapon tilini",
+    titleB: "birgalikda o'rganing",
+    sub: "JLPT N5 dan N2 gacha — interaktiv testlar, lug'atlar va AI talaffuz baholash bilan boshlang.",
+    cta1: "Boshlash",
+    cta2: "Mashqlarni ko'rish",
+    stats: ["Faol o'quvchi", "JLPT darajasi", "Muvaffaqiyat", "Lug'at so'zi"],
+  },
 }
 
-export default function Hero({ isBottom = false }: HeroProps) {
-  const t = useTranslations("Hero");
+const kana = ['あ', 'い', 'う', 'え', 'お', 'か', 'き', 'く', 'け', 'こ']
+const statValues = ['41,200', '5', '98%', '2,800+']
+
+export default function Hero() {
+  const progress = useScrollProgress()
 
   return (
-    <section
-      className={`relative flex w-full flex-col items-center overflow-hidden bg-[#eaf6ff] ${isBottom ? "pt-24 pb-0" : "min-h-[85vh] pt-42 pb-20"}`}
-    >
-      {/* Nuqtali orqa fon */}
+    <section id="top" className="relative overflow-hidden pt-32 pb-16 sm:pt-40">
+      {/* A quiet wash of light behind the headline — the whole ground stays flat otherwise. */}
       <div
-        className="pointer-events-none absolute inset-0 z-0 opacity-[0.15]"
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-0 h-[520px] w-[900px] -translate-x-1/2 opacity-70"
         style={{
-          backgroundImage: "radial-gradient(#94a3b8 2px, transparent 2px)",
-          backgroundSize: "40px 40px",
+          background:
+            'radial-gradient(ellipse at center, color-mix(in srgb, var(--primary) 22%, transparent), transparent 65%)',
+          transform: `translate(-50%, ${progress * -120}px)`,
         }}
-      ></div>
+      />
 
-      <div className="z-20 flex w-full max-w-5xl flex-col items-center justify-center gap-10 px-6 md:flex-row md:gap-20">
-        <div className="h-64 w-64 md:h-[400px] md:w-[400px]">
-          <Image
-            src="/images/minna.png"
-            alt="MINNA logo"
-            width={400}
-            height={400}
-            className="w-full h-full object-contain"
-            priority
-          />
-        </div>
+      <div className="relative mx-auto max-w-[1120px] px-5">
+        <Reveal>
+          <p className="mb-6 text-center font-jp text-[15px] text-muted-foreground">
+            日本語を、みんなで。
+          </p>
+        </Reveal>
 
-        {/* Matn va tugmalar */}
-        <motion.div
-          className="order-1 flex w-full flex-col items-center text-center md:order-2 md:w-1/2 md:items-start md:text-left"
-          initial={{ opacity: 0, x: isBottom ? 0 : 50 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <h1 className="mb-10 text-4xl leading-tight font-black text-[#042c60] md:text-5xl lg:text-[4rem]">
-            {t("title")}
+        <Reveal delay={80}>
+          <h1 className="headline mx-auto max-w-[14ch] text-center text-[clamp(2.7rem,8.4vw,6.2rem)]">
+            {t.hero.titleA} <span className="text-primary">N5</span>
+            <br />
+            {t.hero.titleB}
           </h1>
+        </Reveal>
 
-          <div className="flex w-full max-w-[320px] flex-col gap-4">
-            <Link href="/dashboard">
-              <button className="w-full rounded-2xl border-b-4 border-[#03206a] py-4 text-[17px] font-black text-[#0549b0] text-[#1259fe] uppercase shadow-sm transition-all hover:bg-gray-100 active:translate-y-1 active:border-b-3">
-                {t("getStarted")}
-              </button>
-            </Link>
+        <Reveal delay={180}>
+          <p className="mx-auto mt-7 max-w-[48ch] text-center text-[19px] leading-relaxed text-muted-foreground">
+            {t.hero.sub}
+          </p>
+        </Reveal>
 
-            {!isBottom && (
-              <Link href="/auth/login">
-                <button className="w-full rounded-2xl border-2 border-b-4 border-gray-200 bg-white py-4 text-[17px] font-black text-[#1cb0f6] uppercase shadow-sm transition-all hover:bg-gray-100 active:translate-y-[2px] active:border-b-2">
-                  {t("haveAccount")}
-                </button>
-              </Link>
-            )}
+        <Reveal delay={260}>
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+            <CTA href="/auth/login">{t.hero.cta1}</CTA>
+            <CTA href="#practice" variant="ghost">
+              {t.hero.cta2}
+            </CTA>
           </div>
-        </motion.div>
-      </div>
+        </Reveal>
 
-      {/* Wave */}
-      {!isBottom && (
-        <div className="absolute bottom-0 left-0 z-10 w-full translate-y-[1px] leading-[0]">
-          <svg
-            viewBox="0 0 1200 120"
-            preserveAspectRatio="none"
-            className="relative block h-[120px] w-full fill-[#042c60]"
-          >
-            <path d="M0,0 C300,100 900,100 1200,0 L1200,120 L0,120 Z"></path>
-          </svg>
-        </div>
-      )}
+        {/* Kana rail — the hero's one moving part. */}
+        <Reveal delay={340} className="mt-20">
+          <div className="relative overflow-hidden rounded-[32px] border border-border bg-card py-14">
+            <div
+              className="flex justify-center gap-8 will-change-transform"
+              style={{ transform: `translateX(${-progress * 260}px)` }}
+            >
+              {kana.map((c, i) => (
+                <span
+                  key={c}
+                  className="font-jp text-[clamp(2.2rem,7vw,4.4rem)] leading-none transition-colors duration-500"
+                  style={{
+                    color: i === 4 ? 'var(--primary)' : 'var(--muted-foreground)',
+                    opacity: 1 - Math.abs(i - 4) * 0.11,
+                  }}
+                >
+                  {c}
+                </span>
+              ))}
+            </div>
+            <div className="mt-10 grid grid-cols-2 gap-y-8 border-t border-border pt-10 sm:grid-cols-4">
+              {t.hero.stats.map((label, i) => (
+                <div key={label} className="px-6 text-center">
+                  <p className="headline text-[28px] sm:text-[34px]">{statValues[i]}</p>
+                  <p className="mt-1 text-[13px] text-muted-foreground">{label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+      </div>
     </section>
-  );
+  )
 }

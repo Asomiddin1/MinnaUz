@@ -44,7 +44,7 @@ export function ActivityTracker() {
       window.removeEventListener("touchstart", handleActivity)
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
-  }, [session, status])
+  }, [status])
 
   return null
 }

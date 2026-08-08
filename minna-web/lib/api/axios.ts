@@ -1,3 +1,5 @@
+"use client";
+
 import axios from "axios";
 import { getSession, signOut } from "next-auth/react";
 
