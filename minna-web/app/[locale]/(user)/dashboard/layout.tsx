@@ -114,7 +114,9 @@ export default function DashboardLayout({
           </header>
 
           {/* Content */}
-          <div className="flex-1">{children}</div>
+          <div key={pathname} className="flex-1 animate-page-transition">
+            {children}
+          </div>
         </main>
 
         {/* Mobile Bottom Tab Bar - Doimiy qotib turadigan (Fixed) holat */}

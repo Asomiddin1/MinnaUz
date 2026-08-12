@@ -145,26 +145,26 @@ export function UserSidebar() {
         
         {/* LOGO */}
         <div
-          className={`flex h-16 items-center gap-2.5 px-4 ${collapsed ? "justify-center" : "justify-between"}`}
+          className={`flex h-20 items-center gap-3 px-5 ${collapsed ? "justify-center" : "justify-between"}`}
         >
-          <Link href="/" className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center gap-3">
             <Image
               src={'/logo.png'}
               alt="Logo"
-              width={40}
-              height={40}
-              className="h-[40px] w-[40px] shrink-0"
+              width={44}
+              height={44}
+              className="h-[44px] w-[44px] shrink-0 drop-shadow-sm"
             />
-            {!collapsed && <span className="headline text-[18px] tracking-[-0.045em]">MinnaUz</span>}
+            {!collapsed && <span className="headline text-[22px] font-bold tracking-tight">MinnaUz</span>}
           </Link>
           {!collapsed && (
             <button
               type="button"
               onClick={toggleSidebar}
               aria-label="Collapse sidebar"
-              className="hidden h-8 w-8 place-items-center rounded-[10px] text-muted-foreground transition-colors duration-300 hover:bg-secondary hover:text-foreground lg:grid"
+              className="hidden h-9 w-9 place-items-center rounded-xl text-muted-foreground transition-colors duration-300 hover:bg-secondary hover:text-foreground lg:grid"
             >
-              <PanelLeftClose className="h-[18px] w-[18px]" />
+              <PanelLeftClose className="h-[20px] w-[20px]" />
             </button>
           )}
         </div>
@@ -173,15 +173,15 @@ export function UserSidebar() {
         {collapsed && (
           <button
             onClick={toggleSidebar}
-            className="mx-auto mb-4 text-muted-foreground transition-colors hover:text-foreground"
+            className="mx-auto mb-6 mt-2 text-muted-foreground transition-colors hover:text-foreground"
           >
-            <PanelLeft size={20} />
+            <PanelLeft size={22} />
           </button>
         )}
 
         {/* MENU */}
-        <nav className="px-3 pt-2">
-          <ul className="space-y-1">
+        <nav className="px-4 pt-4">
+          <ul className="space-y-1.5">
             {menuItems.map((item) => {
               const isActive = isItemActive(item.href)
 
@@ -191,15 +191,15 @@ export function UserSidebar() {
                     href={item.href}
                     title={collapsed ? item.name : undefined}
                     aria-current={isActive ? 'page' : undefined}
-                    className={`flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-[14px] transition-all duration-300 ${
+                    className={`flex w-full items-center gap-3.5 rounded-2xl px-4 py-3.5 text-[15px] transition-all duration-300 font-medium ${
                       collapsed ? 'justify-center' : ''
                     } ${
                       isActive
-                        ? 'bg-primary font-medium text-primary-foreground'
+                        ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
                         : 'text-muted-foreground hover:bg-secondary hover:text-foreground'
                     }`}
                   >
-                    <item.icon className="h-[19px] w-[19px] shrink-0" />
+                    <item.icon className={`shrink-0 ${collapsed ? 'h-[22px] w-[22px]' : 'h-[20px] w-[20px]'}`} />
                     {!collapsed && <span>{item.name}</span>}
                   </Link>
                 </li>
@@ -210,49 +210,49 @@ export function UserSidebar() {
 
         {/* MAQSADINGIZGA YAQINLASHYAPSIZ KARTACHKASI */}
         {courseProgress && !collapsed && (
-          <div className="mx-3 mt-6 rounded-[20px] border border-border p-4">
-            <div className="flex items-start gap-3">
+          <div className="mx-4 mt-6 rounded-[24px] border border-border p-5 bg-card/50 shadow-sm">
+            <div className="flex items-start gap-4">
               <div className="min-w-0 flex-1">
-                <p className="text-[14px] font-medium leading-snug">Maqsadingizga yaqinlashyapsiz!</p>
-                <p className="mt-1 text-[12px] text-muted-foreground">
-                  Daraja: <span className="text-primary">{courseProgress.level?.title || "Daraja"}</span>
+                <p className="text-[15px] font-semibold leading-snug">Maqsadingizga yaqinlashyapsiz!</p>
+                <p className="mt-1.5 text-[13px] text-muted-foreground font-medium">
+                  Daraja: <span className="text-primary font-bold">{courseProgress.level?.title || "Daraja"}</span>
                 </p>
               </div>
               <GoalRing value={courseProgress.progress_percentage || 0} />
             </div>
             <Link
               href={`/dashboard/level/${courseProgress.level?.slug}/watch`}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2 text-[13px] font-medium text-primary-foreground transition-opacity duration-300 hover:opacity-90 active:scale-[0.98]"
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-[14px] font-semibold text-primary-foreground transition-all duration-300 hover:bg-primary/90 hover:shadow-md hover:shadow-primary/20 active:scale-[0.98]"
             >
               Davom etish
-              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+              <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
           </div>
         )}
 
         {/* PASTKI BLOKLAR (ADMIN PANEL, PROFIL, CHIQISH) */}
-        <div className="mt-auto space-y-1 border-t border-border p-3">
+        <div className="mt-auto space-y-1.5 border-t border-border p-4">
           
           {session?.user?.role === "admin" && (
             <Link
               href="/admin"
               title={collapsed ? (t("adminPanel") || "Panel administratori") : undefined}
-              className={`flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-[13px] text-muted-foreground transition-colors duration-300 hover:bg-secondary hover:text-foreground ${
+              className={`flex w-full items-center gap-3.5 rounded-2xl px-4 py-3 text-[14px] font-medium text-muted-foreground transition-colors duration-300 hover:bg-secondary hover:text-foreground ${
                 collapsed ? 'justify-center' : ''
               }`}
             >
-              <ShieldAlert className="h-[18px] w-[18px] shrink-0" />
+              <ShieldAlert className="h-[20px] w-[20px] shrink-0" />
               {!collapsed && <span>{t("adminPanel") || "Panel administratori"}</span>}
             </Link>
           )}
 
           {/* PROFIL QISMI - YAXSHILANDI */}
-          <div className={`flex items-center gap-3 px-3 py-2 ${collapsed ? 'justify-center' : ''}`}>
+          <div className={`flex items-center gap-3.5 px-4 py-3 rounded-2xl transition-colors hover:bg-secondary/50 ${collapsed ? 'justify-center' : ''}`}>
             {status === "loading" ? (
-              <Skeleton className="h-9 w-9 rounded-full" />
+              <Skeleton className="h-10 w-10 rounded-full" />
             ) : (
               // UI Avatar komponentidan foydalanildi
-              <Avatar className="h-9 w-9 shrink-0 border border-border">
+              <Avatar className="h-10 w-10 shrink-0 border border-border shadow-sm">
                 {session?.user?.image && (
                   <AvatarImage 
                     src={getAvatarUrl(session.user.image)} 
@@ -261,7 +261,7 @@ export function UserSidebar() {
                   />
                 )}
                 {/* Rasm bo'lmasa yoki yuklanayotgan bo'lsa fallback ko'rinadi */}
-                <AvatarFallback className="bg-secondary text-secondary-foreground text-[13px] font-semibold">
+                <AvatarFallback className="bg-primary/10 text-primary text-[14px] font-bold">
                   {getInitials(userName)}
                 </AvatarFallback>
               </Avatar>
@@ -276,9 +276,9 @@ export function UserSidebar() {
                   </>
                 ) : (
                   <>
-                    <p className="truncate text-[13px] font-medium">{userName}</p>
+                    <p className="truncate text-[14px] font-semibold text-foreground">{userName}</p>
                     {userEmail && (
-                      <p className="truncate text-[12px] text-muted-foreground">{userEmail}</p>
+                      <p className="truncate text-[13px] text-muted-foreground font-medium">{userEmail}</p>
                     )}
                   </>
                 )}
@@ -289,11 +289,11 @@ export function UserSidebar() {
           <button
             onClick={() => signOut({ callbackUrl: "/auth/login" })}
             title={collapsed ? "Chiqish" : undefined}
-            className={`flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-[13px] text-destructive transition-colors duration-300 hover:bg-secondary ${
+            className={`flex w-full items-center gap-3.5 rounded-2xl px-4 py-3 text-[14px] font-medium text-destructive transition-colors duration-300 hover:bg-destructive/10 ${
               collapsed ? 'justify-center' : ''
             }`}
           >
-            <LogOut className="h-[18px] w-[18px] shrink-0" />
+            <LogOut className="h-[20px] w-[20px] shrink-0" />
             {!collapsed && <span>Chiqish</span>}
           </button>
 
