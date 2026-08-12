@@ -22,7 +22,20 @@ export default function JlptLevels() {
     const fetchLevels = async () => {
       try {
         const res = await userAPI.getLevels()
-        setLevelsData(res.data)
+        
+        // Darajalarni kerakli ketma-ketlikda tartiblash
+        const order = ['hira-kata', 'n5', 'n4', 'n3', 'n2', 'n1']
+        const sortedLevels = (res.data || []).sort((a: any, b: any) => {
+          const indexA = order.indexOf(a.slug?.toLowerCase())
+          const indexB = order.indexOf(b.slug?.toLowerCase())
+          
+          const posA = indexA === -1 ? 999 : indexA
+          const posB = indexB === -1 ? 999 : indexB
+          
+          return posA - posB
+        })
+        
+        setLevelsData(sortedLevels)
       } catch (error) {
         console.error("Darajalarni yuklashda xatolik:", error)
         toast.error("Darajalarni yuklab bo'lmadi")
@@ -70,38 +83,38 @@ export default function JlptLevels() {
                 className="aspect-video w-full object-cover object-top"
               />
 
-              <CardContent className="flex flex-grow flex-col p-5">
-                <h3 className="mb-4 text-xl font-bold text-slate-800 dark:text-slate-100">
+              <CardContent className="flex flex-grow flex-col p-4">
+                <h3 className="mb-2 text-lg font-bold text-slate-800 dark:text-slate-100">
                   {typeof level.title === 'string' ? level.title : (level.title as any)?.uz || "Nomsiz"}
                 </h3>
 
-                <div className="mb-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] font-medium text-slate-500 dark:text-slate-400">
+                <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-[12px] font-medium text-slate-500 dark:text-slate-400">
                   <div className="flex items-center gap-1.5">
-                    <BookOpen className="h-4 w-4 text-blue-400" />
+                    <BookOpen className="h-3.5 w-3.5 text-blue-400" />
                     <span>0 {t("grammar")}</span>
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <Package className="h-4 w-4 text-purple-400" />
+                    <Package className="h-3.5 w-3.5 text-purple-400" />
                     <span>0 {t("vocab")}</span>
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <Languages className="h-4 w-4 text-green-400" />
+                    <Languages className="h-3.5 w-3.5 text-green-400" />
                     <span>0 {t("kanji")}</span>
                   </div>
                 </div>
 
-                <div className="mt-auto flex items-center justify-between pt-2">
-                  <span className="text-sm font-medium text-slate-400 dark:text-slate-500">
+                <div className="mt-auto flex items-center justify-between pt-1">
+                  <span className="text-[13px] font-medium text-slate-400 dark:text-slate-500">
                     Batafsil ko'rish
                   </span>
 
                   <Button
                     size="icon"
-                    className="rounded-full bg-blue-500 text-white shadow-sm shadow-blue-200 hover:bg-blue-600 dark:shadow-none"
+                    className="h-8 w-8 rounded-full bg-blue-500 text-white shadow-sm shadow-blue-200 hover:bg-blue-600 dark:shadow-none"
                   >
-                    <ArrowRight className="h-5 w-5" />
+                    <ArrowRight className="h-4 w-4" />
                   </Button>
                 </div>
               </CardContent>

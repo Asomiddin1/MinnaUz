@@ -59,13 +59,13 @@ const BannerCarousel = () => {
           {banners.map((banner, index) => (
             <CarouselItem key={banner.id}>
               <div 
-                className="relative w-full overflow-hidden rounded-2xl shadow-sm cursor-pointer transition-transform hover:scale-[1.01]"
+                className="relative w-full overflow-hidden rounded-[24px] shadow-sm cursor-pointer transition-transform hover:scale-[1.01]"
                 onClick={() => handleBannerClick(banner)}
               >
                 <img 
                   src={banner.image} 
                   alt={banner.title || "Banner"}
-                  className="w-full h-auto object-contain rounded-2xl" 
+                  className="w-full h-[220px] sm:h-[260px] md:h-[300px] lg:h-[340px] object-cover object-center rounded-[24px]" 
                 />
               </div>
             </CarouselItem>
@@ -87,7 +87,7 @@ const BannerCarousel = () => {
               <img 
                 src={selectedBanner.image} 
                 alt={selectedBanner.title || "Banner"} 
-                className="w-full h-auto rounded-lg object-contain"
+                className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-xl object-cover object-center"
               />
             )}
             {selectedBanner?.description && (

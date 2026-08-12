@@ -50,59 +50,53 @@ export function QuickCategories() {
     {
       title: "Real testlar",
       desc: isLoading ? "Yuklanmoqda..." : `${stats.tests} ta yechilgan`,
-      icon: ClipboardList,
-      iconBg: "bg-blue-500 text-white",
+      image: "/images/quick-categories/test.png",
       href: "/dashboard/jlpt",
     },
     {
       title: "Mashqlar",
       desc: isLoading ? "Yuklanmoqda..." : `${stats.exercises} ta bajarilgan`,
-      icon: Headphones,
-      iconBg: "bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400",
+      image: "/images/quick-categories/mashqlar.png",
       href: "/dashboard/dokkai",
     },
     {
       title: "Grammatika",
       desc: isLoading ? "Yuklanmoqda..." : `${stats.grammar} ta o'rganilgan`,
-      icon: BookOpen,
-      iconBg: "bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-400",
+      image: "/images/quick-categories/grammatika.png",
       href: "/dashboard/kanji",
     },
     {
       title: "So'zlar",
       desc: isLoading ? "Yuklanmoqda..." : `${stats.words} ta yodlangan`,
-      icon: Languages,
-      iconBg: "bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400",
+      image: "/images/quick-categories/suzlar.png",
       href: "/dashboard/dictionary",
     },
     {
       title: "Statistika",
       desc: isLoading ? "Yuklanmoqda..." : `Umumiy: ${stats.statPercent}`,
-      icon: BarChart3,
-      iconBg: "bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400",
+      image: "/images/quick-categories/statistika.png",
       href: "/dashboard/profile",
     },
   ]
 
   return (
     <Card className="w-full rounded-[28px] border-none bg-white shadow-sm dark:bg-slate-900 px-4 py-3 my-0">
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 items-center w-full">
+      <div className="flex w-full items-center gap-2 md:gap-3 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {categories.map((item, index) => {
-          const Icon = item.icon
           return (
             <div
               key={index}
               onClick={() => router.push(item.href)}
-              className="flex items-center gap-3 p-2.5 rounded-2xl transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer group active:scale-95"
+              className="flex shrink-0 items-center gap-3 p-2.5 rounded-2xl transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer group active:scale-95"
             >
-              <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-sm transition-transform group-hover:scale-105 ${item.iconBg}`}>
-                <Icon className="h-5 w-5" />
+              <div className="relative flex h-[46px] w-[46px] shrink-0 items-center justify-center transition-transform duration-300 group-hover:scale-110 mix-blend-multiply dark:mix-blend-normal dark:bg-white dark:rounded-xl">
+                <img src={item.image} alt={item.title} className="w-full h-full object-cover scale-[1.25] pointer-events-none" />
               </div>
-              <div className="flex flex-col min-w-0">
-                <span className="text-[13px] font-bold text-slate-900 dark:text-white truncate">
+              <div className="flex flex-col min-w-max pr-2">
+                <span className="text-[13px] font-bold text-slate-900 dark:text-white whitespace-nowrap">
                   {item.title}
                 </span>
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight truncate">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight whitespace-nowrap">
                   {item.desc}
                 </span>
               </div>
