@@ -200,26 +200,27 @@ export default function DashboardPage() {
       <div className="relative hidden w-full md:block">
         
         {/* SHU YER O'ZGARDI: top-[61px] qilindi. Asosiy Header 61px atrofida joy egallaganligi uchun unga tegib turadi */}
-        <div className="sticky top-[61px] z-30 w-full border-b border-border bg-[#F8FAFC]/90 px-4 py-2 backdrop-blur-xl sm:px-6 dark:bg-slate-950/90">
+        <div className="sticky top-[61px] z-30 w-full border-b border-slate-200/60 bg-white/80 px-4 py-2.5 backdrop-blur-xl sm:px-6 dark:border-slate-800/60 dark:bg-slate-950/80">
           <div className="flex items-center justify-between">
-            <nav className="flex gap-1 overflow-x-auto [scrollbar-width:none]">
+            <nav className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">
               {TABS.map((label, i) => (
                 <button
                   key={label}
                   type="button"
                   onClick={() => setActiveTab(i)}
                   aria-current={i === activeTab ? 'page' : undefined}
-                  className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-1.5 text-[13px] transition-all duration-300 ${
+                  className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2 text-[13px] transition-all duration-300 ${
                     i === activeTab
-                      ? 'bg-secondary font-medium text-foreground'
-                      : 'text-muted-foreground hover:text-foreground'
+                      ? 'bg-white font-semibold text-primary shadow-sm ring-1 ring-slate-200/50 dark:bg-slate-800 dark:text-white dark:ring-slate-700/50'
+                      : 'text-slate-500 font-medium hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/50 dark:hover:text-slate-100'
                   }`}
                 >
-                  {i === 0 && <Layers className="h-4 w-4" />}
+                  {i === 0 && <Layers className="h-4 w-4" strokeWidth={2.5} />}
                   {i > 0 && MENU_ITEMS[i - 1] && (
                     <span className="flex items-center gap-2">
                       {React.createElement(MENU_ITEMS[i - 1].icon, { 
-                        className: `h-4 w-4 ${MENU_ITEMS[i - 1].color || ''}` 
+                        className: `h-4 w-4 ${MENU_ITEMS[i - 1].color || ''}`,
+                        strokeWidth: 2
                       })}
                       {label}
                     </span>
@@ -230,7 +231,7 @@ export default function DashboardPage() {
 
             <button
               onClick={handleExpandPage}
-              className="ml-4 flex shrink-0 items-center gap-2 rounded-full border border-border px-4 py-1.5 text-[13px] font-medium text-muted-foreground transition-all duration-300 hover:bg-secondary hover:text-foreground"
+              className="ml-4 flex shrink-0 items-center gap-2 rounded-xl bg-white px-4 py-2 text-[13px] font-medium text-slate-600 shadow-sm ring-1 ring-slate-200/50 transition-all duration-300 hover:bg-slate-50 hover:text-slate-900 dark:bg-slate-900 dark:text-slate-300 dark:ring-slate-800 dark:hover:bg-slate-800 dark:hover:text-white"
               title="Sahifani to'liq ekranda ochish"
             >
               <Maximize className="h-4 w-4" />
@@ -240,17 +241,17 @@ export default function DashboardPage() {
         </div>
 
         {/* Content Area */}
-        <div className="px-4 py-7 sm:px-6">
+        <div className="px-3 py-3 sm:px-4">
           {activeTab === 0 && (
-            <div className="flex w-full flex-col space-y-4">
-              <div className="grid w-full grid-cols-1 items-start gap-4 lg:grid-cols-12">
-                <div className="flex w-full flex-col gap-4 lg:col-span-8">
+            <div className="flex w-full flex-col space-y-2">
+              <div className="grid w-full grid-cols-1 items-start gap-3 lg:grid-cols-12 xl:gap-4">
+                <div className="flex w-full flex-col gap-2.5 lg:col-span-9 xl:col-span-9">
                   <BannerCarousel />
                   <QuickCategories />
                   <JlptLevels />
                 </div>
-                {/* O'ng tarafdagi kalendar ham scroll qilinganda qotib turishi uchun top-32 ga tushirildi */}
-                <div className="sticky top-[130px] flex w-full self-start flex-col gap-3 lg:col-span-4">
+                {/* O'ng tarafdagi kalendar ham scroll qilinganda qotib turishi uchun top-[105px] ga tushirildi */}
+                <div className="sticky top-[105px] flex w-full self-start flex-col gap-2 lg:col-span-3 xl:col-span-3">
                   <div className="w-full">
                     <StreakCalendar />
                   </div>
