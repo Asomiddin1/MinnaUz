@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { AdminSidebar } from "@/components/sidebar/admin-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { Search, Globe, Moon, Sun } from "lucide-react";
+import { Search, Globe, Moon, Sun, Maximize2, Minimize2 } from "lucide-react";
 import { useTheme } from "next-themes";
 
 export default function AdminLayout({
@@ -13,10 +13,31 @@ export default function AdminLayout({
 }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+
+  const toggleFullscreen = async () => {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+      return;
+    }
+
+    await document.documentElement.requestFullscreen();
+  };
 
   return (
     <SidebarProvider>
@@ -46,6 +67,13 @@ export default function AdminLayout({
 
             {/* O'ng tomon: Qidiruv, Til va Dark Mode */}
             <div className="flex items-center gap-2 sm:gap-4">
+              <button
+                className="p-2 border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all flex items-center justify-center w-9 h-9 dark:bg-slate-900"
+                aria-label="Open search"
+              >
+                <Search className="w-4 h-4" />
+              </button>
+
               {/* Til o'zgartirish tugmasi */}
               <button className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm font-medium border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all dark:bg-gray-900">
                 <Globe className="w-4 h-4" />
@@ -66,6 +94,19 @@ export default function AdminLayout({
                   ) : (
                     <Moon className="w-4 h-4 text-black" />
                   )
+                )}
+              </button>
+
+              <button
+                onClick={toggleFullscreen}
+                className="p-2 border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all flex items-center justify-center w-9 h-9 dark:bg-slate-900"
+                aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+                title={isFullscreen ? "Kichraytirish" : "Kattalashtirish"}
+              >
+                {isFullscreen ? (
+                  <Minimize2 className="w-4 h-4" />
+                ) : (
+                  <Maximize2 className="w-4 h-4" />
                 )}
               </button>
 
