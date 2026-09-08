@@ -15,9 +15,8 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
+import { memoryStorage } from 'multer';
 import { extname, join } from 'path';
-import { existsSync, mkdirSync } from 'fs';
 import {
   ApiTags,
   ApiOperation,
@@ -28,10 +27,6 @@ import {
 import { Throttle } from '@nestjs/throttler';
 import type { Request } from 'express';
 
-const avatarsUploadDir = join(process.cwd(), 'uploads', 'avatars');
-if (!existsSync(avatarsUploadDir)) {
-  mkdirSync(avatarsUploadDir, { recursive: true });
-}
 import { AuthService } from './auth.service';
 import { SendOtpDto } from './dto/send-otp.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
@@ -156,17 +151,7 @@ export class AuthController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: (req, file, cb) => {
-          cb(null, avatarsUploadDir);
-        },
-        filename: (req: any, file, cb) => {
-          const userId = req.user?.id || 'user';
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e6);
-          const ext = extname(file.originalname).toLowerCase();
-          cb(null, `avatar-${userId}-${uniqueSuffix}${ext}`);
-        },
-      }),
+      storage: memoryStorage(),
       fileFilter: (req, file, cb) => {
         const allowedMimes = [
           'image/jpeg',

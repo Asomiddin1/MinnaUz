@@ -19,36 +19,8 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import type { JwtPayload } from './strategies/jwt.strategy';
 import { randomUUID } from 'crypto';
-import { existsSync, unlinkSync, mkdirSync } from 'fs';
-import { join } from 'path';
 import { Role, User } from '@prisma/client';
-
-const avatarsDir = join(process.cwd(), 'uploads', 'avatars');
-if (!existsSync(avatarsDir)) {
-  mkdirSync(avatarsDir, { recursive: true });
-}
-
-export function safeDeleteAvatarFile(avatarUrl?: string | null) {
-  if (!avatarUrl) return;
-  if (avatarUrl.includes('/uploads/avatars/')) {
-    const filename = avatarUrl.split('/uploads/avatars/')[1];
-    if (
-      filename &&
-      !filename.includes('..') &&
-      !filename.includes('/') &&
-      !filename.includes('\\')
-    ) {
-      const fullPath = join(process.cwd(), 'uploads', 'avatars', filename);
-      if (existsSync(fullPath)) {
-        try {
-          unlinkSync(fullPath);
-        } catch (err) {
-          console.error('Failed to delete old avatar file:', err);
-        }
-      }
-    }
-  }
-}
+import { StorageService } from '../storage/storage.service';
 
 const MAX_DEVICES = 3;
 const MAX_OTP_ATTEMPTS = 5;
@@ -66,6 +38,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private mailService: MailService,
+    private storage: StorageService,
   ) {
     this.googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
   }
@@ -534,19 +507,23 @@ export class AuthService {
     }
 
     // Delete old uploaded avatar if it was a local file
-    safeDeleteAvatarFile(user.avatarUrl);
+    await this.deleteStoredFile(user.avatarUrl);
 
     // Retain existing google url if not set
     const googleAvatarUrl =
       user.googleAvatarUrl ||
       (user.avatarUrl?.includes('googleusercontent.com') ? user.avatarUrl : null);
 
-    const relativeUrl = `/uploads/avatars/${file.filename}`;
+    const uploaded = await this.storage.upload({
+      key: `avatars/${userId}/${Date.now()}-${file.originalname.replace(/[^a-zA-Z0-9._-]/g, '-')}`,
+      buffer: file.buffer,
+      contentType: file.mimetype,
+    });
 
     const updated = await this.prisma.user.update({
       where: { id: userId },
       data: {
-        avatarUrl: relativeUrl,
+        avatarUrl: uploaded.url,
         googleAvatarUrl,
       },
       select: {
@@ -584,7 +561,7 @@ export class AuthService {
     }
 
     // Delete previous custom avatar file if present
-    safeDeleteAvatarFile(user.avatarUrl);
+    await this.deleteStoredFile(user.avatarUrl);
 
     const updated = await this.prisma.user.update({
       where: { id: userId },
@@ -619,7 +596,7 @@ export class AuthService {
     }
 
     // Delete previous custom avatar file if present
-    safeDeleteAvatarFile(user.avatarUrl);
+    await this.deleteStoredFile(user.avatarUrl);
 
     const updated = await this.prisma.user.update({
       where: { id: userId },
@@ -640,6 +617,22 @@ export class AuthService {
     });
 
     return updated;
+  }
+
+  private async deleteStoredFile(url?: string | null): Promise<void> {
+    if (!url) return;
+    const keyParam = '/api/upload/download?key=';
+    const keyIndex = url.indexOf(keyParam);
+    if (keyIndex !== -1) {
+      const key = decodeURIComponent(url.slice(keyIndex + keyParam.length));
+      if (key) await this.storage.delete(key);
+      return;
+    }
+    const marker = '.amazonaws.com/';
+    const index = url.indexOf(marker);
+    if (index === -1) return;
+    const key = url.slice(index + marker.length);
+    if (key) await this.storage.delete(key);
   }
 
   // 11. Update Profile (Name)

@@ -20,6 +20,10 @@ Incoming HTTPS Traffic (:443)
 
 ## 2. Database Migrations Workflow
 
+For production, `DATABASE_URL` should point to the private AWS RDS PostgreSQL
+endpoint and include `sslmode=require`. Allow inbound TCP/5432 only from the
+backend security group; do not expose RDS publicly.
+
 Before starting or updating the backend service in production:
 
 ```bash
@@ -30,6 +34,12 @@ npx prisma generate
 # Apply pending migrations to production PostgreSQL database
 npx prisma migrate deploy
 ```
+
+The backend uses AWS S3 for uploaded avatars, images, videos, audio, PDFs, and
+other files. Grant the backend IAM role (preferred) or IAM user only
+`s3:PutObject`, `s3:GetObject`, and `s3:DeleteObject` permissions for the
+configured bucket prefix. Keep the bucket private and use the API's signed
+download endpoint for private assets.
 
 ---
 
