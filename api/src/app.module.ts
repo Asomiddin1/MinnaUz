@@ -17,7 +17,6 @@ import { AiModule } from './ai/ai.module';
 import { TeacherModule } from './teacher/teacher.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
@@ -25,7 +24,6 @@ import { StorageModule } from './storage/storage.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    StorageModule,
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
