@@ -1,10 +1,6 @@
 import {
   Controller,
   Post,
-  Get,
-  Delete,
-  Query,
-  Res,
   UseInterceptors,
   UploadedFile,
   BadRequestException,
@@ -17,20 +13,32 @@ import {
   ApiConsumes,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { extname } from 'path';
-import { memoryStorage } from 'multer';
-import type { Response } from 'express';
+import { diskStorage } from 'multer';
+import { extname, join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/roles.enum';
-import { StorageService } from '../storage/storage.service';
+
+const uploadDir = join(process.cwd(), 'uploads', 'videos');
+if (!existsSync(uploadDir)) {
+  mkdirSync(uploadDir, { recursive: true });
+}
+
+const audioUploadDir = join(process.cwd(), 'uploads', 'audio');
+if (!existsSync(audioUploadDir)) {
+  mkdirSync(audioUploadDir, { recursive: true });
+}
+
+const imageUploadDir = join(process.cwd(), 'uploads', 'images');
+if (!existsSync(imageUploadDir)) {
+  mkdirSync(imageUploadDir, { recursive: true });
+}
 
 @ApiTags('Fayl Yuklash (Uploads)')
 @Controller('upload')
 export class UploadController {
-  constructor(private readonly storage: StorageService) {}
-
   @Post('video')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -39,7 +47,17 @@ export class UploadController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: memoryStorage(),
+      storage: diskStorage({
+        destination: (req, file, cb) => {
+          cb(null, uploadDir);
+        },
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname).toLowerCase();
+          cb(null, `video-${uniqueSuffix}${ext}`);
+        },
+      }),
       fileFilter: (req, file, cb) => {
         const allowedMimes = [
           'video/mp4',
@@ -67,22 +85,17 @@ export class UploadController {
       },
     }),
   )
-  async uploadVideo(@UploadedFile() file: any) {
+  uploadVideo(@UploadedFile() file: any) {
     if (!file) {
       throw new BadRequestException('Fayl tanlanmadi');
     }
-    const key = `videos/${Date.now()}-${Math.round(Math.random() * 1e9)}${extname(file.originalname).toLowerCase()}`;
-    const uploaded = await this.storage.upload({
-      key,
-      buffer: file.buffer,
-      contentType: file.mimetype,
-    });
+    const relativeUrl = `/uploads/videos/${file.filename}`;
     return {
       success: true,
-      ...uploaded,
+      url: relativeUrl,
       originalName: file.originalname,
       size: file.size,
-      filename: key,
+      filename: file.filename,
     };
   }
 
@@ -94,7 +107,17 @@ export class UploadController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: memoryStorage(),
+      storage: diskStorage({
+        destination: (req, file, cb) => {
+          cb(null, audioUploadDir);
+        },
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname).toLowerCase();
+          cb(null, `audio-${uniqueSuffix}${ext}`);
+        },
+      }),
       fileFilter: (req, file, cb) => {
         const allowedMimes = [
           'audio/mpeg',
@@ -110,7 +133,7 @@ export class UploadController {
         ];
         const allowedExt = /\.(mp3|m4a|wav|aac|ogg|webm|flac)$/i;
         if (
-          allowedMimes.includes(file.mimetype) &&
+          allowedMimes.includes(file.mimetype) ||
           allowedExt.test(file.originalname)
         ) {
           cb(null, true);
@@ -128,22 +151,17 @@ export class UploadController {
       },
     }),
   )
-  async uploadAudio(@UploadedFile() file: any) {
+  uploadAudio(@UploadedFile() file: any) {
     if (!file) {
       throw new BadRequestException('Audio fayl tanlanmadi');
     }
-    const key = `audio/${Date.now()}-${Math.round(Math.random() * 1e9)}${extname(file.originalname).toLowerCase()}`;
-    const uploaded = await this.storage.upload({
-      key,
-      buffer: file.buffer,
-      contentType: file.mimetype,
-    });
+    const relativeUrl = `/uploads/audio/${file.filename}`;
     return {
       success: true,
-      ...uploaded,
+      url: relativeUrl,
       originalName: file.originalname,
       size: file.size,
-      filename: key,
+      filename: file.filename,
     };
   }
 
@@ -155,25 +173,36 @@ export class UploadController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: memoryStorage(),
+      storage: diskStorage({
+        destination: (req, file, cb) => {
+          cb(null, imageUploadDir);
+        },
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname).toLowerCase();
+          cb(null, `img-${uniqueSuffix}${ext}`);
+        },
+      }),
       fileFilter: (req, file, cb) => {
         const allowedMimes = [
           'image/jpeg',
           'image/png',
           'image/webp',
           'image/gif',
+          'image/svg+xml',
           'image/jpg',
         ];
-        const allowedExt = /\.(jpg|jpeg|png|webp|gif)$/i;
+        const allowedExt = /\.(jpg|jpeg|png|webp|gif|svg)$/i;
         if (
-          allowedMimes.includes(file.mimetype) &&
+          allowedMimes.includes(file.mimetype) ||
           allowedExt.test(file.originalname)
         ) {
           cb(null, true);
         } else {
           cb(
             new BadRequestException(
-              'Faqat rasm formatdagi fayllar (JPEG, PNG, WebP, GIF) qabul qilinadi',
+              'Faqat rasm formatdagi fayllar (JPEG, PNG, WebP, GIF, SVG) qabul qilinadi',
             ),
             false,
           );
@@ -184,45 +213,17 @@ export class UploadController {
       },
     }),
   )
-  async uploadImage(@UploadedFile() file: any) {
+  uploadImage(@UploadedFile() file: any) {
     if (!file) {
       throw new BadRequestException('Rasm fayli tanlanmadi');
     }
-    const key = `images/${Date.now()}-${Math.round(Math.random() * 1e9)}${extname(file.originalname).toLowerCase()}`;
-    const uploaded = await this.storage.upload({
-      key,
-      buffer: file.buffer,
-      contentType: file.mimetype,
-    });
+    const relativeUrl = `/uploads/images/${file.filename}`;
     return {
       success: true,
-      ...uploaded,
+      url: relativeUrl,
       originalName: file.originalname,
       size: file.size,
-      filename: key,
+      filename: file.filename,
     };
-  }
-
-  @Get('download')
-  @ApiOperation({ summary: 'S3 faylini vaqtinchalik signed URL orqali yuklab olish' })
-  async download(@Query('key') key: string, @Res() res: Response) {
-    if (!key || key.includes('..') || key.startsWith('/')) {
-      throw new BadRequestException('Notoʻgʻri storage key');
-    }
-    const url = await this.storage.getDownloadUrl(key);
-    return res.redirect(url);
-  }
-
-  @Delete()
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.SUPER_ADMIN, Role.TEACHER)
-  @ApiOperation({ summary: 'S3 faylini oʻchirish' })
-  async delete(@Query('key') key: string) {
-    if (!key || key.includes('..') || key.startsWith('/')) {
-      throw new BadRequestException('Notoʻgʻri storage key');
-    }
-    await this.storage.delete(key);
-    return { success: true };
   }
 }
