@@ -19,36 +19,8 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import type { JwtPayload } from './strategies/jwt.strategy';
 import { randomUUID } from 'crypto';
-import { existsSync, unlinkSync, mkdirSync } from 'fs';
-import { join } from 'path';
 import { Role, User } from '@prisma/client';
-
-const avatarsDir = join(process.cwd(), 'uploads', 'avatars');
-if (!existsSync(avatarsDir)) {
-  mkdirSync(avatarsDir, { recursive: true });
-}
-
-export function safeDeleteAvatarFile(avatarUrl?: string | null) {
-  if (!avatarUrl) return;
-  if (avatarUrl.includes('/uploads/avatars/')) {
-    const filename = avatarUrl.split('/uploads/avatars/')[1];
-    if (
-      filename &&
-      !filename.includes('..') &&
-      !filename.includes('/') &&
-      !filename.includes('\\')
-    ) {
-      const fullPath = join(process.cwd(), 'uploads', 'avatars', filename);
-      if (existsSync(fullPath)) {
-        try {
-          unlinkSync(fullPath);
-        } catch (err) {
-          console.error('Failed to delete old avatar file:', err);
-        }
-      }
-    }
-  }
-}
+import { SupabaseStorageService } from '../upload/supabase-storage.service';
 
 const MAX_DEVICES = 3;
 const MAX_OTP_ATTEMPTS = 5;
@@ -66,6 +38,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private mailService: MailService,
+    private storageService: SupabaseStorageService,
   ) {
     this.googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
   }
@@ -519,12 +492,8 @@ export class AuthService {
     };
   }
 
-  // 8. Upload Profile Avatar (Single image, deletes old local avatar)
-  async uploadAvatar(userId: string, file: any) {
-    if (!file) {
-      throw new BadRequestException('Rasm fayli tanlanmadi');
-    }
-
+  // 8. Upload Profile Avatar (Single image, deletes old Supabase avatar)
+  async uploadAvatar(userId: string, publicUrl: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -533,20 +502,23 @@ export class AuthService {
       throw new NotFoundException('Foydalanuvchi topilmadi');
     }
 
-    // Delete old uploaded avatar if it was a local file
-    safeDeleteAvatarFile(user.avatarUrl);
+    // Delete old Supabase avatar if it was uploaded (not a Google/external URL)
+    if (user.avatarUrl && !user.avatarUrl.includes('googleusercontent.com')) {
+      const filename = this.storageService.extractFilename(user.avatarUrl, 'avatars');
+      if (filename) {
+        await this.storageService.deleteFile('avatars', filename);
+      }
+    }
 
     // Retain existing google url if not set
     const googleAvatarUrl =
       user.googleAvatarUrl ||
       (user.avatarUrl?.includes('googleusercontent.com') ? user.avatarUrl : null);
 
-    const relativeUrl = `/uploads/avatars/${file.filename}`;
-
     const updated = await this.prisma.user.update({
       where: { id: userId },
       data: {
-        avatarUrl: relativeUrl,
+        avatarUrl: publicUrl,
         googleAvatarUrl,
       },
       select: {
@@ -583,8 +555,11 @@ export class AuthService {
       throw new BadRequestException('Google hisobi rasmi mavjud emas');
     }
 
-    // Delete previous custom avatar file if present
-    safeDeleteAvatarFile(user.avatarUrl);
+    // Delete previous custom avatar if it was a Supabase upload
+    if (user.avatarUrl && !user.avatarUrl.includes('googleusercontent.com')) {
+      const filename = this.storageService.extractFilename(user.avatarUrl, 'avatars');
+      if (filename) await this.storageService.deleteFile('avatars', filename);
+    }
 
     const updated = await this.prisma.user.update({
       where: { id: userId },
@@ -618,8 +593,11 @@ export class AuthService {
       throw new NotFoundException('Foydalanuvchi topilmadi');
     }
 
-    // Delete previous custom avatar file if present
-    safeDeleteAvatarFile(user.avatarUrl);
+    // Delete previous custom avatar if it was a Supabase upload
+    if (user.avatarUrl && !user.avatarUrl.includes('googleusercontent.com')) {
+      const filename = this.storageService.extractFilename(user.avatarUrl, 'avatars');
+      if (filename) await this.storageService.deleteFile('avatars', filename);
+    }
 
     const updated = await this.prisma.user.update({
       where: { id: userId },

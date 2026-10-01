@@ -13,32 +13,19 @@ import {
   ApiConsumes,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { diskStorage } from 'multer';
-import { extname, join } from 'path';
-import { existsSync, mkdirSync } from 'fs';
+import { memoryStorage } from 'multer';
+import { extname } from 'path';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../auth/roles.enum';
-
-const uploadDir = join(process.cwd(), 'uploads', 'videos');
-if (!existsSync(uploadDir)) {
-  mkdirSync(uploadDir, { recursive: true });
-}
-
-const audioUploadDir = join(process.cwd(), 'uploads', 'audio');
-if (!existsSync(audioUploadDir)) {
-  mkdirSync(audioUploadDir, { recursive: true });
-}
-
-const imageUploadDir = join(process.cwd(), 'uploads', 'images');
-if (!existsSync(imageUploadDir)) {
-  mkdirSync(imageUploadDir, { recursive: true });
-}
+import { SupabaseStorageService } from './supabase-storage.service';
 
 @ApiTags('Fayl Yuklash (Uploads)')
 @Controller('upload')
 export class UploadController {
+  constructor(private readonly storage: SupabaseStorageService) {}
+
   @Post('video')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -47,17 +34,7 @@ export class UploadController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: (req, file, cb) => {
-          cb(null, uploadDir);
-        },
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname).toLowerCase();
-          cb(null, `video-${uniqueSuffix}${ext}`);
-        },
-      }),
+      storage: memoryStorage(),
       fileFilter: (req, file, cb) => {
         const allowedMimes = [
           'video/mp4',
@@ -80,23 +57,15 @@ export class UploadController {
           );
         }
       },
-      limits: {
-        fileSize: 500 * 1024 * 1024, // 500 MB max video limit
-      },
+      limits: { fileSize: 500 * 1024 * 1024 },
     }),
   )
-  uploadVideo(@UploadedFile() file: any) {
-    if (!file) {
-      throw new BadRequestException('Fayl tanlanmadi');
-    }
-    const relativeUrl = `/uploads/videos/${file.filename}`;
-    return {
-      success: true,
-      url: relativeUrl,
-      originalName: file.originalname,
-      size: file.size,
-      filename: file.filename,
-    };
+  async uploadVideo(@UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('Fayl tanlanmadi');
+    const ext = extname(file.originalname).toLowerCase();
+    const filename = `video-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+    const url = await this.storage.uploadFile('videos', filename, file.buffer, file.mimetype);
+    return { success: true, url, originalName: file.originalname, size: file.size, filename };
   }
 
   @Post('audio')
@@ -107,17 +76,7 @@ export class UploadController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: (req, file, cb) => {
-          cb(null, audioUploadDir);
-        },
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname).toLowerCase();
-          cb(null, `audio-${uniqueSuffix}${ext}`);
-        },
-      }),
+      storage: memoryStorage(),
       fileFilter: (req, file, cb) => {
         const allowedMimes = [
           'audio/mpeg',
@@ -146,23 +105,15 @@ export class UploadController {
           );
         }
       },
-      limits: {
-        fileSize: 100 * 1024 * 1024, // 100 MB max audio limit (covers 40-50 min JLPT listening audio)
-      },
+      limits: { fileSize: 100 * 1024 * 1024 },
     }),
   )
-  uploadAudio(@UploadedFile() file: any) {
-    if (!file) {
-      throw new BadRequestException('Audio fayl tanlanmadi');
-    }
-    const relativeUrl = `/uploads/audio/${file.filename}`;
-    return {
-      success: true,
-      url: relativeUrl,
-      originalName: file.originalname,
-      size: file.size,
-      filename: file.filename,
-    };
+  async uploadAudio(@UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('Audio fayl tanlanmadi');
+    const ext = extname(file.originalname).toLowerCase();
+    const filename = `audio-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+    const url = await this.storage.uploadFile('audio', filename, file.buffer, file.mimetype);
+    return { success: true, url, originalName: file.originalname, size: file.size, filename };
   }
 
   @Post('image')
@@ -173,17 +124,7 @@ export class UploadController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: (req, file, cb) => {
-          cb(null, imageUploadDir);
-        },
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname).toLowerCase();
-          cb(null, `img-${uniqueSuffix}${ext}`);
-        },
-      }),
+      storage: memoryStorage(),
       fileFilter: (req, file, cb) => {
         const allowedMimes = [
           'image/jpeg',
@@ -208,22 +149,14 @@ export class UploadController {
           );
         }
       },
-      limits: {
-        fileSize: 20 * 1024 * 1024, // 20 MB max image limit
-      },
+      limits: { fileSize: 20 * 1024 * 1024 },
     }),
   )
-  uploadImage(@UploadedFile() file: any) {
-    if (!file) {
-      throw new BadRequestException('Rasm fayli tanlanmadi');
-    }
-    const relativeUrl = `/uploads/images/${file.filename}`;
-    return {
-      success: true,
-      url: relativeUrl,
-      originalName: file.originalname,
-      size: file.size,
-      filename: file.filename,
-    };
+  async uploadImage(@UploadedFile() file: Express.Multer.File) {
+    if (!file) throw new BadRequestException('Rasm fayli tanlanmadi');
+    const ext = extname(file.originalname).toLowerCase();
+    const filename = `img-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
+    const url = await this.storage.uploadFile('images', filename, file.buffer, file.mimetype);
+    return { success: true, url, originalName: file.originalname, size: file.size, filename };
   }
 }
