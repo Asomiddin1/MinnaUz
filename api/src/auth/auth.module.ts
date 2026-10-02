@@ -8,10 +8,12 @@ import { RolesGuard } from './guards/roles.guard';
 import { getJwtSecret } from './jwt.constants';
 
 import { MailModule } from '../mail/mail.module';
+import { UploadModule } from '../upload/upload.module';
 
 @Module({
   imports: [
     MailModule,
+    UploadModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: getJwtSecret(),

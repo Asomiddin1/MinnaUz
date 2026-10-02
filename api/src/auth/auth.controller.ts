@@ -15,9 +15,8 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname, join } from 'path';
-import { existsSync, mkdirSync } from 'fs';
+import { memoryStorage } from 'multer';
+import { extname } from 'path';
 import {
   ApiTags,
   ApiOperation,
@@ -28,10 +27,6 @@ import {
 import { Throttle } from '@nestjs/throttler';
 import type { Request } from 'express';
 
-const avatarsUploadDir = join(process.cwd(), 'uploads', 'avatars');
-if (!existsSync(avatarsUploadDir)) {
-  mkdirSync(avatarsUploadDir, { recursive: true });
-}
 import { AuthService } from './auth.service';
 import { SendOtpDto } from './dto/send-otp.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
@@ -43,11 +38,15 @@ import { RolesGuard } from './guards/roles.guard';
 import { Roles } from './decorators/roles.decorator';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { Role } from './roles.enum';
+import { SupabaseStorageService } from '../upload/supabase-storage.service';
 
 @ApiTags('Autentifikatsiya & Qurilmalar (Auth & Devices)')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private storageService: SupabaseStorageService,
+  ) {}
 
   @Post('otp/send')
   @Throttle({ default: { limit: 5, ttl: 60000 } })
@@ -156,17 +155,7 @@ export class AuthController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: (req, file, cb) => {
-          cb(null, avatarsUploadDir);
-        },
-        filename: (req: any, file, cb) => {
-          const userId = req.user?.id || 'user';
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e6);
-          const ext = extname(file.originalname).toLowerCase();
-          cb(null, `avatar-${userId}-${uniqueSuffix}${ext}`);
-        },
-      }),
+      storage: memoryStorage(),
       fileFilter: (req, file, cb) => {
         const allowedMimes = [
           'image/jpeg',
@@ -183,25 +172,24 @@ export class AuthController {
         } else {
           cb(
             new BadRequestException(
-              "Faqat rasm formatidagi fayllar (JPEG, PNG, WEBP) qabul qilinadi",
+              'Faqat rasm formatidagi fayllar (JPEG, PNG, WEBP) qabul qilinadi',
             ),
             false,
           );
         }
       },
-      limits: {
-        fileSize: 5 * 1024 * 1024, // 5 MB max
-      },
+      limits: { fileSize: 5 * 1024 * 1024 },
     }),
   )
   async uploadAvatar(
     @CurrentUser('id') userId: string,
-    @UploadedFile() file: any,
+    @UploadedFile() file: Express.Multer.File,
   ) {
-    if (!file) {
-      throw new BadRequestException('Rasm fayli tanlanmadi');
-    }
-    return this.authService.uploadAvatar(userId, file);
+    if (!file) throw new BadRequestException('Rasm fayli tanlanmadi');
+    const ext = extname(file.originalname).toLowerCase();
+    const filename = `avatar-${userId}-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`;
+    const url = await this.storageService.uploadFile('avatars', filename, file.buffer, file.mimetype);
+    return this.authService.uploadAvatar(userId, url);
   }
 
   @Post('avatar/google')

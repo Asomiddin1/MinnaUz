@@ -1,12 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBannerDto, UpdateBannerDto } from './dto/banner.dto';
+import { SupabaseStorageService } from '../upload/supabase-storage.service';
 
 export { CreateBannerDto, UpdateBannerDto };
 
 @Injectable()
 export class BannersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly supabaseStorage: SupabaseStorageService,
+  ) {}
 
   async onModuleInit() {
     await this.seedDefaultAnnouncement();
@@ -109,6 +113,14 @@ export class BannersService {
     });
     if (!existing) {
       throw new NotFoundException('Banner topilmadi');
+    }
+
+    // Supabase'dan rasmni o'chirish (agar Supabase URL bo'lsa)
+    if (existing.image) {
+      const filename = this.supabaseStorage.extractFilename(existing.image, 'images');
+      if (filename) {
+        await this.supabaseStorage.deleteFile('images', filename);
+      }
     }
 
     await (this.prisma as any).banner.delete({
