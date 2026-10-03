@@ -24,14 +24,19 @@ export class TestsController {
   @Get()
   @UseGuards(OptionalJwtAuthGuard)
   @ApiOperation({ summary: 'Barcha JLPT testlar roʻyxati (filtrlash bilan)' })
-  async getTests(@Query() query: QueryTestsDto, @CurrentUser('id') userId?: string) {
+  async getTests(
+    @Query() query: QueryTestsDto,
+    @CurrentUser('id') userId?: string,
+  ) {
     return this.testsService.findAll(userId, query);
   }
 
   @Get('stats')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Foydalanuvchining JLPT test topshirish statistikasi' })
+  @ApiOperation({
+    summary: 'Foydalanuvchining JLPT test topshirish statistikasi',
+  })
   async getStats(@CurrentUser('id') userId: string) {
     return this.testsService.getStats(userId);
   }
@@ -39,7 +44,9 @@ export class TestsController {
   @Get('history')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Foydalanuvchining topshirgan JLPT testlari tarixi' })
+  @ApiOperation({
+    summary: 'Foydalanuvchining topshirgan JLPT testlari tarixi',
+  })
   async getHistory(
     @CurrentUser('id') userId: string,
     @Query('limit') limit?: number,
@@ -49,7 +56,9 @@ export class TestsController {
 
   @Get(':slug')
   @UseGuards(OptionalJwtAuthGuard)
-  @ApiOperation({ summary: 'Bitta test maʼlumotlari va savollari (slug yoki ID boʻyicha)' })
+  @ApiOperation({
+    summary: 'Bitta test maʼlumotlari va savollari (slug yoki ID boʻyicha)',
+  })
   async getTestBySlug(
     @Param('slug') slug: string,
     @CurrentUser('id') userId?: string,

@@ -151,7 +151,10 @@ export class UpdateTestDto {
 }
 
 export class CreateQuestionDto {
-  @ApiProperty({ example: 'MODULE_1_VOCAB', description: 'MODULE_1_VOCAB, MODULE_2_GRAMMAR_READING, MODULE_3_LISTENING' })
+  @ApiProperty({
+    example: 'MODULE_1_VOCAB',
+    description: 'MODULE_1_VOCAB, MODULE_2_GRAMMAR_READING, MODULE_3_LISTENING',
+  })
   @IsString()
   @IsNotEmpty()
   section: string;

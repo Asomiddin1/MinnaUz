@@ -75,16 +75,23 @@ export class AdminService {
 
   // 2. Get User Stats
   async getUserStats() {
-    const [totalUsers, verifiedUsers, superAdmins, admins, teachers, standardUsers, activeSessions] =
-      await Promise.all([
-        this.prisma.user.count(),
-        this.prisma.user.count({ where: { isVerified: true } }),
-        this.prisma.user.count({ where: { role: Role.SUPER_ADMIN } }),
-        this.prisma.user.count({ where: { role: Role.ADMIN } }),
-        this.prisma.user.count({ where: { role: Role.TEACHER } }),
-        this.prisma.user.count({ where: { role: Role.USER } }),
-        this.prisma.deviceSession.count(),
-      ]);
+    const [
+      totalUsers,
+      verifiedUsers,
+      superAdmins,
+      admins,
+      teachers,
+      standardUsers,
+      activeSessions,
+    ] = await Promise.all([
+      this.prisma.user.count(),
+      this.prisma.user.count({ where: { isVerified: true } }),
+      this.prisma.user.count({ where: { role: Role.SUPER_ADMIN } }),
+      this.prisma.user.count({ where: { role: Role.ADMIN } }),
+      this.prisma.user.count({ where: { role: Role.TEACHER } }),
+      this.prisma.user.count({ where: { role: Role.USER } }),
+      this.prisma.deviceSession.count(),
+    ]);
 
     return {
       totalUsers,
@@ -153,7 +160,9 @@ export class AdminService {
     });
 
     if (existing) {
-      throw new BadRequestException('Ushbu email bilan allaqachon foydalanuvchi roʻyxatdan oʻtgan');
+      throw new BadRequestException(
+        'Ushbu email bilan allaqachon foydalanuvchi roʻyxatdan oʻtgan',
+      );
     }
 
     const user = await this.prisma.user.create({
@@ -165,7 +174,9 @@ export class AdminService {
       },
     });
 
-    this.logger.log(`[Admin] Yangi foydalanuvchi yaratildi: ${email} (${user.role})`);
+    this.logger.log(
+      `[Admin] Yangi foydalanuvchi yaratildi: ${email} (${user.role})`,
+    );
 
     return user;
   }
@@ -210,7 +221,9 @@ export class AdminService {
       },
     });
 
-    this.logger.log(`[Admin] Foydalanuvchi yangilandi: ${updated.email} (${updated.role})`);
+    this.logger.log(
+      `[Admin] Foydalanuvchi yangilandi: ${updated.email} (${updated.role})`,
+    );
 
     return updated;
   }
@@ -218,10 +231,14 @@ export class AdminService {
   // 6. Delete User
   async deleteUser(id: string, currentUserId: string) {
     if (id === currentUserId) {
-      throw new ForbiddenException('Oʻzingizning hisobingizni oʻchira olmaysiz');
+      throw new ForbiddenException(
+        'Oʻzingizning hisobingizni oʻchira olmaysiz',
+      );
     }
 
-    const currentUser = await this.prisma.user.findUnique({ where: { id: currentUserId } });
+    const currentUser = await this.prisma.user.findUnique({
+      where: { id: currentUserId },
+    });
     const user = await this.prisma.user.findUnique({
       where: { id },
     });
@@ -234,7 +251,9 @@ export class AdminService {
       (user.role === Role.ADMIN || user.role === Role.SUPER_ADMIN) &&
       currentUser?.role !== Role.SUPER_ADMIN
     ) {
-      throw new ForbiddenException('Admin hisoblarini faqat Super Admin oʻchira oladi');
+      throw new ForbiddenException(
+        'Admin hisoblarini faqat Super Admin oʻchira oladi',
+      );
     }
 
     if (user.role === Role.SUPER_ADMIN) {
@@ -242,7 +261,9 @@ export class AdminService {
         where: { role: Role.SUPER_ADMIN },
       });
       if (superAdminCount <= 1) {
-        throw new ForbiddenException('Yagona Super Admin hisobini oʻchirish taqiqlanadi');
+        throw new ForbiddenException(
+          'Yagona Super Admin hisobini oʻchirish taqiqlanadi',
+        );
       }
     }
 

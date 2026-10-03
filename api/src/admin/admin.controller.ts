@@ -11,7 +11,12 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -38,14 +43,18 @@ export class AdminController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Foydalanuvchilar roʻyxati (Qidiruv, Filtr, Pagination)' })
+  @ApiOperation({
+    summary: 'Foydalanuvchilar roʻyxati (Qidiruv, Filtr, Pagination)',
+  })
   @ApiResponse({ status: 200, description: 'Foydalanuvchilar roʻyxati' })
   async getUsers(@Query() query: UserQueryDto) {
     return this.adminService.getUsers(query);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Bitta foydalanuvchi maʼlumotlari va faol sessiyalari' })
+  @ApiOperation({
+    summary: 'Bitta foydalanuvchi maʼlumotlari va faol sessiyalari',
+  })
   @ApiResponse({ status: 200, description: 'Foydalanuvchi maʼlumotlari' })
   async getUserById(@Param('id') id: string) {
     return this.adminService.getUserById(id);
@@ -54,7 +63,10 @@ export class AdminController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Yangi foydalanuvchi yaratish' })
-  @ApiResponse({ status: 201, description: 'Foydalanuvchi muvaffaqiyatli yaratildi' })
+  @ApiResponse({
+    status: 201,
+    description: 'Foydalanuvchi muvaffaqiyatli yaratildi',
+  })
   async createUser(
     @Body() dto: CreateUserDto,
     @CurrentUser() currentUser: any,
@@ -64,7 +76,10 @@ export class AdminController {
 
   @Patch(':id')
   @ApiOperation({ summary: 'Foydalanuvchi maʼlumotlarini tahrirlash' })
-  @ApiResponse({ status: 200, description: 'Foydalanuvchi muvaffaqiyatli yangilandi' })
+  @ApiResponse({
+    status: 200,
+    description: 'Foydalanuvchi muvaffaqiyatli yangilandi',
+  })
   async updateUser(
     @Param('id') id: string,
     @Body() dto: UpdateUserDto,
@@ -75,7 +90,10 @@ export class AdminController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Foydalanuvchini oʻchirish' })
-  @ApiResponse({ status: 200, description: 'Foydalanuvchi muvaffaqiyatli oʻchirildi' })
+  @ApiResponse({
+    status: 200,
+    description: 'Foydalanuvchi muvaffaqiyatli oʻchirildi',
+  })
   async deleteUser(
     @Param('id') id: string,
     @CurrentUser('id') currentUserId: string,

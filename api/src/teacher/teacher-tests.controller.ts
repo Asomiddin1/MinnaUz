@@ -44,10 +44,7 @@ export class TeacherTestsController {
 
   @Post()
   @ApiOperation({ summary: 'Yangi test yaratish' })
-  async createTest(
-    @Body() dto: CreateTestDto,
-    @CurrentUser() user: any,
-  ) {
+  async createTest(@Body() dto: CreateTestDto, @CurrentUser() user: any) {
     return this.teacherService.createTest(user.id, dto);
   }
 
@@ -63,10 +60,7 @@ export class TeacherTestsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Testni oʻchirish' })
-  async deleteTest(
-    @Param('id') id: string,
-    @CurrentUser() user: any,
-  ) {
+  async deleteTest(@Param('id') id: string, @CurrentUser() user: any) {
     return this.teacherService.deleteTest(id, user.id);
   }
 

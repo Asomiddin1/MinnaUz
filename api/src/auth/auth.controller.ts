@@ -188,7 +188,12 @@ export class AuthController {
     if (!file) throw new BadRequestException('Rasm fayli tanlanmadi');
     const ext = extname(file.originalname).toLowerCase();
     const filename = `avatar-${userId}-${Date.now()}-${Math.round(Math.random() * 1e6)}${ext}`;
-    const url = await this.storageService.uploadFile('avatars', filename, file.buffer, file.mimetype);
+    const url = await this.storageService.uploadFile(
+      'avatars',
+      filename,
+      file.buffer,
+      file.mimetype,
+    );
     return this.authService.uploadAvatar(userId, url);
   }
 
@@ -199,6 +204,24 @@ export class AuthController {
   @ApiOperation({ summary: 'Google hisobidagi rasmni tanlash' })
   async selectGoogleAvatar(@CurrentUser('id') userId: string) {
     return this.authService.selectGoogleAvatar(userId);
+  }
+
+  @Post('avatar/url')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary:
+      'Direct upload orqali yuklangan avatar havolasini profilga biriktirish',
+  })
+  async setAvatarUrl(
+    @CurrentUser('id') userId: string,
+    @Body('avatarUrl') avatarUrl: string,
+  ) {
+    if (!avatarUrl) {
+      throw new BadRequestException('avatarUrl talab qilinadi');
+    }
+    return this.authService.uploadAvatar(userId, avatarUrl);
   }
 
   @Delete('avatar')

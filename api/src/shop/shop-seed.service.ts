@@ -19,7 +19,9 @@ export class ShopSeedService implements OnModuleInit {
       return;
     }
 
-    this.logger.log("Doʻkon mahsulotlarini bazaga kiritish (seeding) boshlandi...");
+    this.logger.log(
+      'Doʻkon mahsulotlarini bazaga kiritish (seeding) boshlandi...',
+    );
 
     const items = [
       // ==========================================
@@ -27,7 +29,8 @@ export class ShopSeedService implements OnModuleInit {
       // ==========================================
       {
         title: '10% Pro Chegirma Vaucheri',
-        description: 'Oylik Pro obunasini 49 000 soʻm oʻrniga 10% chegirma bilan xarid qilish vaucheri.',
+        description:
+          'Oylik Pro obunasini 49 000 soʻm oʻrniga 10% chegirma bilan xarid qilish vaucheri.',
         category: StoreItemCategory.DISCOUNT,
         costCoins: 150,
         icon: 'Percent',
@@ -49,7 +52,8 @@ export class ShopSeedService implements OnModuleInit {
       },
       {
         title: '50% Katta Pro Chegirma',
-        description: 'Oylik Pro obunasini yarim narxiga (50% chegirma) qoʻlga kiritish uchun super vaucher.',
+        description:
+          'Oylik Pro obunasini yarim narxiga (50% chegirma) qoʻlga kiritish uchun super vaucher.',
         category: StoreItemCategory.DISCOUNT,
         costCoins: 500,
         icon: 'Crown',
@@ -60,7 +64,8 @@ export class ShopSeedService implements OnModuleInit {
       },
       {
         title: '3 Kunlik Bepul Pro Sinov (Trial)',
-        description: 'Barcha JLPT N5-N3 kurslari, video darslar va mock imtihonlarni 3 kunga bepul ochish kaliti.',
+        description:
+          'Barcha JLPT N5-N3 kurslari, video darslar va mock imtihonlarni 3 kunga bepul ochish kaliti.',
         category: StoreItemCategory.DISCOUNT,
         costCoins: 250,
         icon: 'Sparkles',
@@ -71,7 +76,8 @@ export class ShopSeedService implements OnModuleInit {
       },
       {
         title: '7 Kunlik Bepul Pro Sinov',
-        description: '1 hafta davomida platformadagi barcha premium imkoniyatlardan cheklovlarsiz foydalanish.',
+        description:
+          '1 hafta davomida platformadagi barcha premium imkoniyatlardan cheklovlarsiz foydalanish.',
         category: StoreItemCategory.DISCOUNT,
         costCoins: 500,
         icon: 'Sparkles',
@@ -86,7 +92,8 @@ export class ShopSeedService implements OnModuleInit {
       // ==========================================
       {
         title: 'Streak Muzlatgich (Streak Freeze ❄️)',
-        description: 'Ertaga dars qila olmasangiz ham, koʻp kunlik uzluksiz oʻrganish streakingiz kuyib ketmaydi.',
+        description:
+          'Ertaga dars qila olmasangiz ham, koʻp kunlik uzluksiz oʻrganish streakingiz kuyib ketmaydi.',
         category: StoreItemCategory.POWERUP,
         costCoins: 80,
         icon: 'Shield',
@@ -96,7 +103,8 @@ export class ShopSeedService implements OnModuleInit {
       },
       {
         title: 'Streak Tiklagich (Streak Repair 🩹)',
-        description: 'Kecha tasodifan uzilib qolgan streakingizni tiklab, qayta davom ettirish vositasi.',
+        description:
+          'Kecha tasodifan uzilib qolgan streakingizni tiklab, qayta davom ettirish vositasi.',
         category: StoreItemCategory.POWERUP,
         costCoins: 120,
         icon: 'RotateCcw',
@@ -106,7 +114,8 @@ export class ShopSeedService implements OnModuleInit {
       },
       {
         title: '2x Double Coin Booster (24 soat ⚡️)',
-        description: 'Keyingi 24 soat ichida dars va testlardan 2 barobar koʻproq coin ishlash imkoniyati.',
+        description:
+          'Keyingi 24 soat ichida dars va testlardan 2 barobar koʻproq coin ishlash imkoniyati.',
         category: StoreItemCategory.POWERUP,
         costCoins: 100,
         icon: 'Zap',
@@ -121,7 +130,8 @@ export class ShopSeedService implements OnModuleInit {
       // ==========================================
       {
         title: 'AI Sensei Cheksiz Suhbat (1 hafta 💬)',
-        description: 'Yapon tili repetitori (AI Sensei) bilan cheksiz audio suhbatlashish va xatolarni toʻgʻrilash.',
+        description:
+          'Yapon tili repetitori (AI Sensei) bilan cheksiz audio suhbatlashish va xatolarni toʻgʻrilash.',
         category: StoreItemCategory.AI_PERK,
         costCoins: 200,
         icon: 'Bot',
@@ -132,7 +142,8 @@ export class ShopSeedService implements OnModuleInit {
       },
       {
         title: 'VIP Mock Imtihon Chiptasi (🎟️)',
-        description: 'Eksklyuziv yopiq JLPT mock imtihonini ochish va batafsil tahliliy xulosa olish.',
+        description:
+          'Eksklyuziv yopiq JLPT mock imtihonini ochish va batafsil tahliliy xulosa olish.',
         category: StoreItemCategory.AI_PERK,
         costCoins: 150,
         icon: 'FileCheck2',
@@ -142,7 +153,8 @@ export class ShopSeedService implements OnModuleInit {
       },
       {
         title: 'Xatolar Chuqur Tahlili (AI Diagnostics 📊)',
-        description: 'Barcha testlardagi zaif tomonlaringizni AI orqali toʻliq tahlil qilib beruvchi shaxsiy hisobot.',
+        description:
+          'Barcha testlardagi zaif tomonlaringizni AI orqali toʻliq tahlil qilib beruvchi shaxsiy hisobot.',
         category: StoreItemCategory.AI_PERK,
         costCoins: 100,
         icon: 'BarChart3',
@@ -156,7 +168,8 @@ export class ShopSeedService implements OnModuleInit {
       // ==========================================
       {
         title: 'Sakura Profil Ramkasi 🌸',
-        description: 'Profilingiz avatari uchun goʻzal yapon bahori va sakura gulbarglari ramkasi.',
+        description:
+          'Profilingiz avatari uchun goʻzal yapon bahori va sakura gulbarglari ramkasi.',
         category: StoreItemCategory.COSMETIC,
         costCoins: 150,
         icon: 'Palette',
@@ -166,7 +179,8 @@ export class ShopSeedService implements OnModuleInit {
       },
       {
         title: 'Samuray Qilich Ramkasi ⚔️',
-        description: 'Kuch va intizom ramzi boʻlgan oltin metall samuray qilichi tasvirlangan VIP ramka.',
+        description:
+          'Kuch va intizom ramzi boʻlgan oltin metall samuray qilichi tasvirlangan VIP ramka.',
         category: StoreItemCategory.COSMETIC,
         costCoins: 250,
         icon: 'Sword',
@@ -176,7 +190,8 @@ export class ShopSeedService implements OnModuleInit {
       },
       {
         title: 'Shogun Imperator Toji 🏯',
-        description: 'Platformada oʻz mavqeyingizni koʻrsatuvchi eng yuqori darajadagi Shogun toji bezagi.',
+        description:
+          'Platformada oʻz mavqeyingizni koʻrsatuvchi eng yuqori darajadagi Shogun toji bezagi.',
         category: StoreItemCategory.COSMETIC,
         costCoins: 400,
         icon: 'Crown',
@@ -192,6 +207,8 @@ export class ShopSeedService implements OnModuleInit {
       });
     }
 
-    this.logger.log(`Doʻkonga ${items.length} ta raqamli mahsulot muvaffaqiyatli kiritildi!`);
+    this.logger.log(
+      `Doʻkonga ${items.length} ta raqamli mahsulot muvaffaqiyatli kiritildi!`,
+    );
   }
 }

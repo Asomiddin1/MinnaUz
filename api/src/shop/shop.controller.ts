@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ShopService } from './shop.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -25,7 +18,9 @@ export class ShopController {
   @Get('inventory')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Foydalanuvchining sotib olgan buyumlari (Inventar)' })
+  @ApiOperation({
+    summary: 'Foydalanuvchining sotib olgan buyumlari (Inventar)',
+  })
   async getInventory(@CurrentUser('id') userId: string) {
     return this.shopService.getUserInventory(userId);
   }
@@ -61,7 +56,9 @@ export class CoinsController {
   @Get('balance')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Foydalanuvchining joriy tanga balansi va streak holati' })
+  @ApiOperation({
+    summary: 'Foydalanuvchining joriy tanga balansi va streak holati',
+  })
   async getBalance(@CurrentUser('id') userId: string) {
     return this.shopService.getUserCoins(userId);
   }

@@ -194,7 +194,9 @@ export class SubscriptionsService implements OnModuleInit {
 
     if (inventoryItem) {
       if (inventoryItem.expiresAt && inventoryItem.expiresAt < new Date()) {
-        throw new BadRequestException('Ushbu chegirma vaucherining amal qilish muddati tugagan');
+        throw new BadRequestException(
+          'Ushbu chegirma vaucherining amal qilish muddati tugagan',
+        );
       }
       discountPercent = inventoryItem.item.discountPercent || 10;
       inventoryItemId = inventoryItem.id;
@@ -207,7 +209,9 @@ export class SubscriptionsService implements OnModuleInit {
       } else if (cleanCode === 'SAKURA30') {
         discountPercent = 30;
       } else {
-        throw new BadRequestException('Kiritilgan promokod yaroqsiz yoki allaqachon ishlatilgan');
+        throw new BadRequestException(
+          'Kiritilgan promokod yaroqsiz yoki allaqachon ishlatilgan',
+        );
       }
     }
 
@@ -300,11 +304,15 @@ export class SubscriptionsService implements OnModuleInit {
     }
 
     if (transaction.status === PaymentStatus.COMPLETED) {
-      return { success: true, message: 'Ushbu toʻlov allaqachon qabul qilingan' };
+      return {
+        success: true,
+        message: 'Ushbu toʻlov allaqachon qabul qilingan',
+      };
     }
 
     const metadata = transaction.metadata as any;
-    const tier = (metadata?.tier as SubscriptionTier) || SubscriptionTier.MONTHLY;
+    const tier =
+      (metadata?.tier as SubscriptionTier) || SubscriptionTier.MONTHLY;
     const durationDays = metadata?.durationDays || 30;
 
     const plan = await this.prisma.subscriptionPlan.findFirst({
@@ -430,7 +438,8 @@ export class SubscriptionsService implements OnModuleInit {
 
     return {
       success: true,
-      message: 'Toʻlov muvaffaqiyatli amalga oshirildi va obuna faollashtirildi!',
+      message:
+        'Toʻlov muvaffaqiyatli amalga oshirildi va obuna faollashtirildi!',
       subscription: userSub,
       transaction: updatedTx,
     };
@@ -474,7 +483,8 @@ export class SubscriptionsService implements OnModuleInit {
 
     return {
       success: true,
-      message: 'Obunaning avtomatik yangilanishi bekor qilindi. Joriy davr tugaguncha foydalanishingiz mumkin.',
+      message:
+        'Obunaning avtomatik yangilanishi bekor qilindi. Joriy davr tugaguncha foydalanishingiz mumkin.',
     };
   }
 
@@ -483,7 +493,11 @@ export class SubscriptionsService implements OnModuleInit {
   // ====================================================
 
   // Admin barcha obunachilarni ko'rishi
-  async adminGetSubscriptions(page = 1, limit = 20, status?: SubscriptionStatus) {
+  async adminGetSubscriptions(
+    page = 1,
+    limit = 20,
+    status?: SubscriptionStatus,
+  ) {
     const skip = (page - 1) * limit;
     const where = status ? { status } : {};
 
@@ -527,29 +541,33 @@ export class SubscriptionsService implements OnModuleInit {
   // Admin statistikasi
   async adminGetStats() {
     const now = new Date();
-    const [activeCount, totalCount, sumRevenue, plansBreakdown] = await Promise.all([
-      this.prisma.userSubscription.count({
-        where: { status: SubscriptionStatus.ACTIVE, endDate: { gt: now } },
-      }),
-      this.prisma.userSubscription.count(),
-      this.prisma.paymentTransaction.aggregate({
-        where: { status: PaymentStatus.COMPLETED },
-        _sum: { finalAmountUzs: true },
-      }),
-      this.prisma.userSubscription.groupBy({
-        by: ['tier'],
-        _count: { id: true },
-      }),
-    ]);
+    const [activeCount, totalCount, sumRevenue, plansBreakdown] =
+      await Promise.all([
+        this.prisma.userSubscription.count({
+          where: { status: SubscriptionStatus.ACTIVE, endDate: { gt: now } },
+        }),
+        this.prisma.userSubscription.count(),
+        this.prisma.paymentTransaction.aggregate({
+          where: { status: PaymentStatus.COMPLETED },
+          _sum: { finalAmountUzs: true },
+        }),
+        this.prisma.userSubscription.groupBy({
+          by: ['tier'],
+          _count: { id: true },
+        }),
+      ]);
 
     return {
       activeSubscribers: activeCount,
       totalSubscriptions: totalCount,
       totalRevenueUzs: sumRevenue._sum.finalAmountUzs || 0,
-      plansBreakdown: plansBreakdown.reduce((acc, cur) => {
-        acc[cur.tier] = cur._count.id;
-        return acc;
-      }, {} as Record<string, number>),
+      plansBreakdown: plansBreakdown.reduce(
+        (acc, cur) => {
+          acc[cur.tier] = cur._count.id;
+          return acc;
+        },
+        {} as Record<string, number>,
+      ),
     };
   }
 
@@ -638,7 +656,9 @@ export class SubscriptionsService implements OnModuleInit {
 
   async adminCreatePlan(dto: any) {
     if (!dto.name || dto.priceUzs === undefined || !dto.durationDays) {
-      throw new BadRequestException('Tarif nomi, narxi va davomiyligi kiritilishi shart');
+      throw new BadRequestException(
+        'Tarif nomi, narxi va davomiyligi kiritilishi shart',
+      );
     }
 
     return this.prisma.subscriptionPlan.create({
@@ -658,7 +678,9 @@ export class SubscriptionsService implements OnModuleInit {
   }
 
   async adminUpdatePlan(id: string, dto: any) {
-    const existing = await this.prisma.subscriptionPlan.findUnique({ where: { id } });
+    const existing = await this.prisma.subscriptionPlan.findUnique({
+      where: { id },
+    });
     if (!existing) throw new NotFoundException('Tarif topilmadi');
 
     const data: any = {};
@@ -666,7 +688,8 @@ export class SubscriptionsService implements OnModuleInit {
     if (dto.name !== undefined) data.name = dto.name.trim();
     if (dto.nameRu !== undefined) data.nameRu = dto.nameRu?.trim() || null;
     if (dto.priceUzs !== undefined) data.priceUzs = Number(dto.priceUzs);
-    if (dto.durationDays !== undefined) data.durationDays = Number(dto.durationDays);
+    if (dto.durationDays !== undefined)
+      data.durationDays = Number(dto.durationDays);
     if (dto.features !== undefined) data.features = dto.features;
     if (dto.popular !== undefined) data.popular = Boolean(dto.popular);
     if (dto.tag !== undefined) data.tag = dto.tag?.trim() || null;
@@ -680,7 +703,9 @@ export class SubscriptionsService implements OnModuleInit {
   }
 
   async adminDeletePlan(id: string) {
-    const existing = await this.prisma.subscriptionPlan.findUnique({ where: { id } });
+    const existing = await this.prisma.subscriptionPlan.findUnique({
+      where: { id },
+    });
     if (!existing) throw new NotFoundException('Tarif topilmadi');
 
     await this.prisma.subscriptionPlan.delete({ where: { id } });
@@ -688,7 +713,9 @@ export class SubscriptionsService implements OnModuleInit {
   }
 
   async adminTogglePlan(id: string) {
-    const existing = await this.prisma.subscriptionPlan.findUnique({ where: { id } });
+    const existing = await this.prisma.subscriptionPlan.findUnique({
+      where: { id },
+    });
     if (!existing) throw new NotFoundException('Tarif topilmadi');
 
     return this.prisma.subscriptionPlan.update({
@@ -702,7 +729,9 @@ export class SubscriptionsService implements OnModuleInit {
   // ====================================================
 
   async adminUpdateUserSubscription(id: string, dto: any) {
-    const existing = await this.prisma.userSubscription.findUnique({ where: { id } });
+    const existing = await this.prisma.userSubscription.findUnique({
+      where: { id },
+    });
     if (!existing) throw new NotFoundException('Obuna topilmadi');
 
     const data: any = {};
@@ -726,7 +755,9 @@ export class SubscriptionsService implements OnModuleInit {
   }
 
   async adminExtendSubscription(id: string, days: number) {
-    const existing = await this.prisma.userSubscription.findUnique({ where: { id } });
+    const existing = await this.prisma.userSubscription.findUnique({
+      where: { id },
+    });
     if (!existing) throw new NotFoundException('Obuna topilmadi');
 
     const now = new Date();
@@ -750,10 +781,15 @@ export class SubscriptionsService implements OnModuleInit {
   }
 
   async adminDeleteUserSubscription(id: string) {
-    const existing = await this.prisma.userSubscription.findUnique({ where: { id } });
+    const existing = await this.prisma.userSubscription.findUnique({
+      where: { id },
+    });
     if (!existing) throw new NotFoundException('Obuna topilmadi');
 
     await this.prisma.userSubscription.delete({ where: { id } });
-    return { success: true, message: 'Foydalanuvchi obunasi bekor qilindi va oʻchirildi' };
+    return {
+      success: true,
+      message: 'Foydalanuvchi obunasi bekor qilindi va oʻchirildi',
+    };
   }
 }

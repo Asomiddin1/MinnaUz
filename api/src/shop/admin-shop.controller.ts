@@ -24,7 +24,9 @@ export class AdminShopController {
   constructor(private readonly shopService: ShopService) {}
 
   @Get('stats')
-  @ApiOperation({ summary: 'Doʻkon umumiy statistikasi (jami sotuvlar, sarflangan tangalar)' })
+  @ApiOperation({
+    summary: 'Doʻkon umumiy statistikasi (jami sotuvlar, sarflangan tangalar)',
+  })
   async getStats() {
     return this.shopService.adminGetStats();
   }

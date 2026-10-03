@@ -12,7 +12,9 @@ async function bootstrap() {
   app.set('trust proxy', 1);
 
   // Enable CORS (allowlist from env + local LAN for mobile testing)
-  const configuredOrigins = (process.env.CORS_ORIGINS || 'http://localhost:3000')
+  const configuredOrigins = (
+    process.env.CORS_ORIGINS || 'http://localhost:3000'
+  )
     .split(',')
     .map((o) => o.trim())
     .filter(Boolean);
@@ -23,14 +25,18 @@ async function bootstrap() {
       if (!origin) return callback(null, true);
 
       // Check explicit config
-      if (configuredOrigins.includes(origin) || configuredOrigins.includes('*')) {
+      if (
+        configuredOrigins.includes(origin) ||
+        configuredOrigins.includes('*')
+      ) {
         return callback(null, true);
       }
 
       // Allow localhost, 127.0.0.1 and LAN IPs (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
-      const isLocalOrLan = /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$/.test(
-        origin,
-      );
+      const isLocalOrLan =
+        /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?$/.test(
+          origin,
+        );
       if (isLocalOrLan) {
         return callback(null, true);
       }
@@ -44,7 +50,12 @@ async function bootstrap() {
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'Accept',
+      'X-Requested-With',
+    ],
   });
 
   // Global Validation
@@ -72,7 +83,9 @@ async function bootstrap() {
 
   const port = process.env.PORT ?? 3001;
   await app.listen(port, '0.0.0.0');
-  console.log(`🚀 MinnaUz 2.0 API ishga tushdi: http://localhost:${port}/api (0.0.0.0:${port})`);
+  console.log(
+    `🚀 MinnaUz 2.0 API ishga tushdi: http://localhost:${port}/api (0.0.0.0:${port})`,
+  );
   console.log(`📚 Swagger hujjatlari: http://localhost:${port}/api/docs`);
 }
 bootstrap();

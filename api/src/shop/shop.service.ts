@@ -101,7 +101,9 @@ export class ShopService {
           // If streak freeze purchased, activate streak frozen status
           ...(item.actionKey === 'STREAK_FREEZE' ? { streakFrozen: true } : {}),
           // If avatar frame, auto-equip it
-          ...(item.category === StoreItemCategory.COSMETIC ? { avatarFrame: item.actionKey } : {}),
+          ...(item.category === StoreItemCategory.COSMETIC
+            ? { avatarFrame: item.actionKey }
+            : {}),
         },
         select: {
           id: true,
@@ -297,27 +299,31 @@ export class ShopService {
 
   // Admin stats
   async adminGetStats() {
-    const [totalItems, totalPurchases, purchaseSum, categories] = await Promise.all([
-      this.prisma.storeItem.count(),
-      this.prisma.userInventoryItem.count(),
-      this.prisma.coinTransaction.aggregate({
-        where: { type: 'STORE_PURCHASE' },
-        _sum: { amount: true },
-      }),
-      this.prisma.storeItem.groupBy({
-        by: ['category'],
-        _count: { id: true },
-      }),
-    ]);
+    const [totalItems, totalPurchases, purchaseSum, categories] =
+      await Promise.all([
+        this.prisma.storeItem.count(),
+        this.prisma.userInventoryItem.count(),
+        this.prisma.coinTransaction.aggregate({
+          where: { type: 'STORE_PURCHASE' },
+          _sum: { amount: true },
+        }),
+        this.prisma.storeItem.groupBy({
+          by: ['category'],
+          _count: { id: true },
+        }),
+      ]);
 
     return {
       totalItems,
       totalPurchases,
       totalCoinsSpent: Math.abs(purchaseSum._sum.amount || 0),
-      categories: categories.reduce((acc, curr) => {
-        acc[curr.category] = curr._count.id;
-        return acc;
-      }, {} as Record<string, number>),
+      categories: categories.reduce(
+        (acc, curr) => {
+          acc[curr.category] = curr._count.id;
+          return acc;
+        },
+        {} as Record<string, number>,
+      ),
     };
   }
 
@@ -337,7 +343,9 @@ export class ShopService {
   async adminCreateItem(dto: any) {
     const cost = Number(dto.costCoins);
     if (!dto.title || isNaN(cost) || cost < 1) {
-      throw new BadRequestException('Nomi va narxi (kamida 1 coin) toʻgʻri kiritilishi shart');
+      throw new BadRequestException(
+        'Nomi va narxi (kamida 1 coin) toʻgʻri kiritilishi shart',
+      );
     }
 
     return this.prisma.storeItem.create({
@@ -348,10 +356,13 @@ export class ShopService {
         costCoins: cost,
         icon: dto.icon || 'Sparkles',
         badge: dto.badge?.trim() || null,
-        discountPercent: dto.discountPercent ? Number(dto.discountPercent) : null,
+        discountPercent: dto.discountPercent
+          ? Number(dto.discountPercent)
+          : null,
         durationDays: dto.durationDays ? Number(dto.durationDays) : null,
         actionKey: dto.actionKey?.trim() || null,
-        isAvailable: dto.isAvailable !== undefined ? Boolean(dto.isAvailable) : true,
+        isAvailable:
+          dto.isAvailable !== undefined ? Boolean(dto.isAvailable) : true,
         order: dto.order ? Number(dto.order) : 0,
       },
     });
@@ -366,17 +377,23 @@ export class ShopService {
 
     const data: any = {};
     if (dto.title !== undefined) data.title = dto.title.trim();
-    if (dto.description !== undefined) data.description = dto.description.trim();
+    if (dto.description !== undefined)
+      data.description = dto.description.trim();
     if (dto.category !== undefined) data.category = dto.category;
     if (dto.costCoins !== undefined) data.costCoins = Number(dto.costCoins);
     if (dto.icon !== undefined) data.icon = dto.icon;
-    if (dto.badge !== undefined) data.badge = dto.badge ? dto.badge.trim() : null;
+    if (dto.badge !== undefined)
+      data.badge = dto.badge ? dto.badge.trim() : null;
     if (dto.discountPercent !== undefined)
-      data.discountPercent = dto.discountPercent ? Number(dto.discountPercent) : null;
+      data.discountPercent = dto.discountPercent
+        ? Number(dto.discountPercent)
+        : null;
     if (dto.durationDays !== undefined)
       data.durationDays = dto.durationDays ? Number(dto.durationDays) : null;
-    if (dto.actionKey !== undefined) data.actionKey = dto.actionKey ? dto.actionKey.trim() : null;
-    if (dto.isAvailable !== undefined) data.isAvailable = Boolean(dto.isAvailable);
+    if (dto.actionKey !== undefined)
+      data.actionKey = dto.actionKey ? dto.actionKey.trim() : null;
+    if (dto.isAvailable !== undefined)
+      data.isAvailable = Boolean(dto.isAvailable);
     if (dto.order !== undefined) data.order = Number(dto.order);
 
     return this.prisma.storeItem.update({

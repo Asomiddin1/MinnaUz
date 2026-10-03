@@ -50,6 +50,32 @@ export function getMediaUrl(url?: string | null): string {
   return `${API_ORIGIN}/${trimmed}`;
 }
 
+export type StorageCategory =
+  | 'videos'
+  | 'audio'
+  | 'images'
+  | 'avatars'
+  | 'documents'
+  | 'materials';
+
+export interface PresignedUrlResponse {
+  success: boolean;
+  fileId: string;
+  uploadUrl: string;
+  objectKey: string;
+  isPublic: boolean;
+  publicUrl?: string | null;
+  expiresIn: number;
+}
+
+export interface CompleteUploadResponse {
+  success: boolean;
+  fileId: string;
+  objectKey: string;
+  url?: string | null;
+  isPublic: boolean;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -924,12 +950,21 @@ class ApiClient {
 
   // === PROFILE AVATAR MANAGEMENT ===
   async uploadAvatar(file: File) {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.request<User>('/auth/avatar', {
-      method: 'POST',
-      body: formData,
-    });
+    try {
+      const direct = await this.directUpload(file, 'avatars');
+      return await this.request<User>('/auth/avatar/url', {
+        method: 'POST',
+        body: JSON.stringify({ avatarUrl: direct.url }),
+      });
+    } catch (directErr) {
+      console.warn('Direct avatar upload failed, falling back to server upload:', directErr);
+      const formData = new FormData();
+      formData.append('file', file);
+      return this.request<User>('/auth/avatar', {
+        method: 'POST',
+        body: formData,
+      });
+    }
   }
 
   async selectGoogleAvatar() {
@@ -1363,28 +1398,110 @@ class ApiClient {
     });
   }
 
-  // === FILE UPLOADS ===
-  async uploadVideo(file: File) {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const token = typeof window !== 'undefined' ? localStorage.getItem('minna_access_token') : null;
-    const headers: Record<string, string> = {};
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-
-    const url = `${API_URL}/upload/video`;
-
-    const res = await fetch(url, {
+  // === FILE UPLOADS (CLOUDFLARE R2 DIRECT UPLOAD + FALLBACK) ===
+  async directUpload(
+    file: File,
+    category: StorageCategory,
+    onProgress?: (percent: number) => void,
+  ): Promise<{
+    success: boolean;
+    fileId: string;
+    objectKey: string;
+    url: string;
+    originalName: string;
+    size: number;
+    filename: string;
+    isPublic: boolean;
+  }> {
+    // 1. Presigned upload URL olish
+    const presigned = await this.request<PresignedUrlResponse>('/upload/presigned-url', {
       method: 'POST',
-      headers,
-      body: formData,
+      body: JSON.stringify({
+        filename: file.name,
+        mimetype: file.type || 'application/octet-stream',
+        size: file.size,
+        category,
+      }),
     });
 
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      throw new Error(data.message || 'Video yuklashda xatolik yuz berdi');
+    // 2. Direct PUT to Cloudflare R2 via XMLHttpRequest (progress event qo\'llab-quvvatlash uchun)
+    await new Promise<void>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('PUT', presigned.uploadUrl);
+      xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
+
+      if (xhr.upload && onProgress) {
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const percent = Math.round((e.loaded / e.total) * 100);
+            onProgress(percent);
+          }
+        };
+      }
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          if (onProgress) onProgress(100);
+          resolve();
+        } else {
+          reject(new Error(`Cloudflare R2 ga yuklashda xatolik yuz berdi (HTTP ${xhr.status})`));
+        }
+      };
+
+      xhr.onerror = () => {
+        reject(new Error('Cloudflare R2 ga yuklashda tarmoq xatosi yuz berdi'));
+      };
+
+      xhr.send(file);
+    });
+
+    // 3. Backend tasdiqlashi (COMPLETED holatiga o'tkazish)
+    const completed = await this.request<CompleteUploadResponse>('/upload/complete', {
+      method: 'POST',
+      body: JSON.stringify({ fileId: presigned.fileId }),
+    });
+
+    const finalUrl = completed.url || presigned.publicUrl || presigned.objectKey;
+
+    return {
+      success: true,
+      fileId: completed.fileId,
+      objectKey: completed.objectKey,
+      url: finalUrl,
+      originalName: file.name,
+      size: file.size,
+      filename: file.name,
+      isPublic: completed.isPublic,
+    };
+  }
+
+  async getFileDownloadUrl(fileId: string) {
+    return this.request<{
+      success: boolean;
+      url: string;
+      isPublic: boolean;
+      expiresIn?: number;
+    }>(`/upload/file/${fileId}/download-url`);
+  }
+
+  async uploadVideo(file: File, onProgress?: (percent: number) => void) {
+    try {
+      return await this.directUpload(file, 'videos', onProgress);
+    } catch (directErr) {
+      console.warn('Direct upload to R2 failed, falling back to server upload:', directErr);
+      const formData = new FormData();
+      formData.append('file', file);
+      return this.request<{
+        success: boolean;
+        url: string;
+        originalName: string;
+        size: number;
+        filename: string;
+      }>('/upload/video', {
+        method: 'POST',
+        body: formData,
+      });
     }
-    return data as { success: boolean; url: string; originalName: string; size: number; filename: string };
   }
 
   // === JLPT TESTS & MOCK EXAMS ===
@@ -1472,34 +1589,44 @@ class ApiClient {
     });
   }
 
-  async uploadAudio(file: File) {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.request<{
-      success: boolean;
-      url: string;
-      originalName: string;
-      size: number;
-      filename: string;
-    }>('/upload/audio', {
-      method: 'POST',
-      body: formData,
-    });
+  async uploadAudio(file: File, onProgress?: (percent: number) => void) {
+    try {
+      return await this.directUpload(file, 'audio', onProgress);
+    } catch (directErr) {
+      console.warn('Direct audio upload to R2 failed, falling back to server upload:', directErr);
+      const formData = new FormData();
+      formData.append('file', file);
+      return this.request<{
+        success: boolean;
+        url: string;
+        originalName: string;
+        size: number;
+        filename: string;
+      }>('/upload/audio', {
+        method: 'POST',
+        body: formData,
+      });
+    }
   }
 
-  async uploadImage(file: File) {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.request<{
-      success: boolean;
-      url: string;
-      originalName: string;
-      size: number;
-      filename: string;
-    }>('/upload/image', {
-      method: 'POST',
-      body: formData,
-    });
+  async uploadImage(file: File, onProgress?: (percent: number) => void) {
+    try {
+      return await this.directUpload(file, 'images', onProgress);
+    } catch (directErr) {
+      console.warn('Direct image upload to R2 failed, falling back to server upload:', directErr);
+      const formData = new FormData();
+      formData.append('file', file);
+      return this.request<{
+        success: boolean;
+        url: string;
+        originalName: string;
+        size: number;
+        filename: string;
+      }>('/upload/image', {
+        method: 'POST',
+        body: formData,
+      });
+    }
   }
 
   // === SHOP & COINS ===
