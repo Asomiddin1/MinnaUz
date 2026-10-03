@@ -504,7 +504,10 @@ export class AuthService {
 
     // Delete old Supabase avatar if it was uploaded (not a Google/external URL)
     if (user.avatarUrl && !user.avatarUrl.includes('googleusercontent.com')) {
-      const filename = this.storageService.extractFilename(user.avatarUrl, 'avatars');
+      const filename = this.storageService.extractFilename(
+        user.avatarUrl,
+        'avatars',
+      );
       if (filename) {
         await this.storageService.deleteFile('avatars', filename);
       }
@@ -513,7 +516,9 @@ export class AuthService {
     // Retain existing google url if not set
     const googleAvatarUrl =
       user.googleAvatarUrl ||
-      (user.avatarUrl?.includes('googleusercontent.com') ? user.avatarUrl : null);
+      (user.avatarUrl?.includes('googleusercontent.com')
+        ? user.avatarUrl
+        : null);
 
     const updated = await this.prisma.user.update({
       where: { id: userId },
@@ -549,7 +554,9 @@ export class AuthService {
 
     const googlePic =
       user.googleAvatarUrl ||
-      (user.avatarUrl?.includes('googleusercontent.com') ? user.avatarUrl : null);
+      (user.avatarUrl?.includes('googleusercontent.com')
+        ? user.avatarUrl
+        : null);
 
     if (!googlePic) {
       throw new BadRequestException('Google hisobi rasmi mavjud emas');
@@ -557,7 +564,10 @@ export class AuthService {
 
     // Delete previous custom avatar if it was a Supabase upload
     if (user.avatarUrl && !user.avatarUrl.includes('googleusercontent.com')) {
-      const filename = this.storageService.extractFilename(user.avatarUrl, 'avatars');
+      const filename = this.storageService.extractFilename(
+        user.avatarUrl,
+        'avatars',
+      );
       if (filename) await this.storageService.deleteFile('avatars', filename);
     }
 
@@ -595,7 +605,10 @@ export class AuthService {
 
     // Delete previous custom avatar if it was a Supabase upload
     if (user.avatarUrl && !user.avatarUrl.includes('googleusercontent.com')) {
-      const filename = this.storageService.extractFilename(user.avatarUrl, 'avatars');
+      const filename = this.storageService.extractFilename(
+        user.avatarUrl,
+        'avatars',
+      );
       if (filename) await this.storageService.deleteFile('avatars', filename);
     }
 

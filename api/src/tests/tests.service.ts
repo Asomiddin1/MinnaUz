@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  Logger,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { SubmitTestDto } from './dto/submit-test.dto';
 import { QueryTestsDto } from './dto/query-tests.dto';
@@ -75,7 +80,9 @@ export class TestsService {
     const passedCount = results.filter((r) => r.isPassed).length;
     const avgPercentage =
       totalTestsTaken > 0
-        ? Math.round(results.reduce((acc, r) => acc + r.percentage, 0) / totalTestsTaken)
+        ? Math.round(
+            results.reduce((acc, r) => acc + r.percentage, 0) / totalTestsTaken,
+          )
         : 0;
 
     let totalQuestionsAnswered = 0;
@@ -217,7 +224,8 @@ export class TestsService {
       maxPoints += q.points;
       const userSubmission = dto.answers?.find((a) => a.questionId === q.id);
       const selectedAnswer = userSubmission?.selectedAnswer?.trim() || null;
-      const isCorrect = selectedAnswer !== null && selectedAnswer === q.correctAnswer.trim();
+      const isCorrect =
+        selectedAnswer !== null && selectedAnswer === q.correctAnswer.trim();
 
       if (isCorrect) {
         earnedPoints += q.points;
@@ -237,7 +245,8 @@ export class TestsService {
       };
     });
 
-    const percentage = maxPoints > 0 ? Math.round((earnedPoints / maxPoints) * 100) : 0;
+    const percentage =
+      maxPoints > 0 ? Math.round((earnedPoints / maxPoints) * 100) : 0;
     const scaledScore = Math.round((percentage / 100) * test.totalScore);
 
     // Official JLPT pass marks:
@@ -257,7 +266,7 @@ export class TestsService {
     const targetPassScore =
       test.passingScore >= 70
         ? test.passingScore
-        : officialThresholds[test.level] ?? 80;
+        : (officialThresholds[test.level] ?? 80);
 
     const isPassed = scaledScore >= targetPassScore;
 
@@ -314,7 +323,9 @@ export class TestsService {
           },
         });
       } catch (err) {
-        this.logger.warn(`Failed to log study activity for test submit: ${err}`);
+        this.logger.warn(
+          `Failed to log study activity for test submit: ${err}`,
+        );
       }
     }
 
@@ -404,7 +415,11 @@ export class TestsService {
       where: { id },
       include: {
         questions: {
-          orderBy: [{ section: 'asc' }, { order: 'asc' }, { questionNumber: 'asc' }],
+          orderBy: [
+            { section: 'asc' },
+            { order: 'asc' },
+            { questionNumber: 'asc' },
+          ],
         },
         _count: {
           select: {
@@ -473,7 +488,8 @@ export class TestsService {
       data: {
         title: dto.title ?? test.title,
         slug: dto.slug ?? test.slug,
-        description: dto.description !== undefined ? dto.description : test.description,
+        description:
+          dto.description !== undefined ? dto.description : test.description,
         level: dto.level ?? test.level,
         category: dto.category ?? test.category,
         durationMinutes: dto.durationMinutes ?? test.durationMinutes,
@@ -481,7 +497,8 @@ export class TestsService {
         totalScore: dto.totalScore ?? test.totalScore,
         audioUrl: dto.audioUrl !== undefined ? dto.audioUrl : test.audioUrl,
         order: dto.order ?? test.order,
-        isPublished: dto.isPublished !== undefined ? dto.isPublished : test.isPublished,
+        isPublished:
+          dto.isPublished !== undefined ? dto.isPublished : test.isPublished,
         isPremium: dto.isPremium !== undefined ? dto.isPremium : test.isPremium,
       },
     });
@@ -498,7 +515,9 @@ export class TestsService {
 
   // Admin: Add question to test
   async adminCreateQuestion(testId: string, dto: CreateQuestionDto) {
-    const test = await this.prisma.jlptTest.findUnique({ where: { id: testId } });
+    const test = await this.prisma.jlptTest.findUnique({
+      where: { id: testId },
+    });
     if (!test) throw new NotFoundException('Test topilmadi');
 
     return this.prisma.jlptQuestion.create({
@@ -520,20 +539,26 @@ export class TestsService {
 
   // Admin: Update question
   async adminUpdateQuestion(questionId: string, dto: UpdateQuestionDto) {
-    const q = await this.prisma.jlptQuestion.findUnique({ where: { id: questionId } });
+    const q = await this.prisma.jlptQuestion.findUnique({
+      where: { id: questionId },
+    });
     if (!q) throw new NotFoundException('Savol topilmadi');
 
     return this.prisma.jlptQuestion.update({
       where: { id: questionId },
       data: {
         section: dto.section ?? q.section,
-        mondaiTitle: dto.mondaiTitle !== undefined ? dto.mondaiTitle : q.mondaiTitle,
+        mondaiTitle:
+          dto.mondaiTitle !== undefined ? dto.mondaiTitle : q.mondaiTitle,
         questionNumber: dto.questionNumber ?? q.questionNumber,
         questionText: dto.questionText ?? q.questionText,
-        contextText: dto.contextText !== undefined ? dto.contextText : q.contextText,
-        options: dto.options !== undefined ? (dto.options as any) : (q.options as any),
+        contextText:
+          dto.contextText !== undefined ? dto.contextText : q.contextText,
+        options:
+          dto.options !== undefined ? (dto.options as any) : (q.options as any),
         correctAnswer: dto.correctAnswer ?? q.correctAnswer,
-        explanation: dto.explanation !== undefined ? dto.explanation : q.explanation,
+        explanation:
+          dto.explanation !== undefined ? dto.explanation : q.explanation,
         points: dto.points ?? q.points,
         order: dto.order ?? q.order,
       },
@@ -542,7 +567,9 @@ export class TestsService {
 
   // Admin: Delete question
   async adminDeleteQuestion(questionId: string) {
-    const q = await this.prisma.jlptQuestion.findUnique({ where: { id: questionId } });
+    const q = await this.prisma.jlptQuestion.findUnique({
+      where: { id: questionId },
+    });
     if (!q) throw new NotFoundException('Savol topilmadi');
 
     await this.prisma.jlptQuestion.delete({ where: { id: questionId } });

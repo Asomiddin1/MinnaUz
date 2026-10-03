@@ -11,7 +11,11 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AdminCoursesService } from './admin-courses.service';
-import { CreateCourseDto, CreateModuleDto, CreateLessonDto } from '../courses/dto/course.dto';
+import {
+  CreateCourseDto,
+  CreateModuleDto,
+  CreateLessonDto,
+} from '../courses/dto/course.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -28,7 +32,10 @@ export class AdminCoursesController {
 
   // === TEACHERS LIST ===
   @Get('teachers')
-  @ApiOperation({ summary: 'Oʻqituvchilar va Adminlar roʻyxatini olish (Kurs muallifi tanlash uchun)' })
+  @ApiOperation({
+    summary:
+      'Oʻqituvchilar va Adminlar roʻyxatini olish (Kurs muallifi tanlash uchun)',
+  })
   async getTeachers() {
     return this.adminCoursesService.getTeachers();
   }
@@ -71,13 +78,19 @@ export class AdminCoursesController {
   // === MODULES ===
   @Post(':courseId/modules')
   @ApiOperation({ summary: 'Kursga yangi modul qoʻshish' })
-  async createModule(@Param('courseId') courseId: string, @Body() dto: CreateModuleDto) {
+  async createModule(
+    @Param('courseId') courseId: string,
+    @Body() dto: CreateModuleDto,
+  ) {
     return this.adminCoursesService.createModule(courseId, dto);
   }
 
   @Patch(':courseId/modules/:moduleId')
   @ApiOperation({ summary: 'Modulni tahrirlash' })
-  async updateModule(@Param('moduleId') moduleId: string, @Body() dto: Partial<CreateModuleDto>) {
+  async updateModule(
+    @Param('moduleId') moduleId: string,
+    @Body() dto: Partial<CreateModuleDto>,
+  ) {
     return this.adminCoursesService.updateModule(moduleId, dto);
   }
 
@@ -90,13 +103,19 @@ export class AdminCoursesController {
   // === LESSONS ===
   @Post(':courseId/modules/:moduleId/lessons')
   @ApiOperation({ summary: 'Modulga yangi dars qoʻshish' })
-  async createLesson(@Param('moduleId') moduleId: string, @Body() dto: CreateLessonDto) {
+  async createLesson(
+    @Param('moduleId') moduleId: string,
+    @Body() dto: CreateLessonDto,
+  ) {
     return this.adminCoursesService.createLesson(moduleId, dto);
   }
 
   @Patch(':courseId/lessons/:lessonId')
   @ApiOperation({ summary: 'Darsni tahrirlash' })
-  async updateLesson(@Param('lessonId') lessonId: string, @Body() dto: Partial<CreateLessonDto> & { isPublished?: boolean }) {
+  async updateLesson(
+    @Param('lessonId') lessonId: string,
+    @Body() dto: Partial<CreateLessonDto> & { isPublished?: boolean },
+  ) {
     return this.adminCoursesService.updateLesson(lessonId, dto);
   }
 
@@ -108,7 +127,10 @@ export class AdminCoursesController {
 
   // === CONTENT SECTIONS ===
   @Get(':courseId/lessons/:lessonId/content')
-  @ApiOperation({ summary: 'Darsning toʻliq kontentini (Kotoba, Bunpou, Kanji, Renshuu) olish' })
+  @ApiOperation({
+    summary:
+      'Darsning toʻliq kontentini (Kotoba, Bunpou, Kanji, Renshuu) olish',
+  })
   async getLessonContent(@Param('lessonId') lessonId: string) {
     return this.adminCoursesService.getLessonContent(lessonId);
   }

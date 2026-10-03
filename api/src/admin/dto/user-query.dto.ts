@@ -21,7 +21,10 @@ export class UserQueryDto {
   @Min(1)
   page?: number = 1;
 
-  @ApiPropertyOptional({ default: 10, description: 'Bitta sahifadagi elementlar soni' })
+  @ApiPropertyOptional({
+    default: 10,
+    description: 'Bitta sahifadagi elementlar soni',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()

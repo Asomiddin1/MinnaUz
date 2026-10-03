@@ -11,7 +11,12 @@ import {
   RequestDeleteLessonDto,
 } from './dto/teacher.dto';
 import { CreateModuleDto, CreateLessonDto } from '../courses/dto/course.dto';
-import { CreateTestDto, UpdateTestDto, CreateQuestionDto, UpdateQuestionDto } from '../tests/dto/admin-test.dto';
+import {
+  CreateTestDto,
+  UpdateTestDto,
+  CreateQuestionDto,
+  UpdateQuestionDto,
+} from '../tests/dto/admin-test.dto';
 
 @Injectable()
 export class TeacherService {
@@ -27,7 +32,9 @@ export class TeacherService {
     });
     if (!course) throw new NotFoundException('Kurs topilmadi');
     if (course.authorId !== teacherId) {
-      throw new ForbiddenException('Siz faqat oʻzingizga biriktirilgan kurslarni boshqara olasiz');
+      throw new ForbiddenException(
+        'Siz faqat oʻzingizga biriktirilgan kurslarni boshqara olasiz',
+      );
     }
     return course;
   }
@@ -45,7 +52,9 @@ export class TeacherService {
     });
     if (!lesson) throw new NotFoundException('Dars topilmadi');
     if (lesson.module.course.authorId !== teacherId) {
-      throw new ForbiddenException('Ushbu dars sizning kursingizga tegishli emas');
+      throw new ForbiddenException(
+        'Ushbu dars sizning kursingizga tegishli emas',
+      );
     }
     return lesson;
   }
@@ -101,7 +110,9 @@ export class TeacherService {
       orderBy: { lastStudiedAt: 'desc' },
       take: 5,
       include: {
-        user: { select: { id: true, fullName: true, email: true, avatarUrl: true } },
+        user: {
+          select: { id: true, fullName: true, email: true, avatarUrl: true },
+        },
         lesson: { select: { id: true, title: true, order: true } },
       },
     });
@@ -206,7 +217,11 @@ export class TeacherService {
   }
 
   // Modules
-  async createModule(courseId: string, teacherId: string, dto: CreateModuleDto) {
+  async createModule(
+    courseId: string,
+    teacherId: string,
+    dto: CreateModuleDto,
+  ) {
     await this.verifyCourseOwnership(courseId, teacherId);
 
     return this.prisma.courseModule.create({
@@ -219,14 +234,20 @@ export class TeacherService {
     });
   }
 
-  async updateModule(moduleId: string, teacherId: string, dto: Partial<CreateModuleDto>) {
+  async updateModule(
+    moduleId: string,
+    teacherId: string,
+    dto: Partial<CreateModuleDto>,
+  ) {
     const mod = await this.prisma.courseModule.findUnique({
       where: { id: moduleId },
       include: { course: true },
     });
     if (!mod) throw new NotFoundException('Modul topilmadi');
     if (mod.course.authorId !== teacherId) {
-      throw new ForbiddenException('Ushbu modul sizning kursingizga tegishli emas');
+      throw new ForbiddenException(
+        'Ushbu modul sizning kursingizga tegishli emas',
+      );
     }
 
     return this.prisma.courseModule.update({
@@ -242,10 +263,14 @@ export class TeacherService {
     });
     if (!mod) throw new NotFoundException('Modul topilmadi');
     if (mod.course.authorId !== teacherId) {
-      throw new ForbiddenException('Ushbu modul sizning kursingizga tegishli emas');
+      throw new ForbiddenException(
+        'Ushbu modul sizning kursingizga tegishli emas',
+      );
     }
     if (mod.lessons.length > 0) {
-      throw new BadRequestException('Modul ichida darslar mavjud. Avval darslarni oʻchirish soʻrovini yuboring');
+      throw new BadRequestException(
+        'Modul ichida darslar mavjud. Avval darslarni oʻchirish soʻrovini yuboring',
+      );
     }
 
     await this.prisma.courseModule.delete({ where: { id: moduleId } });
@@ -253,14 +278,20 @@ export class TeacherService {
   }
 
   // Lessons
-  async createLesson(moduleId: string, teacherId: string, dto: CreateLessonDto) {
+  async createLesson(
+    moduleId: string,
+    teacherId: string,
+    dto: CreateLessonDto,
+  ) {
     const mod = await this.prisma.courseModule.findUnique({
       where: { id: moduleId },
       include: { course: true },
     });
     if (!mod) throw new NotFoundException('Modul topilmadi');
     if (mod.course.authorId !== teacherId) {
-      throw new ForbiddenException('Ushbu kursga dars qoʻshish huquqingiz yoʻq');
+      throw new ForbiddenException(
+        'Ushbu kursga dars qoʻshish huquqingiz yoʻq',
+      );
     }
 
     return this.prisma.lesson.create({
@@ -299,7 +330,11 @@ export class TeacherService {
   // =========================================================================
   // DELETION RESTRICTION: TEACHER CANNOT DELETE LESSON WITHOUT ADMIN APPROVAL
   // =========================================================================
-  async requestDeleteLesson(lessonId: string, teacherId: string, dto: RequestDeleteLessonDto) {
+  async requestDeleteLesson(
+    lessonId: string,
+    teacherId: string,
+    dto: RequestDeleteLessonDto,
+  ) {
     const lesson = await this.verifyLessonOwnership(lessonId, teacherId);
 
     const updated = await this.prisma.lesson.update({
@@ -313,7 +348,8 @@ export class TeacherService {
 
     return {
       success: true,
-      message: 'Darsni oʻchirish soʻrovi Adminga yuborildi. Dars vaqtincha yopildi.',
+      message:
+        'Darsni oʻchirish soʻrovi Adminga yuborildi. Dars vaqtincha yopildi.',
       lesson: updated,
     };
   }
@@ -361,7 +397,9 @@ export class TeacherService {
   async updateKotoba(id: string, teacherId: string, dto: any) {
     const item = await this.prisma.kotobaItem.findUnique({
       where: { id },
-      include: { lesson: { include: { module: { include: { course: true } } } } },
+      include: {
+        lesson: { include: { module: { include: { course: true } } } },
+      },
     });
     if (!item || item.lesson.module.course.authorId !== teacherId) {
       throw new ForbiddenException('Ruxsat berilmagan');
@@ -372,7 +410,9 @@ export class TeacherService {
   async deleteKotoba(id: string, teacherId: string) {
     const item = await this.prisma.kotobaItem.findUnique({
       where: { id },
-      include: { lesson: { include: { module: { include: { course: true } } } } },
+      include: {
+        lesson: { include: { module: { include: { course: true } } } },
+      },
     });
     if (!item || item.lesson.module.course.authorId !== teacherId) {
       throw new ForbiddenException('Ruxsat berilmagan');
@@ -389,7 +429,9 @@ export class TeacherService {
   async updateBunpou(id: string, teacherId: string, dto: any) {
     const item = await this.prisma.bunpouItem.findUnique({
       where: { id },
-      include: { lesson: { include: { module: { include: { course: true } } } } },
+      include: {
+        lesson: { include: { module: { include: { course: true } } } },
+      },
     });
     if (!item || item.lesson.module.course.authorId !== teacherId) {
       throw new ForbiddenException('Ruxsat berilmagan');
@@ -400,7 +442,9 @@ export class TeacherService {
   async deleteBunpou(id: string, teacherId: string) {
     const item = await this.prisma.bunpouItem.findUnique({
       where: { id },
-      include: { lesson: { include: { module: { include: { course: true } } } } },
+      include: {
+        lesson: { include: { module: { include: { course: true } } } },
+      },
     });
     if (!item || item.lesson.module.course.authorId !== teacherId) {
       throw new ForbiddenException('Ruxsat berilmagan');
@@ -417,7 +461,9 @@ export class TeacherService {
   async updateKanji(id: string, teacherId: string, dto: any) {
     const item = await this.prisma.kanjiItem.findUnique({
       where: { id },
-      include: { lesson: { include: { module: { include: { course: true } } } } },
+      include: {
+        lesson: { include: { module: { include: { course: true } } } },
+      },
     });
     if (!item || item.lesson.module.course.authorId !== teacherId) {
       throw new ForbiddenException('Ruxsat berilmagan');
@@ -428,7 +474,9 @@ export class TeacherService {
   async deleteKanji(id: string, teacherId: string) {
     const item = await this.prisma.kanjiItem.findUnique({
       where: { id },
-      include: { lesson: { include: { module: { include: { course: true } } } } },
+      include: {
+        lesson: { include: { module: { include: { course: true } } } },
+      },
     });
     if (!item || item.lesson.module.course.authorId !== teacherId) {
       throw new ForbiddenException('Ruxsat berilmagan');
@@ -445,7 +493,9 @@ export class TeacherService {
   async updateRenshuu(id: string, teacherId: string, dto: any) {
     const item = await this.prisma.renshuuItem.findUnique({
       where: { id },
-      include: { lesson: { include: { module: { include: { course: true } } } } },
+      include: {
+        lesson: { include: { module: { include: { course: true } } } },
+      },
     });
     if (!item || item.lesson.module.course.authorId !== teacherId) {
       throw new ForbiddenException('Ruxsat berilmagan');
@@ -456,7 +506,9 @@ export class TeacherService {
   async deleteRenshuu(id: string, teacherId: string) {
     const item = await this.prisma.renshuuItem.findUnique({
       where: { id },
-      include: { lesson: { include: { module: { include: { course: true } } } } },
+      include: {
+        lesson: { include: { module: { include: { course: true } } } },
+      },
     });
     if (!item || item.lesson.module.course.authorId !== teacherId) {
       throw new ForbiddenException('Ruxsat berilmagan');
@@ -468,7 +520,11 @@ export class TeacherService {
   // ==========================================
   // 3. STUDENTS MONITORING & FEEDBACK
   // ==========================================
-  async getTeacherStudents(teacherId: string, courseId?: string, search?: string) {
+  async getTeacherStudents(
+    teacherId: string,
+    courseId?: string,
+    search?: string,
+  ) {
     const courses = await this.prisma.course.findMany({
       where: {
         authorId: teacherId,
@@ -485,7 +541,7 @@ export class TeacherService {
 
     const allTeacherCourseIds = courses.map((c) => c.id);
     const allTeacherLessonIds = courses.flatMap((c) =>
-      c.modules.flatMap((m) => m.lessons.map((l) => l.id))
+      c.modules.flatMap((m) => m.lessons.map((l) => l.id)),
     );
 
     if (allTeacherLessonIds.length === 0) {
@@ -562,10 +618,14 @@ export class TeacherService {
     const students = Array.from(studentMap.values()).map((s) => {
       s.progressPercent = Math.min(
         100,
-        Math.round((s.completedLessonsCount / Math.max(1, s.totalLessonsCount)) * 100)
+        Math.round(
+          (s.completedLessonsCount / Math.max(1, s.totalLessonsCount)) * 100,
+        ),
       );
       s.averageQuizScore =
-        s.quizScoresCount > 0 ? Math.round(s.quizScoresSum / s.quizScoresCount) : null;
+        s.quizScoresCount > 0
+          ? Math.round(s.quizScoresSum / s.quizScoresCount)
+          : null;
       delete s.quizScoresSum;
       delete s.quizScoresCount;
       return s;
@@ -578,7 +638,7 @@ export class TeacherService {
         (s) =>
           s.fullName.toLowerCase().includes(q) ||
           s.email.toLowerCase().includes(q) ||
-          s.courseTitle.toLowerCase().includes(q)
+          s.courseTitle.toLowerCase().includes(q),
       );
     }
 
@@ -588,7 +648,13 @@ export class TeacherService {
   async getStudentDetail(studentId: string, teacherId: string) {
     const student = await this.prisma.user.findUnique({
       where: { id: studentId },
-      select: { id: true, fullName: true, email: true, avatarUrl: true, createdAt: true },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        avatarUrl: true,
+        createdAt: true,
+      },
     });
     if (!student) throw new NotFoundException('Oʻquvchi topilmadi');
 
@@ -607,7 +673,7 @@ export class TeacherService {
     });
 
     const teacherLessonIds = courses.flatMap((c) =>
-      c.modules.flatMap((m) => m.lessons.map((l) => l.id))
+      c.modules.flatMap((m) => m.lessons.map((l) => l.id)),
     );
 
     const progress = await this.prisma.userLessonProgress.findMany({
@@ -681,7 +747,9 @@ export class TeacherService {
         ...(studentId ? { studentId } : {}),
       },
       include: {
-        student: { select: { id: true, fullName: true, email: true, avatarUrl: true } },
+        student: {
+          select: { id: true, fullName: true, email: true, avatarUrl: true },
+        },
         course: { select: { id: true, title: true } },
         lesson: { select: { id: true, title: true } },
       },
@@ -770,7 +838,9 @@ export class TeacherService {
     });
     if (!test) throw new NotFoundException('Test topilmadi');
     if (test.authorId !== teacherId && test.course?.authorId !== teacherId) {
-      throw new ForbiddenException('Ushbu test sizning kursingizga tegishli emas');
+      throw new ForbiddenException(
+        'Ushbu test sizning kursingizga tegishli emas',
+      );
     }
     return test;
   }
@@ -783,7 +853,11 @@ export class TeacherService {
     return this.prisma.jlptTest.create({
       data: {
         title: dto.title,
-        slug: dto.slug || dto.title.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now().toString().slice(-4),
+        slug:
+          dto.slug ||
+          dto.title.toLowerCase().replace(/\s+/g, '-') +
+            '-' +
+            Date.now().toString().slice(-4),
         description: dto.description,
         level: dto.level as any,
         category: (dto.category as any) || 'MOCK_EXAM',
@@ -814,7 +888,11 @@ export class TeacherService {
     return { success: true, message: 'Test oʻchirildi' };
   }
 
-  async createQuestion(testId: string, teacherId: string, dto: CreateQuestionDto) {
+  async createQuestion(
+    testId: string,
+    teacherId: string,
+    dto: CreateQuestionDto,
+  ) {
     await this.getTestById(testId, teacherId);
 
     return this.prisma.jlptQuestion.create({
@@ -832,13 +910,20 @@ export class TeacherService {
     });
   }
 
-  async updateQuestion(questionId: string, teacherId: string, dto: UpdateQuestionDto) {
+  async updateQuestion(
+    questionId: string,
+    teacherId: string,
+    dto: UpdateQuestionDto,
+  ) {
     const q = await this.prisma.jlptQuestion.findUnique({
       where: { id: questionId },
       include: { test: { include: { course: true } } },
     });
     if (!q) throw new NotFoundException('Savol topilmadi');
-    if (q.test.authorId !== teacherId && q.test.course?.authorId !== teacherId) {
+    if (
+      q.test.authorId !== teacherId &&
+      q.test.course?.authorId !== teacherId
+    ) {
       throw new ForbiddenException('Ushbu savolni tahrirlash huquqingiz yoʻq');
     }
 
@@ -854,7 +939,10 @@ export class TeacherService {
       include: { test: { include: { course: true } } },
     });
     if (!q) throw new NotFoundException('Savol topilmadi');
-    if (q.test.authorId !== teacherId && q.test.course?.authorId !== teacherId) {
+    if (
+      q.test.authorId !== teacherId &&
+      q.test.course?.authorId !== teacherId
+    ) {
       throw new ForbiddenException('Ushbu savolni oʻchirish huquqingiz yoʻq');
     }
 

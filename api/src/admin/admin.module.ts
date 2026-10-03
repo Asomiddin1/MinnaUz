@@ -7,9 +7,12 @@ import { AdminTeachersService } from './admin-teachers.service';
 import { AdminTeachersController } from './admin-teachers.controller';
 
 @Module({
-  controllers: [AdminController, AdminCoursesController, AdminTeachersController],
+  controllers: [
+    AdminController,
+    AdminCoursesController,
+    AdminTeachersController,
+  ],
   providers: [AdminService, AdminCoursesService, AdminTeachersService],
   exports: [AdminService, AdminCoursesService, AdminTeachersService],
 })
 export class AdminModule {}
-

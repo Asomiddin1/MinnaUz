@@ -63,7 +63,11 @@ export class AiService {
 
   private async resolveModel(apiKey: string, baseUrl: string): Promise<string> {
     const configured = this.configService.get<string>('GROQ_MODEL');
-    if (configured && configured !== 'llama-3.3-70b-versatile' && configured.trim() !== '') {
+    if (
+      configured &&
+      configured !== 'llama-3.3-70b-versatile' &&
+      configured.trim() !== ''
+    ) {
       return configured.trim();
     }
 
@@ -200,7 +204,10 @@ export class AiService {
   }
 
   private cleanJson(raw: string): any {
-    let cleaned = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+    let cleaned = raw
+      .replace(/^```(?:json)?\s*/i, '')
+      .replace(/\s*```$/i, '')
+      .trim();
     const jsonStart = cleaned.indexOf('{');
     const jsonEnd = cleaned.lastIndexOf('}');
     if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
@@ -210,7 +217,10 @@ export class AiService {
   }
 
   // === 1. TRANSLATE ===
-  async translate(text: string, direction: 'ja-uz' | 'uz-ja'): Promise<TranslateResult> {
+  async translate(
+    text: string,
+    direction: 'ja-uz' | 'uz-ja',
+  ): Promise<TranslateResult> {
     const systemPrompt =
       direction === 'ja-uz'
         ? `Siz yapon tilidan o'zbek tiliga yuqori aniqlikdagi professional tarjimon va yapon tili o'qituvchisisiz. 
@@ -247,7 +257,10 @@ Javobni FAQAT QUYIDAGI JSON formatida qaytaring:
   }
 
   // === 2. LESSON KAIWA (5-STEP BOUNDED SENSEI DIALOG) ===
-  async chatKaiwa(dto: KaiwaMessageDto, userId?: string): Promise<KaiwaResponse> {
+  async chatKaiwa(
+    dto: KaiwaMessageDto,
+    userId?: string,
+  ): Promise<KaiwaResponse> {
     const isLastStep = dto.step >= 5;
 
     const systemPrompt = `Siz yapon tili o'qituvchisi "Sensei"siz.
@@ -280,16 +293,16 @@ JAVOBNI FAQAT SHU JSON FORMATIDA QAYTARING:
   "correction": "Xatoni o'zbekcha tushuntirish yoki null",
   "encouragement": "Qisqa motivatsion so'z",
   "isCompleted": ${isLastStep ? 'true' : 'false'}${
-      isLastStep
-        ? `,
+    isLastStep
+      ? `,
   "summary": {
     "accuracyPercent": 90,
     "wordsUsedCount": 4,
     "feedback": "Darsdagi iboralarni juda yaxshi o'zlashtiribsiz!",
     "rewardCoins": 20
   }`
-        : ''
-    }
+      : ''
+  }
 }`;
 
     const userPrompt = JSON.stringify({
@@ -387,7 +400,9 @@ JAVOBNI FAQAT SHU JSON FORMATIDA QAYTARING:
   }
 
   // === 3. TEST EXPLAINER ("Nega bu javob xato?") ===
-  async explainMistake(dto: ExplainMistakeDto): Promise<ExplainMistakeResponse> {
+  async explainMistake(
+    dto: ExplainMistakeDto,
+  ): Promise<ExplainMistakeResponse> {
     const systemPrompt = `Siz tajribali va do'stona Yapon tili o'qituvchisisiz.
 Talaba test savolini yechishda xato javobni tanladi.
 Savol: "${dto.question}"
@@ -408,13 +423,18 @@ FAQAT SHU JSON FORMATIDA QAYTARING.`;
     try {
       const parsed = this.cleanJson(raw);
       return {
-        whyWrong: parsed.whyWrong || 'Tanlangan variant ushbu gap tuzilishiga mos kelmaydi.',
-        whyCorrect: parsed.whyCorrect || `To'g'ri javob: "${dto.correctAnswer}".`,
-        tip: parsed.tip || 'Grammatik yuklamalar va so\'z ma\'nosiga e\'tibor bering.',
+        whyWrong:
+          parsed.whyWrong ||
+          'Tanlangan variant ushbu gap tuzilishiga mos kelmaydi.',
+        whyCorrect:
+          parsed.whyCorrect || `To'g'ri javob: "${dto.correctAnswer}".`,
+        tip:
+          parsed.tip ||
+          "Grammatik yuklamalar va so'z ma'nosiga e'tibor bering.",
       };
     } catch {
       return {
-        whyWrong: 'Tanlangan variant bu kontekstda to\'g\'ri kelmaydi.',
+        whyWrong: "Tanlangan variant bu kontekstda to'g'ri kelmaydi.",
         whyCorrect: `To'g'ri javob "${dto.correctAnswer}" hisoblanadi.`,
         tip: 'Qoidalarni takrorlab, darsdagi misollarga yana bir bor qarang.',
       };
@@ -422,7 +442,9 @@ FAQAT SHU JSON FORMATIDA QAYTARING.`;
   }
 
   // === 4. DOKKAI GENERATOR ===
-  async generateDokkai(dto: GenerateDokkaiDto): Promise<GeneratedDokkaiResponse> {
+  async generateDokkai(
+    dto: GenerateDokkaiDto,
+  ): Promise<GeneratedDokkaiResponse> {
     const systemPrompt = `Siz Yapon tili bo'yicha JLPT mutaxassisisiz.
 ${dto.level} darajasiga mos qiziqarli o'qish (Dokkai) matni yaratib bering.
 Mavzu: "${dto.topic}".
@@ -459,7 +481,7 @@ JAVOBNI FAQAT QUYIDAGI JSON FORMATIDA QAYTARING:
       return this.cleanJson(raw);
     } catch {
       throw new HttpException(
-        'Dokkai matnini yaratishda xatolik yuz berdi. Iltimos qaytadan urinib ko\'ring.',
+        "Dokkai matnini yaratishda xatolik yuz berdi. Iltimos qaytadan urinib ko'ring.",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

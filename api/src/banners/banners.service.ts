@@ -73,7 +73,8 @@ export class BannersService {
         notificationId: dto.notificationId || null,
         order: targetOrder,
         isActive: dto.isActive !== undefined ? dto.isActive : true,
-        isDismissible: dto.isDismissible !== undefined ? dto.isDismissible : false,
+        isDismissible:
+          dto.isDismissible !== undefined ? dto.isDismissible : false,
         targetAudience: dto.targetAudience || 'ALL',
       },
       include: {
@@ -117,7 +118,10 @@ export class BannersService {
 
     // Supabase'dan rasmni o'chirish (agar Supabase URL bo'lsa)
     if (existing.image) {
-      const filename = this.supabaseStorage.extractFilename(existing.image, 'images');
+      const filename = this.supabaseStorage.extractFilename(
+        existing.image,
+        'images',
+      );
       if (filename) {
         await this.supabaseStorage.deleteFile('images', filename);
       }
@@ -160,8 +164,10 @@ export class BannersService {
       // Create initial sample notification and banner
       const notif = await (this.prisma as any).notification.create({
         data: {
-          title: "MinnaUz 2.0 yangilanishi va JLPT imtihoniga tayyorgarlik kursi!",
-          message: "Platformada yangi video darslar, sun'iy intellekt talaffuz tekshiruvchisi va testlar tizimi ishga tushirildi.",
+          title:
+            'MinnaUz 2.0 yangilanishi va JLPT imtihoniga tayyorgarlik kursi!',
+          message:
+            "Platformada yangi video darslar, sun'iy intellekt talaffuz tekshiruvchisi va testlar tizimi ishga tushirildi.",
           content: `### Xush kelibsiz MinnaUz 2.0 platformasiga!
 
 Yapon tilini o'rganish endi yanada qulay va qiziqarli:
@@ -184,18 +190,18 @@ Videoni tomosha qiling va o'rganishni bugunoq boshlang!`,
       await (this.prisma as any).banner.create({
         data: {
           title: "Yangi video darslar va JLPT imtihoni qo'llanmasi",
-          desc: "MinnaUz 2.0 dagi barcha yangi imkoniyatlar va darsliklar bilan video orqali tanishing.",
+          desc: 'MinnaUz 2.0 dagi barcha yangi imkoniyatlar va darsliklar bilan video orqali tanishing.',
           tag: "Video Qo'llanma",
-          tagIcon: "Sparkles",
-          image: "/banner_art.png",
+          tagIcon: 'Sparkles',
+          image: '/banner_art.png',
           btnText: "Videoni ko'rish",
-          btnIcon: "PlayCircle",
-          actionType: "NOTIFICATION_DETAIL",
+          btnIcon: 'PlayCircle',
+          actionType: 'NOTIFICATION_DETAIL',
           notificationId: notif.id,
           order: 4,
           isActive: true,
           isDismissible: true,
-          targetAudience: "ALL",
+          targetAudience: 'ALL',
         },
       });
     }

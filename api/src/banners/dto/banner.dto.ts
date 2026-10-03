@@ -10,12 +10,18 @@ import {
 } from 'class-validator';
 
 export class CreateBannerDto {
-  @ApiProperty({ description: 'Banner sarlavhasi', example: 'MinnaUz 2.0 yangilanishi' })
+  @ApiProperty({
+    description: 'Banner sarlavhasi',
+    example: 'MinnaUz 2.0 yangilanishi',
+  })
   @IsString({ message: "Sarlavha matn bo'lishi kerak" })
   @IsNotEmpty({ message: 'Sarlavha kiritilishi shart' })
   title: string;
 
-  @ApiProperty({ description: 'Banner tavsifi', example: 'Platformadagi yangiliklar bilan tanishing' })
+  @ApiProperty({
+    description: 'Banner tavsifi',
+    example: 'Platformadagi yangiliklar bilan tanishing',
+  })
   @IsString({ message: "Tavsif matn bo'lishi kerak" })
   @IsNotEmpty({ message: 'Tavsif kiritilishi shart' })
   desc: string;
@@ -30,7 +36,10 @@ export class CreateBannerDto {
   @IsString()
   tagIcon?: string;
 
-  @ApiPropertyOptional({ description: 'Banner rasmi URL', example: '/banner_art.png' })
+  @ApiPropertyOptional({
+    description: 'Banner rasmi URL',
+    example: '/banner_art.png',
+  })
   @IsOptional()
   @IsString()
   image?: string;
@@ -40,12 +49,18 @@ export class CreateBannerDto {
   @IsString()
   btnText?: string;
 
-  @ApiPropertyOptional({ description: 'Tugma havolasi (URL)', example: '/dashboard/courses' })
+  @ApiPropertyOptional({
+    description: 'Tugma havolasi (URL)',
+    example: '/dashboard/courses',
+  })
   @IsOptional()
   @IsString()
   btnUrl?: string;
 
-  @ApiPropertyOptional({ description: 'Tugma ikonka nomi', example: 'ArrowRight' })
+  @ApiPropertyOptional({
+    description: 'Tugma ikonka nomi',
+    example: 'ArrowRight',
+  })
   @IsOptional()
   @IsString()
   btnIcon?: string;
@@ -76,7 +91,10 @@ export class CreateBannerDto {
   @IsBoolean()
   isActive?: boolean;
 
-  @ApiPropertyOptional({ description: 'Foydalanuvchi yopishi mumkinmi', default: false })
+  @ApiPropertyOptional({
+    description: 'Foydalanuvchi yopishi mumkinmi',
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   isDismissible?: boolean;

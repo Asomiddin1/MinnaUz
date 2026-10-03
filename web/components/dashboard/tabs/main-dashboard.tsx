@@ -155,7 +155,7 @@ export function MainDashboard() {
       btnUrl: null,
       btnIcon: TrendingUp,
       actionType: 'PLAN_MODAL',
-      image: '/planbanner_bg.png',
+      image: '/new-default-banner.jpg',
       isDismissible: false,
     },
   ];

@@ -41,7 +41,9 @@ export class SubscriptionsController {
   @Get('my-status')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Foydalanuvchining joriy obuna holati va doʻkon vaucherlari' })
+  @ApiOperation({
+    summary: 'Foydalanuvchining joriy obuna holati va doʻkon vaucherlari',
+  })
   async getMySubscription(@CurrentUser('id') userId: string) {
     return this.subscriptionsService.getMySubscription(userId);
   }
@@ -60,7 +62,9 @@ export class SubscriptionsController {
   @Post('checkout')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Toʻlov tranzaksiyasini ochish (Checkout boshlash)' })
+  @ApiOperation({
+    summary: 'Toʻlov tranzaksiyasini ochish (Checkout boshlash)',
+  })
   async checkout(
     @CurrentUser('id') userId: string,
     @Body() dto: CheckoutSubscriptionDto,
@@ -124,7 +128,9 @@ export class AdminSubscriptionsController {
 
   // === PLAN CRUD ENDPOINTS ===
   @Get('plans')
-  @ApiOperation({ summary: 'Barcha tariflarni boshqaruv uchun olish (faol va nofaol)' })
+  @ApiOperation({
+    summary: 'Barcha tariflarni boshqaruv uchun olish (faol va nofaol)',
+  })
   async getAdminPlans() {
     return this.subscriptionsService.adminGetAllPlans();
   }
@@ -155,7 +161,9 @@ export class AdminSubscriptionsController {
 
   // === USER SUBSCRIPTION CRUD ENDPOINTS ===
   @Patch(':id')
-  @ApiOperation({ summary: 'Foydalanuvchi obunasini tahrirlash (status, muddat, izoh)' })
+  @ApiOperation({
+    summary: 'Foydalanuvchi obunasini tahrirlash (status, muddat, izoh)',
+  })
   async updateUserSubscription(
     @Param('id') id: string,
     @Body() dto: UpdateUserSubscriptionDto,
@@ -173,9 +181,10 @@ export class AdminSubscriptionsController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Foydalanuvchi obunasini bekor qilish va oʻchirish' })
+  @ApiOperation({
+    summary: 'Foydalanuvchi obunasini bekor qilish va oʻchirish',
+  })
   async deleteUserSubscription(@Param('id') id: string) {
     return this.subscriptionsService.adminDeleteUserSubscription(id);
   }
 }
-

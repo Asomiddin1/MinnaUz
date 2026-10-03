@@ -27,7 +27,9 @@ export class MailService {
           pass,
         },
       });
-      this.logger.log(`📧 SMTP Email xizmati ulandi (${host}:${port}, user: ${user})`);
+      this.logger.log(
+        `📧 SMTP Email xizmati ulandi (${host}:${port}, user: ${user})`,
+      );
     } else {
       this.logger.warn(
         '⚠️ SMTP_USER yoki SMTP_PASS .env faylida topilmadi. Email yuborilmaydi (OTP faqat terminalda koʻrinadi).',
@@ -41,7 +43,8 @@ export class MailService {
       return true;
     }
 
-    const from = process.env.SMTP_FROM || `"MinnaUz" <${process.env.SMTP_USER}>`;
+    const from =
+      process.env.SMTP_FROM || `"MinnaUz" <${process.env.SMTP_USER}>`;
 
     const htmlContent = `
       <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 32px 24px; background-color: #ffffff; border-radius: 16px; border: 1px solid #e4e4e7;">
@@ -79,10 +82,15 @@ export class MailService {
         html: htmlContent,
       });
 
-      this.logger.log(`✅ Tasdiqlash kodi (${code}) ${toEmail} manziliga yuborildi.`);
+      this.logger.log(
+        `✅ Tasdiqlash kodi (${code}) ${toEmail} manziliga yuborildi.`,
+      );
       return true;
     } catch (err: any) {
-      this.logger.error(`❌ Email yuborishda xatolik (${toEmail}):`, err.message);
+      this.logger.error(
+        `❌ Email yuborishda xatolik (${toEmail}):`,
+        err.message,
+      );
       return false;
     }
   }

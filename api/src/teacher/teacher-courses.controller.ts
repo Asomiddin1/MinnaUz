@@ -27,7 +27,9 @@ export class TeacherCoursesController {
   constructor(private readonly teacherService: TeacherService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Oʻqituvchiga biriktirilgan barcha kurslar roʻyxati' })
+  @ApiOperation({
+    summary: 'Oʻqituvchiga biriktirilgan barcha kurslar roʻyxati',
+  })
   async getCourses(@CurrentUser() user: any) {
     return this.teacherService.getCourses(user.id);
   }
@@ -90,7 +92,9 @@ export class TeacherCoursesController {
   }
 
   @Patch(':id/lessons/:lessonId')
-  @ApiOperation({ summary: 'Darsni tahrirlash (video, pdf, summary, publish/unpublish)' })
+  @ApiOperation({
+    summary: 'Darsni tahrirlash (video, pdf, summary, publish/unpublish)',
+  })
   async updateLesson(
     @Param('lessonId') lessonId: string,
     @Body() dto: any,
@@ -101,7 +105,10 @@ export class TeacherCoursesController {
 
   // === LESSON DELETION REQUEST (ADMIN APPROVAL REQUIRED) ===
   @Post(':id/lessons/:lessonId/request-delete')
-  @ApiOperation({ summary: 'Darsni oʻchirish soʻrovini Adminga yuborish (Toʻgʻridan-toʻgʻri oʻchirish cheklangan)' })
+  @ApiOperation({
+    summary:
+      'Darsni oʻchirish soʻrovini Adminga yuborish (Toʻgʻridan-toʻgʻri oʻchirish cheklangan)',
+  })
   async requestDeleteLesson(
     @Param('lessonId') lessonId: string,
     @Body() dto: RequestDeleteLessonDto,
@@ -121,7 +128,10 @@ export class TeacherCoursesController {
 
   // === LESSON CONTENT (KOTOBA, BUNPOU, KANJI, RENSHUU) ===
   @Get('lessons/:lessonId/content')
-  @ApiOperation({ summary: 'Darsning toʻliq kontentini olish (Lugʻat, Grammatika, Kanji, Mashqlar)' })
+  @ApiOperation({
+    summary:
+      'Darsning toʻliq kontentini olish (Lugʻat, Grammatika, Kanji, Mashqlar)',
+  })
   async getLessonContent(
     @Param('lessonId') lessonId: string,
     @CurrentUser() user: any,
@@ -132,13 +142,21 @@ export class TeacherCoursesController {
   // Kotoba
   @Post('lessons/:lessonId/kotoba')
   @ApiOperation({ summary: 'Darsga yangi soʻz qoʻshish' })
-  async addKotoba(@Param('lessonId') lessonId: string, @Body() dto: any, @CurrentUser() user: any) {
+  async addKotoba(
+    @Param('lessonId') lessonId: string,
+    @Body() dto: any,
+    @CurrentUser() user: any,
+  ) {
     return this.teacherService.addKotoba(lessonId, user.id, dto);
   }
 
   @Patch('lessons/kotoba/:id')
   @ApiOperation({ summary: 'Soʻzni tahrirlash' })
-  async updateKotoba(@Param('id') id: string, @Body() dto: any, @CurrentUser() user: any) {
+  async updateKotoba(
+    @Param('id') id: string,
+    @Body() dto: any,
+    @CurrentUser() user: any,
+  ) {
     return this.teacherService.updateKotoba(id, user.id, dto);
   }
 
@@ -151,13 +169,21 @@ export class TeacherCoursesController {
   // Bunpou
   @Post('lessons/:lessonId/bunpou')
   @ApiOperation({ summary: 'Darsga grammatika qoidasi qoʻshish' })
-  async addBunpou(@Param('lessonId') lessonId: string, @Body() dto: any, @CurrentUser() user: any) {
+  async addBunpou(
+    @Param('lessonId') lessonId: string,
+    @Body() dto: any,
+    @CurrentUser() user: any,
+  ) {
     return this.teacherService.addBunpou(lessonId, user.id, dto);
   }
 
   @Patch('lessons/bunpou/:id')
   @ApiOperation({ summary: 'Grammatikani tahrirlash' })
-  async updateBunpou(@Param('id') id: string, @Body() dto: any, @CurrentUser() user: any) {
+  async updateBunpou(
+    @Param('id') id: string,
+    @Body() dto: any,
+    @CurrentUser() user: any,
+  ) {
     return this.teacherService.updateBunpou(id, user.id, dto);
   }
 
@@ -170,13 +196,21 @@ export class TeacherCoursesController {
   // Kanji
   @Post('lessons/:lessonId/kanji')
   @ApiOperation({ summary: 'Darsga kanji qoʻshish' })
-  async addKanji(@Param('lessonId') lessonId: string, @Body() dto: any, @CurrentUser() user: any) {
+  async addKanji(
+    @Param('lessonId') lessonId: string,
+    @Body() dto: any,
+    @CurrentUser() user: any,
+  ) {
     return this.teacherService.addKanji(lessonId, user.id, dto);
   }
 
   @Patch('lessons/kanji/:id')
   @ApiOperation({ summary: 'Kanjini tahrirlash' })
-  async updateKanji(@Param('id') id: string, @Body() dto: any, @CurrentUser() user: any) {
+  async updateKanji(
+    @Param('id') id: string,
+    @Body() dto: any,
+    @CurrentUser() user: any,
+  ) {
     return this.teacherService.updateKanji(id, user.id, dto);
   }
 
@@ -189,13 +223,21 @@ export class TeacherCoursesController {
   // Renshuu
   @Post('lessons/:lessonId/renshuu')
   @ApiOperation({ summary: 'Darsga test/mashq savoli qoʻshish' })
-  async addRenshuu(@Param('lessonId') lessonId: string, @Body() dto: any, @CurrentUser() user: any) {
+  async addRenshuu(
+    @Param('lessonId') lessonId: string,
+    @Body() dto: any,
+    @CurrentUser() user: any,
+  ) {
     return this.teacherService.addRenshuu(lessonId, user.id, dto);
   }
 
   @Patch('lessons/renshuu/:id')
   @ApiOperation({ summary: 'Mashq savolini tahrirlash' })
-  async updateRenshuu(@Param('id') id: string, @Body() dto: any, @CurrentUser() user: any) {
+  async updateRenshuu(
+    @Param('id') id: string,
+    @Body() dto: any,
+    @CurrentUser() user: any,
+  ) {
     return this.teacherService.updateRenshuu(id, user.id, dto);
   }
 

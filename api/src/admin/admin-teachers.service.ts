@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Role } from '../auth/roles.enum';
 
@@ -43,9 +47,11 @@ export class AdminTeachersService {
     return teachers.map((t) => {
       const courses = t.authoredCourses;
       const allLessons = courses.flatMap((c) =>
-        c.modules.flatMap((m) => m.lessons)
+        c.modules.flatMap((m) => m.lessons),
       );
-      const pendingDeletionCount = allLessons.filter((l) => l.deleteRequested).length;
+      const pendingDeletionCount = allLessons.filter(
+        (l) => l.deleteRequested,
+      ).length;
 
       return {
         id: t.id,
@@ -96,17 +102,23 @@ export class AdminTeachersService {
   // 3. ASSIGN COURSE TO TEACHER
   // ==========================================
   async assignCourseToTeacher(courseId: string, teacherId: string) {
-    const course = await this.prisma.course.findUnique({ where: { id: courseId } });
+    const course = await this.prisma.course.findUnique({
+      where: { id: courseId },
+    });
     if (!course) throw new NotFoundException('Kurs topilmadi');
 
-    const teacher = await this.prisma.user.findUnique({ where: { id: teacherId } });
+    const teacher = await this.prisma.user.findUnique({
+      where: { id: teacherId },
+    });
     if (!teacher) throw new NotFoundException('Oʻqituvchi topilmadi');
 
     return this.prisma.course.update({
       where: { id: courseId },
       data: { authorId: teacherId },
       include: {
-        author: { select: { id: true, fullName: true, email: true, role: true } },
+        author: {
+          select: { id: true, fullName: true, email: true, role: true },
+        },
       },
     });
   }
@@ -123,7 +135,12 @@ export class AdminTeachersService {
             course: {
               include: {
                 author: {
-                  select: { id: true, fullName: true, email: true, avatarUrl: true },
+                  select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                    avatarUrl: true,
+                  },
                 },
               },
             },
@@ -135,7 +152,9 @@ export class AdminTeachersService {
   }
 
   async approveLessonDeletion(lessonId: string) {
-    const lesson = await this.prisma.lesson.findUnique({ where: { id: lessonId } });
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { id: lessonId },
+    });
     if (!lesson) throw new NotFoundException('Dars topilmadi');
 
     await this.prisma.lesson.delete({ where: { id: lessonId } });
@@ -147,7 +166,9 @@ export class AdminTeachersService {
   }
 
   async rejectLessonDeletion(lessonId: string) {
-    const lesson = await this.prisma.lesson.findUnique({ where: { id: lessonId } });
+    const lesson = await this.prisma.lesson.findUnique({
+      where: { id: lessonId },
+    });
     if (!lesson) throw new NotFoundException('Dars topilmadi');
 
     const updated = await this.prisma.lesson.update({
@@ -161,7 +182,8 @@ export class AdminTeachersService {
 
     return {
       success: true,
-      message: 'Darsni oʻchirish soʻrovi rad etildi va dars qayta faollashtirildi.',
+      message:
+        'Darsni oʻchirish soʻrovi rad etildi va dars qayta faollashtirildi.',
       lesson: updated,
     };
   }

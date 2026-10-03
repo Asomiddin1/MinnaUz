@@ -192,7 +192,9 @@ export class NotificationsService {
           tag: dto.bannerTag || (dto.type === 'PROMO' ? 'Aksiya' : 'Eʼlon'),
           tagIcon: dto.videoUrl ? 'PlayCircle' : 'Sparkles',
           image: dto.bannerImage || dto.imageUrl || '/banner_art.png',
-          btnText: dto.actionText || (dto.videoUrl ? 'Videoni koʻrish' : 'Batafsil oʻqish'),
+          btnText:
+            dto.actionText ||
+            (dto.videoUrl ? 'Videoni koʻrish' : 'Batafsil oʻqish'),
           btnIcon: dto.videoUrl ? 'PlayCircle' : 'ArrowRight',
           actionType: 'NOTIFICATION_DETAIL',
           notificationId: notification.id,
@@ -203,8 +205,8 @@ export class NotificationsService {
             dto.audience === 'TEACHER'
               ? 'TEACHER'
               : dto.audience === 'USER'
-              ? 'USER'
-              : 'ALL',
+                ? 'USER'
+                : 'ALL',
         },
       });
     }

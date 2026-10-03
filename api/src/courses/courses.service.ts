@@ -35,7 +35,8 @@ export class CoursesService {
     });
 
     const totalLessons = allCourses.reduce(
-      (sum, c) => sum + c.modules.reduce((mSum, m) => mSum + m.lessons.length, 0),
+      (sum, c) =>
+        sum + c.modules.reduce((mSum, m) => mSum + m.lessons.length, 0),
       0,
     );
 
@@ -174,17 +175,29 @@ export class CoursesService {
     const targetLevel = studyPlan?.targetLevel || 'N5';
     const totalTargetLessons = allCourses
       .filter((c) => c.level === targetLevel)
-      .reduce((sum, c) => sum + c.modules.reduce((mSum, m) => mSum + m.lessons.length, 0), 0);
+      .reduce(
+        (sum, c) =>
+          sum + c.modules.reduce((mSum, m) => mSum + m.lessons.length, 0),
+        0,
+      );
     const completedTargetLessons = completedProgress.filter(
       (p) => p.lesson?.module?.course?.level === targetLevel,
     ).length;
     const n5ProgressPercent =
-      totalTargetLessons > 0 ? Math.round((completedTargetLessons / totalTargetLessons) * 100) : 0;
+      totalTargetLessons > 0
+        ? Math.round((completedTargetLessons / totalTargetLessons) * 100)
+        : 0;
 
     // 4. Find Active Course & Next Lesson (prioritize targetLevel course if available)
-    let activeCourseData = allCourses.find((c) => c.level === targetLevel) || allCourses[0];
-    if (allUserProgress.length > 0 && allUserProgress[0].lesson?.module?.course) {
-      const matched = allCourses.find((c) => c.id === allUserProgress[0].lesson.module.course.id);
+    let activeCourseData =
+      allCourses.find((c) => c.level === targetLevel) || allCourses[0];
+    if (
+      allUserProgress.length > 0 &&
+      allUserProgress[0].lesson?.module?.course
+    ) {
+      const matched = allCourses.find(
+        (c) => c.id === allUserProgress[0].lesson.module.course.id,
+      );
       if (matched) activeCourseData = matched;
     }
 
@@ -192,12 +205,16 @@ export class CoursesService {
     if (activeCourseData) {
       const courseLessons = activeCourseData.modules.flatMap((m) => m.lessons);
       const courseTotal = courseLessons.length;
-      const courseCompleted = courseLessons.filter((l) => progressMap.get(l.id)?.isCompleted).length;
+      const courseCompleted = courseLessons.filter(
+        (l) => progressMap.get(l.id)?.isCompleted,
+      ).length;
       const courseProgressPercent =
         courseTotal > 0 ? Math.round((courseCompleted / courseTotal) * 100) : 0;
 
       // Find next uncompleted lesson
-      let nextLessonObj = courseLessons.find((l) => !progressMap.get(l.id)?.isCompleted);
+      let nextLessonObj = courseLessons.find(
+        (l) => !progressMap.get(l.id)?.isCompleted,
+      );
       if (!nextLessonObj && courseLessons.length > 0) {
         nextLessonObj = courseLessons[courseLessons.length - 1];
       }
@@ -205,8 +222,12 @@ export class CoursesService {
       let nextLessonData: any = null;
       if (nextLessonObj) {
         const nextProg = progressMap.get(nextLessonObj.id);
-        const completedSecs = ((nextProg?.completedSections as string[]) || []).length;
-        const lessonProgressPercent = Math.min(100, Math.round((completedSecs / 4) * 100));
+        const completedSecs = ((nextProg?.completedSections as string[]) || [])
+          .length;
+        const lessonProgressPercent = Math.min(
+          100,
+          Math.round((completedSecs / 4) * 100),
+        );
 
         let category = 'Grammatika';
         if (completedSecs === 0) category = 'Kirish va Lugʻat';
@@ -286,7 +307,8 @@ export class CoursesService {
       const currentDayDate = new Date(monday);
       currentDayDate.setDate(monday.getDate() + idx);
       const dStr = currentDayDate.toISOString().split('T')[0];
-      const mins = activityMap.get(dStr) || (idx === dayOfWeek ? todayMinutes : 0);
+      const mins =
+        activityMap.get(dStr) || (idx === dayOfWeek ? todayMinutes : 0);
       weeklyMinutes += mins;
 
       // Determine height bar
@@ -387,13 +409,24 @@ export class CoursesService {
     },
   ) {
     const validLevels = ['N5', 'N4', 'N3', 'N2', 'N1', 'OTHER'];
-    const targetLevel = validLevels.includes(dto.targetLevel || '') ? dto.targetLevel : 'N5';
-    const weeklyGoalHours = Math.max(1, Math.min(40, Number(dto.weeklyGoalHours) || 4));
+    const targetLevel = validLevels.includes(dto.targetLevel || '')
+      ? dto.targetLevel
+      : 'N5';
+    const weeklyGoalHours = Math.max(
+      1,
+      Math.min(40, Number(dto.weeklyGoalHours) || 4),
+    );
     const dailyMinutes = Math.max(
       10,
-      Math.min(240, Number(dto.dailyMinutes) || Math.round((weeklyGoalHours * 60) / 6)),
+      Math.min(
+        240,
+        Number(dto.dailyMinutes) || Math.round((weeklyGoalHours * 60) / 6),
+      ),
     );
-    const targetMonths = Math.max(1, Math.min(36, Number(dto.targetMonths) || 6));
+    const targetMonths = Math.max(
+      1,
+      Math.min(36, Number(dto.targetMonths) || 6),
+    );
 
     return (this.prisma as any).userStudyPlan.upsert({
       where: { userId },
@@ -466,7 +499,7 @@ export class CoursesService {
     });
 
     // If user is authenticated, compute progress for each course
-    let userProgressMap: Record<string, number> = {};
+    const userProgressMap: Record<string, number> = {};
     if (userId) {
       const completedProgress = await this.prisma.userLessonProgress.findMany({
         where: {
@@ -475,22 +508,33 @@ export class CoursesService {
         },
         select: { lessonId: true },
       });
-      const completedLessonIds = new Set(completedProgress.map((p) => p.lessonId));
+      const completedLessonIds = new Set(
+        completedProgress.map((p) => p.lessonId),
+      );
 
       for (const course of courses) {
-        const allLessonIds = course.modules.flatMap((m) => m.lessons.map((l) => l.id));
+        const allLessonIds = course.modules.flatMap((m) =>
+          m.lessons.map((l) => l.id),
+        );
         const total = allLessonIds.length;
         if (total === 0) {
           userProgressMap[course.id] = 0;
         } else {
-          const completedCount = allLessonIds.filter((id) => completedLessonIds.has(id)).length;
-          userProgressMap[course.id] = Math.round((completedCount / total) * 100);
+          const completedCount = allLessonIds.filter((id) =>
+            completedLessonIds.has(id),
+          ).length;
+          userProgressMap[course.id] = Math.round(
+            (completedCount / total) * 100,
+          );
         }
       }
     }
 
     return courses.map((course) => {
-      const totalLessons = course.modules.reduce((acc, m) => acc + m.lessons.length, 0);
+      const totalLessons = course.modules.reduce(
+        (acc, m) => acc + m.lessons.length,
+        0,
+      );
       const totalModules = course.modules.length;
       return {
         id: course.id,
@@ -561,9 +605,14 @@ export class CoursesService {
     const isPro = await this.checkUserIsPro(userId);
 
     // Get user progress for all lessons in this course
-    let progressMap: Record<string, { isCompleted: boolean; quizScore?: number; completedSections?: string[] }> = {};
+    const progressMap: Record<
+      string,
+      { isCompleted: boolean; quizScore?: number; completedSections?: string[] }
+    > = {};
     if (userId) {
-      const allLessonIds = course.modules.flatMap((m) => m.lessons.map((l) => l.id));
+      const allLessonIds = course.modules.flatMap((m) =>
+        m.lessons.map((l) => l.id),
+      );
       const userProgress = await this.prisma.userLessonProgress.findMany({
         where: {
           userId,
@@ -588,14 +637,21 @@ export class CoursesService {
         const isCurrent = !isCompleted && previousLessonCompleted;
         const isProRequired = !lesson.isFree;
         const isLockedBySub = isProRequired && !isPro;
-        const isLocked = (!previousLessonCompleted && !isCompleted) || isLockedBySub;
+        const isLocked =
+          (!previousLessonCompleted && !isCompleted) || isLockedBySub;
 
         // update flag for next lesson
         previousLessonCompleted = isCompleted;
 
         return {
           ...lesson,
-          status: isCompleted ? 'COMPLETED' : isCurrent ? 'CURRENT' : isLocked ? 'LOCKED' : 'AVAILABLE',
+          status: isCompleted
+            ? 'COMPLETED'
+            : isCurrent
+              ? 'CURRENT'
+              : isLocked
+                ? 'LOCKED'
+                : 'AVAILABLE',
           isCompleted,
           isLocked,
           isFree: lesson.isFree,
@@ -617,9 +673,17 @@ export class CoursesService {
       };
     });
 
-    const totalLessons = course.modules.reduce((acc, m) => acc + m.lessons.length, 0);
-    const completedLessons = Object.values(progressMap).filter((p) => p.isCompleted).length;
-    const overallProgress = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+    const totalLessons = course.modules.reduce(
+      (acc, m) => acc + m.lessons.length,
+      0,
+    );
+    const completedLessons = Object.values(progressMap).filter(
+      (p) => p.isCompleted,
+    ).length;
+    const overallProgress =
+      totalLessons > 0
+        ? Math.round((completedLessons / totalLessons) * 100)
+        : 0;
 
     return {
       id: course.id,
@@ -678,10 +742,16 @@ export class CoursesService {
     const isProRequired = !lesson.isFree;
 
     // Flatten all course lessons in chronological order
-    const allCourseLessons = lesson.module.course.modules.flatMap((m) => m.lessons);
+    const allCourseLessons = lesson.module.course.modules.flatMap(
+      (m) => m.lessons,
+    );
     const currentIndex = allCourseLessons.findIndex((l) => l.id === lesson.id);
-    const prevLesson = currentIndex > 0 ? allCourseLessons[currentIndex - 1] : null;
-    const nextLesson = currentIndex < allCourseLessons.length - 1 ? allCourseLessons[currentIndex + 1] : null;
+    const prevLesson =
+      currentIndex > 0 ? allCourseLessons[currentIndex - 1] : null;
+    const nextLesson =
+      currentIndex < allCourseLessons.length - 1
+        ? allCourseLessons[currentIndex + 1]
+        : null;
 
     let userProgress: any = null;
     let isLocked = false;
@@ -755,7 +825,8 @@ export class CoursesService {
       },
       userProgress: userProgress
         ? {
-            completedSections: (userProgress.completedSections as string[]) || [],
+            completedSections:
+              (userProgress.completedSections as string[]) || [],
             quizScore: userProgress.quizScore,
             isCompleted: userProgress.isCompleted,
             lastStudiedAt: userProgress.lastStudiedAt,
@@ -768,7 +839,11 @@ export class CoursesService {
     };
   }
 
-  async updateProgress(userId: string, lessonId: string, dto: UpdateProgressDto) {
+  async updateProgress(
+    userId: string,
+    lessonId: string,
+    dto: UpdateProgressDto,
+  ) {
     const existing = await this.prisma.userLessonProgress.findUnique({
       where: {
         userId_lessonId: {
@@ -778,7 +853,8 @@ export class CoursesService {
       },
     });
 
-    let currentSections: string[] = (existing?.completedSections as string[]) || [];
+    let currentSections: string[] =
+      (existing?.completedSections as string[]) || [];
     if (dto.completedSections && Array.isArray(dto.completedSections)) {
       const merged = new Set([...currentSections, ...dto.completedSections]);
       currentSections = Array.from(merged);
@@ -787,7 +863,9 @@ export class CoursesService {
     const isCompleted =
       dto.isCompleted !== undefined
         ? dto.isCompleted
-        : (dto.quizScore !== undefined && dto.quizScore >= 70) || existing?.isCompleted || false;
+        : (dto.quizScore !== undefined && dto.quizScore >= 70) ||
+          existing?.isCompleted ||
+          false;
 
     const progress = await this.prisma.userLessonProgress.upsert({
       where: {
@@ -798,7 +876,8 @@ export class CoursesService {
       },
       update: {
         completedSections: currentSections,
-        quizScore: dto.quizScore !== undefined ? dto.quizScore : existing?.quizScore,
+        quizScore:
+          dto.quizScore !== undefined ? dto.quizScore : existing?.quizScore,
         isCompleted,
         lastStudiedAt: new Date(),
       },
@@ -874,7 +953,9 @@ export class CoursesService {
       include: {
         module: {
           include: {
-            course: { select: { id: true, title: true, slug: true, level: true } },
+            course: {
+              select: { id: true, title: true, slug: true, level: true },
+            },
           },
         },
         kotobaItems: {
@@ -941,7 +1022,11 @@ export class CoursesService {
     };
   }
 
-  async setFlashcardStatus(userId: string, kotobaId: string, status?: 'LEARNING' | 'MASTERED') {
+  async setFlashcardStatus(
+    userId: string,
+    kotobaId: string,
+    status?: 'LEARNING' | 'MASTERED',
+  ) {
     const targetStatus = status || 'LEARNING';
     return (this.prisma as any).userKotobaProgress.upsert({
       where: { userId_kotobaId: { userId, kotobaId } },
@@ -960,7 +1045,11 @@ export class CoursesService {
     });
   }
 
-  async batchAddFlashcards(userId: string, kotobaIds: string[], status?: 'LEARNING' | 'MASTERED') {
+  async batchAddFlashcards(
+    userId: string,
+    kotobaIds: string[],
+    status?: 'LEARNING' | 'MASTERED',
+  ) {
     const targetStatus = status || 'LEARNING';
     const operations = kotobaIds.map((kotobaId) =>
       (this.prisma as any).userKotobaProgress.upsert({
@@ -1005,8 +1094,12 @@ export class CoursesService {
       select: { status: true },
     });
 
-    const totalLearning = items.filter((i: any) => i.status === 'LEARNING').length;
-    const totalMastered = items.filter((i: any) => i.status === 'MASTERED').length;
+    const totalLearning = items.filter(
+      (i: any) => i.status === 'LEARNING',
+    ).length;
+    const totalMastered = items.filter(
+      (i: any) => i.status === 'MASTERED',
+    ).length;
 
     return {
       totalLearning,
@@ -1028,7 +1121,9 @@ export class CoursesService {
       include: {
         module: {
           include: {
-            course: { select: { id: true, title: true, slug: true, level: true } },
+            course: {
+              select: { id: true, title: true, slug: true, level: true },
+            },
           },
         },
         kanjiItems: {
@@ -1094,7 +1189,11 @@ export class CoursesService {
     };
   }
 
-  async setKanjiFlashcardStatus(userId: string, kanjiId: string, status?: 'LEARNING' | 'MASTERED') {
+  async setKanjiFlashcardStatus(
+    userId: string,
+    kanjiId: string,
+    status?: 'LEARNING' | 'MASTERED',
+  ) {
     const targetStatus = status || 'LEARNING';
     return (this.prisma as any).userKanjiProgress.upsert({
       where: { userId_kanjiId: { userId, kanjiId } },
@@ -1113,7 +1212,11 @@ export class CoursesService {
     });
   }
 
-  async batchAddKanjiFlashcards(userId: string, kanjiIds: string[], status?: 'LEARNING' | 'MASTERED') {
+  async batchAddKanjiFlashcards(
+    userId: string,
+    kanjiIds: string[],
+    status?: 'LEARNING' | 'MASTERED',
+  ) {
     const targetStatus = status || 'LEARNING';
     const operations = kanjiIds.map((kanjiId) =>
       (this.prisma as any).userKanjiProgress.upsert({
@@ -1158,8 +1261,12 @@ export class CoursesService {
       select: { status: true },
     });
 
-    const totalLearning = items.filter((i: any) => i.status === 'LEARNING').length;
-    const totalMastered = items.filter((i: any) => i.status === 'MASTERED').length;
+    const totalLearning = items.filter(
+      (i: any) => i.status === 'LEARNING',
+    ).length;
+    const totalMastered = items.filter(
+      (i: any) => i.status === 'MASTERED',
+    ).length;
 
     return {
       totalLearning,

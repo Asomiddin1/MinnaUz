@@ -145,7 +145,10 @@ export class CreateLessonDto {
   @IsNumber()
   order?: number;
 
-  @ApiPropertyOptional({ description: 'Dars bepulmi (hamma uchun)', example: false })
+  @ApiPropertyOptional({
+    description: 'Dars bepulmi (hamma uchun)',
+    example: false,
+  })
   @IsOptional()
   @IsBoolean()
   isFree?: boolean;
@@ -192,7 +195,8 @@ export class ToggleFlashcardDto {
   kotobaId: string;
 
   @ApiPropertyOptional({
-    description: 'Flashcard holati: LEARNING (yodlanayotgan) yoki MASTERED (yodlangan)',
+    description:
+      'Flashcard holati: LEARNING (yodlanayotgan) yoki MASTERED (yodlangan)',
     enum: ['LEARNING', 'MASTERED'],
     example: 'LEARNING',
   })

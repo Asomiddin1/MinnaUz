@@ -35,7 +35,9 @@ export class AdminTeachersController {
   }
 
   @Post(':userId/remove-role')
-  @ApiOperation({ summary: 'Oʻqituvchi rolini bekor qilish (USER ga qaytarish)' })
+  @ApiOperation({
+    summary: 'Oʻqituvchi rolini bekor qilish (USER ga qaytarish)',
+  })
   async removeTeacherRole(@Param('userId') userId: string) {
     return this.adminTeachersService.removeTeacherRole(userId);
   }
@@ -51,13 +53,17 @@ export class AdminTeachersController {
 
   // === LESSON DELETION REQUESTS ===
   @Get('deletion-requests')
-  @ApiOperation({ summary: 'Oʻqituvchilar tomonidan yuborilgan dars oʻchirish soʻrovlari' })
+  @ApiOperation({
+    summary: 'Oʻqituvchilar tomonidan yuborilgan dars oʻchirish soʻrovlari',
+  })
   async getDeletionRequests() {
     return this.adminTeachersService.getDeletionRequests();
   }
 
   @Post('deletion-requests/:lessonId/approve')
-  @ApiOperation({ summary: 'Darsni oʻchirish soʻrovini tasdiqlash (Bazadan oʻchirish)' })
+  @ApiOperation({
+    summary: 'Darsni oʻchirish soʻrovini tasdiqlash (Bazadan oʻchirish)',
+  })
   async approveLessonDeletion(@Param('lessonId') lessonId: string) {
     return this.adminTeachersService.approveLessonDeletion(lessonId);
   }

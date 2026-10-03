@@ -1,0 +1,13 @@
+# GitHub Copilot App Configuration
+# https://docs.github.com/copilot/reference/github-copilot-app-reference/repository-configuration
+
+# Worktree umuman ishlatmaslik - faqat asosiy papkada ishlash
+workspace:
+  strategy: branch
+
+sessions:
+  default_workspace_type: branch
+  
+# Worktree'larni butunlay o'chirish
+worktrees:
+  enabled: false

@@ -1,6 +1,14 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateCourseDto, CreateModuleDto, CreateLessonDto } from '../courses/dto/course.dto';
+import {
+  CreateCourseDto,
+  CreateModuleDto,
+  CreateLessonDto,
+} from '../courses/dto/course.dto';
 import { Role } from '../auth/roles.enum';
 
 @Injectable()
@@ -36,7 +44,15 @@ export class AdminCoursesService {
       where: whereClause,
       orderBy: { order: 'asc' },
       include: {
-        author: { select: { id: true, fullName: true, email: true, role: true, avatarUrl: true } },
+        author: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            role: true,
+            avatarUrl: true,
+          },
+        },
         modules: {
           include: {
             lessons: {
@@ -52,7 +68,15 @@ export class AdminCoursesService {
     const course = await this.prisma.course.findUnique({
       where: { id },
       include: {
-        author: { select: { id: true, fullName: true, email: true, role: true, avatarUrl: true } },
+        author: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            role: true,
+            avatarUrl: true,
+          },
+        },
         modules: {
           orderBy: { order: 'asc' },
           include: {
@@ -78,15 +102,25 @@ export class AdminCoursesService {
 
     // If teacher, ensure they own this course
     if (user?.role === Role.TEACHER && course.authorId !== user.id) {
-      throw new ForbiddenException('Ushbu kursni boshqarish uchun sizda yetarli ruxsat yoʻq');
+      throw new ForbiddenException(
+        'Ushbu kursni boshqarish uchun sizda yetarli ruxsat yoʻq',
+      );
     }
 
     return course;
   }
 
-  async createCourse(dto: CreateCourseDto, currentUserId: string, currentUserRole: Role) {
+  async createCourse(
+    dto: CreateCourseDto,
+    currentUserId: string,
+    currentUserRole: Role,
+  ) {
     let authorId = currentUserId;
-    if ((currentUserRole === Role.ADMIN || currentUserRole === Role.SUPER_ADMIN) && dto.authorId) {
+    if (
+      (currentUserRole === Role.ADMIN ||
+        currentUserRole === Role.SUPER_ADMIN) &&
+      dto.authorId
+    ) {
       authorId = dto.authorId;
     }
 
@@ -102,21 +136,40 @@ export class AdminCoursesService {
         authorId,
       },
       include: {
-        author: { select: { id: true, fullName: true, email: true, role: true, avatarUrl: true } },
+        author: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            role: true,
+            avatarUrl: true,
+          },
+        },
       },
     });
   }
 
-  async updateCourse(id: string, dto: Partial<CreateCourseDto>, currentUserId: string, currentUserRole: Role) {
+  async updateCourse(
+    id: string,
+    dto: Partial<CreateCourseDto>,
+    currentUserId: string,
+    currentUserRole: Role,
+  ) {
     const course = await this.prisma.course.findUnique({ where: { id } });
     if (!course) throw new NotFoundException('Kurs topilmadi');
 
     if (currentUserRole === Role.TEACHER && course.authorId !== currentUserId) {
-      throw new ForbiddenException('Siz faqat oʻzingiz yaratgan kurslarni tahrirlashingiz mumkin');
+      throw new ForbiddenException(
+        'Siz faqat oʻzingiz yaratgan kurslarni tahrirlashingiz mumkin',
+      );
     }
 
     let authorId = course.authorId;
-    if ((currentUserRole === Role.ADMIN || currentUserRole === Role.SUPER_ADMIN) && dto.authorId) {
+    if (
+      (currentUserRole === Role.ADMIN ||
+        currentUserRole === Role.SUPER_ADMIN) &&
+      dto.authorId
+    ) {
       authorId = dto.authorId;
     }
 
@@ -128,7 +181,15 @@ export class AdminCoursesService {
         level: dto.level ? (dto.level as any) : undefined,
       },
       include: {
-        author: { select: { id: true, fullName: true, email: true, role: true, avatarUrl: true } },
+        author: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            role: true,
+            avatarUrl: true,
+          },
+        },
       },
     });
   }
@@ -138,7 +199,9 @@ export class AdminCoursesService {
     if (!course) throw new NotFoundException('Kurs topilmadi');
 
     if (currentUserRole === Role.TEACHER && course.authorId !== currentUserId) {
-      throw new ForbiddenException('Siz faqat oʻzingiz yaratgan kurslarni oʻchirishingiz mumkin');
+      throw new ForbiddenException(
+        'Siz faqat oʻzingiz yaratgan kurslarni oʻchirishingiz mumkin',
+      );
     }
 
     await this.prisma.course.delete({ where: { id } });
@@ -187,7 +250,10 @@ export class AdminCoursesService {
     });
   }
 
-  async updateLesson(lessonId: string, dto: Partial<CreateLessonDto> & { isPublished?: boolean; isFree?: boolean }) {
+  async updateLesson(
+    lessonId: string,
+    dto: Partial<CreateLessonDto> & { isPublished?: boolean; isFree?: boolean },
+  ) {
     return this.prisma.lesson.update({
       where: { id: lessonId },
       data: dto,

@@ -85,7 +85,9 @@ export class SearchService {
     }
 
     const lowerQ = q.toLowerCase();
-    const isLevelQuery = ['N5', 'N4', 'N3', 'N2', 'N1'].includes(q.toUpperCase());
+    const isLevelQuery = ['N5', 'N4', 'N3', 'N2', 'N1'].includes(
+      q.toUpperCase(),
+    );
 
     try {
       // Run parallel searches
@@ -272,7 +274,7 @@ export class SearchService {
           lessons: formattedLessons,
           vocab: formattedVocab,
           kanji: formattedKanji,
-          tests: tests as any,
+          tests: tests,
           pages: matchedPages,
         },
       };

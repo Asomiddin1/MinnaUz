@@ -9,7 +9,8 @@ export class SearchController {
 
   @Get()
   @ApiOperation({
-    summary: 'Platformadagi barcha maʼlumotlar (kurslar, darslar, lugʻat, kanji, testlar) boʻyicha qidirish',
+    summary:
+      'Platformadagi barcha maʼlumotlar (kurslar, darslar, lugʻat, kanji, testlar) boʻyicha qidirish',
   })
   @ApiQuery({
     name: 'q',

@@ -3,7 +3,10 @@ import { IsEnum, IsOptional, IsString, IsBoolean } from 'class-validator';
 import { Role } from '../../auth/roles.enum';
 
 export class UpdateUserDto {
-  @ApiPropertyOptional({ example: 'Ali Valiyev', description: 'Foydalanuvchi toʻliq ismi' })
+  @ApiPropertyOptional({
+    example: 'Ali Valiyev',
+    description: 'Foydalanuvchi toʻliq ismi',
+  })
   @IsOptional()
   @IsString()
   fullName?: string;

@@ -8,12 +8,18 @@ import {
 } from 'class-validator';
 
 export class CreateNotificationDto {
-  @ApiProperty({ description: 'Xabarnoma sarlavhasi', example: 'MinnaUz 2.0 yangilanishi' })
+  @ApiProperty({
+    description: 'Xabarnoma sarlavhasi',
+    example: 'MinnaUz 2.0 yangilanishi',
+  })
   @IsString({ message: "Sarlavha matn bo'lishi kerak" })
   @IsNotEmpty({ message: 'Sarlavha kiritilishi shart' })
   title: string;
 
-  @ApiProperty({ description: 'Xabarnoma qisqa matni', example: 'Platformaga yangi imkoniyatlar qoʻshildi.' })
+  @ApiProperty({
+    description: 'Xabarnoma qisqa matni',
+    example: 'Platformaga yangi imkoniyatlar qoʻshildi.',
+  })
   @IsString({ message: "Xabar matni bo'lishi kerak" })
   @IsNotEmpty({ message: 'Xabar kiritilishi shart' })
   message: string;
@@ -54,7 +60,9 @@ export class CreateNotificationDto {
   })
   audience?: 'ALL' | 'USER' | 'TEACHER' | 'INDIVIDUAL';
 
-  @ApiPropertyOptional({ description: 'Muayyan foydalanuvchi ID si (agar INDIVIDUAL boʻlsa)' })
+  @ApiPropertyOptional({
+    description: 'Muayyan foydalanuvchi ID si (agar INDIVIDUAL boʻlsa)',
+  })
   @IsOptional()
   @IsString()
   targetUserId?: string;
@@ -75,7 +83,10 @@ export class CreateNotificationDto {
   @IsBoolean()
   isPublished?: boolean;
 
-  @ApiPropertyOptional({ description: 'Bosh sahifa uchun banner ham biriktirilsinmi', default: false })
+  @ApiPropertyOptional({
+    description: 'Bosh sahifa uchun banner ham biriktirilsinmi',
+    default: false,
+  })
   @IsOptional()
   @IsBoolean()
   createBanner?: boolean;

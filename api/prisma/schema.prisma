@@ -101,6 +101,7 @@ model User {
   paymentTransactions PaymentTransaction[]
   feedbacksGiven    TeacherFeedback[] @relation("TeacherFeedbackGiven")
   feedbacksReceived TeacherFeedback[] @relation("StudentFeedbackReceived")
+  storedFiles       StoredFile[]
 
   @@map("users")
 }
@@ -571,6 +572,45 @@ model CoinTransaction {
   createdAt   DateTime @default(now())
 
   @@map("coin_transactions")
+}
+
+// ==========================================
+// OBJECT STORAGE (CLOUDFLARE R2) METADATA
+// ==========================================
+
+enum FileUploadStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum FileVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+model StoredFile {
+  id           String           @id @default(uuid())
+  userId       String?
+  originalName String
+  objectKey    String           @unique
+  bucket       String
+  category     String           // 'videos' | 'audio' | 'images' | 'avatars' | 'documents' | 'materials'
+  mimeType     String
+  size         Int
+  visibility   FileVisibility   @default(PUBLIC)
+  status       FileUploadStatus @default(PENDING)
+  url          String?          // public URL agar PUBLIC bo'lsa, private bo'lsa null
+  metadata     Json?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  user         User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([category])
+  @@index([status, createdAt])
+  @@map("stored_files")
 }
 
 // ==========================================

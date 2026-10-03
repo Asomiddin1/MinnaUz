@@ -28,13 +28,17 @@ export class TeacherController {
   constructor(private readonly teacherService: TeacherService) {}
 
   @Get('stats')
-  @ApiOperation({ summary: 'Oʻqituvchining asosiy statistikasi va oxirgi faolliklar' })
+  @ApiOperation({
+    summary: 'Oʻqituvchining asosiy statistikasi va oxirgi faolliklar',
+  })
   async getStats(@CurrentUser() user: any) {
     return this.teacherService.getTeacherStats(user.id);
   }
 
   @Get('students')
-  @ApiOperation({ summary: 'Oʻqituvchining barcha talabalari roʻyxati va oʻzlashtirish foizi' })
+  @ApiOperation({
+    summary: 'Oʻqituvchining barcha talabalari roʻyxati va oʻzlashtirish foizi',
+  })
   async getStudents(
     @CurrentUser() user: any,
     @Query('courseId') courseId?: string,
@@ -53,7 +57,9 @@ export class TeacherController {
   }
 
   @Post('students/feedback')
-  @ApiOperation({ summary: 'Talabaga shaxsiy fikr-mulohaza (Feedback) va baho yuborish' })
+  @ApiOperation({
+    summary: 'Talabaga shaxsiy fikr-mulohaza (Feedback) va baho yuborish',
+  })
   async sendFeedback(
     @Body() dto: CreateTeacherFeedbackDto,
     @CurrentUser() user: any,
@@ -62,7 +68,9 @@ export class TeacherController {
   }
 
   @Get('feedbacks')
-  @ApiOperation({ summary: 'Oʻqituvchi tomonidan yuborilgan barcha feedbacklar tarixi' })
+  @ApiOperation({
+    summary: 'Oʻqituvchi tomonidan yuborilgan barcha feedbacklar tarixi',
+  })
   async getFeedbacks(
     @CurrentUser() user: any,
     @Query('studentId') studentId?: string,
