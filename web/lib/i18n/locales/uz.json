@@ -1232,5 +1232,24 @@
       "announcements": "Eʼlonlar yuborish",
       "announcementsSub": "Kurs talabalariga yangilik va xabarnomalar yuborish"
     }
+  },
+  "kitsune": {
+    "alt": "Kitsune — yapon tili o‘rganishdagi hamrohingiz",
+    "preparationLevel": "Tayyorgarlik darajasi: {level}",
+    "retry": "Qayta saqlash",
+    "messages": {
+      "welcome": "Salom! Yapon tilini birga o‘rganamiz.",
+      "studying": "Bugun yangi narsalarni birga o‘rganamiz.",
+      "thinking": "Shoshilmang, javobni o‘ylab ko‘ring.",
+      "correct": "To‘g‘ri javob! Juda yaxshi!",
+      "completed": "Ajoyib mehnat! Davom etamiz.",
+      "encouraging": "Xato qilish tabiiy. Yana bir bor urinib ko‘ring.",
+      "testing": "Xotirjam ishlang. Vaqtni yuqoridagi hisoblagichdan kuzating.",
+      "passed": "Sinovdan muvaffaqiyatli o‘tdingiz. Tabriklayman!",
+      "resting": "Har kuni ozgina mashq ham oldinga qadam.",
+      "premium": "O‘zingizga mos o‘rganish imkoniyatlarini tanlang.",
+      "saving": "Natijangiz saqlanmoqda…",
+      "saveError": "Natijani saqlab bo‘lmadi. Javoblaringiz shu sahifada saqlanib turibdi; qayta urinib ko‘ring."
+    }
   }
 }

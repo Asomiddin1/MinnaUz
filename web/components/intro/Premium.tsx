@@ -1,5 +1,7 @@
 'use client'
 
+import { KitsuneMascot } from '@/components/kitsune/kitsune-mascot';
+
 import * as React from 'react'
 import Link from 'next/link'
 import { Crown, CheckCircle2, ShieldCheck, ArrowRight } from 'lucide-react'
@@ -72,6 +74,7 @@ export default function Premium() {
         {/* Sarlavha qismi */}
         <Reveal>
           <div className="text-center max-w-2xl mx-auto space-y-3">
+            <KitsuneMascot state="excited" className="mx-auto" />
             <div className="inline-flex items-center gap-1.5 rounded-full bg-yellow-500/10 px-3.5 py-1 text-xs font-bold text-yellow-600 dark:text-yellow-400">
               <Crown className="h-4 w-4" />
               <span>MinnaUz Tariflari</span>

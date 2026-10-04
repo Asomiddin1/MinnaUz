@@ -31,10 +31,17 @@ import {
 } from 'lucide-react';
 import { api, API_ORIGIN, LessonDetailsResponse } from '@/lib/api';
 import { useLang } from '@/lib/i18n';
+import { KitsuneMessage } from '@/components/kitsune/kitsune-message';
+import { lessonKitsuneState, type ProgressSaveState } from '@/lib/kitsune/state';
 
 type TabKey = 'video' | 'kotoba' | 'bunpou' | 'kanji' | 'renshuu' | 'kaiwa';
 
 export default function LessonPlayerPage() {
+  const params = useParams();
+  return <LessonPlayer key={`${params.courseId}/${params.lessonId}`} />;
+}
+
+function LessonPlayer() {
   const { lang, t } = useLang();
   const params = useParams();
   const router = useRouter();
@@ -61,6 +68,9 @@ export default function LessonPlayerPage() {
   const [quizAnswers, setQuizAnswers] = React.useState<Record<number, string>>({});
   const [quizSubmitted, setQuizSubmitted] = React.useState(false);
   const [quizScore, setQuizScore] = React.useState<number | null>(null);
+  const [progressSaveState, setProgressSaveState] = React.useState<ProgressSaveState>('idle');
+  const pendingProgress = React.useRef<Parameters<typeof api.updateLessonProgress>[2] | null>(null);
+  const savingProgress = React.useRef(false);
 
   // AI Kaiwa State (5-step bounded speaking practice)
   const [kaiwaStarted, setKaiwaStarted] = React.useState(false);
@@ -129,21 +139,44 @@ export default function LessonPlayerPage() {
     }
   };
 
+  const saveProgress = async (data: Parameters<typeof api.updateLessonProgress>[2]) => {
+    if (savingProgress.current) return false;
+    savingProgress.current = true;
+    // Retain a failed quiz save when the learner completes another section.
+    const payload = {
+      ...pendingProgress.current,
+      ...data,
+      completedSections: Array.from(new Set([
+        ...completedSections,
+        ...(pendingProgress.current?.completedSections ?? []),
+        ...(data.completedSections ?? []),
+      ])),
+    };
+    pendingProgress.current = payload;
+    setProgressSaveState('saving');
+    try {
+      const result = await api.updateLessonProgress(courseId, lessonId, payload);
+      if (!result.success) throw new Error('Progress was not saved');
+      setCompletedSections(result.progress.completedSections);
+      setIsCompleted(result.progress.isCompleted);
+      pendingProgress.current = null;
+      setProgressSaveState('saved');
+      return true;
+    } catch (error) {
+      console.error('Progress update error:', error);
+      setProgressSaveState('error');
+      return false;
+    } finally {
+      savingProgress.current = false;
+    }
+  };
+
   const markSectionCompleted = async (section: TabKey, nextTab?: TabKey) => {
     const updated = Array.from(new Set([...completedSections, section]));
-    setCompletedSections(updated);
-
-    try {
-      await api.updateLessonProgress(courseId, lessonId, {
-        completedSections: updated,
-      });
-    } catch (e) {
-      console.error(e);
-    }
-
-    if (nextTab) {
+    const saved = await saveProgress({ completedSections: updated });
+    if (saved && nextTab) {
       setActiveTab(nextTab);
-      setTheaterMode(false); // Tab almashganda video rejimidan chiqish
+      setTheaterMode(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -154,7 +187,7 @@ export default function LessonPlayerPage() {
   };
 
   const submitQuiz = async () => {
-    if (!lesson) return;
+    if (!lesson || savingProgress.current || lesson.content.renshuu.length === 0) return;
     const questions = lesson.content.renshuu;
     let correctCount = 0;
     questions.forEach((q, idx) => {
@@ -168,18 +201,11 @@ export default function LessonPlayerPage() {
     setQuizSubmitted(true);
 
     const updated = Array.from(new Set([...completedSections, 'renshuu']));
-    setCompletedSections(updated);
-    setIsCompleted(score >= 70);
-
-    try {
-      await api.updateLessonProgress(courseId, lessonId, {
-        completedSections: updated,
-        quizScore: score,
-        isCompleted: score >= 70,
-      });
-    } catch (e) {
-      console.error(e);
-    }
+    await saveProgress({
+      completedSections: updated,
+      quizScore: score,
+      isCompleted: score >= 70,
+    });
   };
 
   const handleAskAiExplainer = async (
@@ -313,18 +339,8 @@ export default function LessonPlayerPage() {
   const handleCompleteLesson = async () => {
     setCompleting(true);
     const allSections: TabKey[] = ['video', 'kotoba', 'bunpou', 'kanji', 'renshuu', 'kaiwa'];
-    setCompletedSections(allSections);
-    setIsCompleted(true);
-    try {
-      await api.updateLessonProgress(courseId, lessonId, {
-        isCompleted: true,
-        completedSections: allSections,
-      });
-    } catch (e) {
-      console.error('Progress update error:', e);
-    } finally {
-      setCompleting(false);
-    }
+    await saveProgress({ isCompleted: true, completedSections: allSections });
+    setCompleting(false);
   };
 
   if (loading) {
@@ -523,7 +539,7 @@ export default function LessonPlayerPage() {
           <button
             type="button"
             onClick={handleCompleteLesson}
-            disabled={completing}
+            disabled={completing || progressSaveState === 'saving'}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-[12px] font-semibold transition-all cursor-pointer shadow-xs ${
               isCompleted
                 ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
@@ -548,6 +564,27 @@ export default function LessonPlayerPage() {
           )}
         </div>
       </div>
+
+      {(!theaterMode || progressSaveState === 'error') && (
+        <div className="space-y-2">
+          <KitsuneMessage
+            state={lessonKitsuneState({ activeTab, submitted: quizSubmitted, score: quizScore, completed: isCompleted, saveState: progressSaveState })}
+            messageKey={progressSaveState === 'error' ? 'saveError' : progressSaveState === 'saving' ? 'saving' : activeTab === 'renshuu' ? (quizSubmitted && quizScore !== null ? (quizScore >= 70 ? 'completed' : 'encouraging') : 'thinking') : isCompleted ? 'completed' : 'studying'}
+            size="small"
+            animate={progressSaveState === 'saved'}
+            announce
+          />
+          {progressSaveState === 'error' && (
+            <button
+              type="button"
+              onClick={() => { if (pendingProgress.current) void saveProgress(pendingProgress.current); }}
+              className="rounded-xl border border-border bg-secondary px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary/80"
+            >
+              {t.kitsune.retry}
+            </button>
+          )}
+        </div>
+      )}
 
       {/* MAIN CONTAINER: CONTENT AREA + RIGHT SIDEBAR */}
       <div className="flex flex-col lg:flex-row gap-6 items-start">
@@ -1074,9 +1111,13 @@ export default function LessonPlayerPage() {
                   {quizSubmitted ? (
                     <button
                       type="button"
+                      disabled={progressSaveState === 'saving'}
                       onClick={() => {
                         setQuizSubmitted(false);
                         setQuizAnswers({});
+                        setQuizScore(null);
+                        setProgressSaveState('idle');
+                        pendingProgress.current = null;
                       }}
                       className="px-4 py-2.5 rounded-xl border border-border text-[13px] font-semibold text-foreground hover:bg-secondary cursor-pointer"
                     >

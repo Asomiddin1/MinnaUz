@@ -1,0 +1,1 @@
+$(cat docs/kitsune-integration-plan.md)

@@ -1232,5 +1232,24 @@
       "announcements": "Announcements",
       "announcementsSub": "Broadcast news and notices to enrolled students"
     }
+  },
+  "kitsune": {
+    "alt": "Kitsune, your Japanese learning companion",
+    "preparationLevel": "Preparation level: {level}",
+    "retry": "Retry saving",
+    "messages": {
+      "welcome": "Hello! Let’s learn Japanese together.",
+      "studying": "Let’s learn something new together today.",
+      "thinking": "Take your time and think about your answer.",
+      "correct": "Correct! Great work!",
+      "completed": "Great work! Let’s keep going.",
+      "encouraging": "Mistakes are part of learning. Give it another try.",
+      "testing": "Take it calmly. Follow the timer above.",
+      "passed": "You passed this practice test. Congratulations!",
+      "resting": "A little practice every day is a step forward.",
+      "premium": "Choose the learning options that work for you.",
+      "saving": "Saving your progress…",
+      "saveError": "Your progress could not be saved. Your answers are still on this page; please try again."
+    }
   }
 }

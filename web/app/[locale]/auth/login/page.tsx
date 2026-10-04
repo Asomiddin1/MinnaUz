@@ -1,5 +1,7 @@
 'use client'
 
+import { KitsuneMascot } from '@/components/kitsune/kitsune-mascot';
+
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -251,6 +253,7 @@ function LoginForm() {
 
         <div className="flex flex-1 items-center justify-center px-6 py-12 sm:px-10">
           <div className="w-full max-w-[380px]">
+            <KitsuneMascot state={step === 'done' ? 'celebrating' : 'welcome'} size="small" animate className="mb-5" />
             {step === 'done' ? (
               <div className="text-center">
                 <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground">

@@ -149,6 +149,20 @@
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
   }
 
+  @keyframes confetti-fall {
+    0% {
+      transform: translateY(0) rotate(0deg) scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(400px) rotate(720deg) scale(0.5);
+      opacity: 0;
+    }
+  }
+
+  .confetti-piece {
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

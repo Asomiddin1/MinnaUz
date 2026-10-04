@@ -1,5 +1,7 @@
 'use client';
 
+import { KitsuneMessage } from '@/components/kitsune/kitsune-message';
+
 import * as React from 'react';
 import {
   Crown,
@@ -195,6 +197,8 @@ export function PremiumTab() {
           </p>
         </div>
       </div>
+
+      <KitsuneMessage state="excited" messageKey="premium" />
 
       {/* 2. FOYDALANUVCHINING FAOL OBUNASI (AGAR PRO BO'LSA) */}
       {mySub?.isPro && mySub.subscription && (

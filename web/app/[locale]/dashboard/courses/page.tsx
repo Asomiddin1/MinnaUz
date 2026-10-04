@@ -1,5 +1,7 @@
 'use client';
 
+import { KitsuneMascot } from '@/components/kitsune/kitsune-mascot';
+
 import * as React from 'react';
 import Link from 'next/link';
 import { BookOpen, Play, CheckCircle2, Clock, Sparkles, Layers, ArrowRight, Award, Flame } from 'lucide-react';
@@ -148,6 +150,8 @@ export default function CoursesPage() {
                       </span>
                     </div>
                   </div>
+
+                  <KitsuneMascot variant="level" level={course.level} size="small" />
 
                   {/* Course Title & Description */}
                   <div>

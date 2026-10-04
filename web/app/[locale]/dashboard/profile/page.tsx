@@ -1,5 +1,7 @@
 'use client';
 
+import { KitsuneMessage } from '@/components/kitsune/kitsune-message';
+
 import * as React from 'react';
 import {
   Mail,
@@ -310,6 +312,10 @@ export default function ProfilePage() {
             <span>{planDict?.editPlan || 'Rejani tahrirlash'}</span>
           </button>
         </div>
+
+        {studyPlan?.isConfigured && (
+          <KitsuneMessage variant="level" level={studyPlan.targetLevel} messageKey="studying" showLevel />
+        )}
 
         {/* Plan Cards Grid */}
         <div className="grid gap-4 sm:grid-cols-3">

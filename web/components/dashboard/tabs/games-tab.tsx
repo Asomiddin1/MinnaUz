@@ -1,5 +1,7 @@
 'use client';
 
+import { KitsuneMessage } from '@/components/kitsune/kitsune-message';
+
 import * as React from 'react';
 import {
   Gamepad2,
@@ -533,6 +535,16 @@ export function GamesTab() {
           </div>
         </div>
       </div>
+
+      {selectedGame === 'speed' && (
+        <KitsuneMessage
+          variant={gameState === 'idle' ? 'level' : 'pose'}
+          level="KANA"
+          state={feedback === 'correct' ? 'celebrating' : feedback === 'wrong' ? 'encouraging' : gameState === 'ended' ? (correctAnswers > 0 ? 'celebrating' : 'encouraging') : 'thinking'}
+          messageKey={gameState === 'idle' ? 'welcome' : feedback === 'correct' ? 'correct' : feedback === 'wrong' ? 'encouraging' : gameState === 'ended' ? (correctAnswers > 0 ? 'completed' : 'encouraging') : 'thinking'}
+          size="small"
+        />
+      )}
 
       {/* Game Selector Tabs */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

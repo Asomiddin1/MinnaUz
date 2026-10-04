@@ -1,0 +1,21 @@
+.idle {
+  animation: kitsune-breathe 2.5s ease-in-out 2;
+}
+
+.celebrate {
+  animation: kitsune-hop 600ms ease-in-out 2;
+}
+
+@keyframes kitsune-breathe {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes kitsune-hop {
+  0%, 100% { transform: translateY(0); }
+  45% { transform: translateY(-8px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .idle, .celebrate { animation: none; }
+}
