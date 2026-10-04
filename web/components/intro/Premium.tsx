@@ -48,7 +48,7 @@ const PLANS: Plan[] = [
   },
   {
     id: 'annual',
-    name: 'Yillik Premuim',
+    name: 'Yillik Premium',
     price: "499 000 so'm",
     period: '/ yiliga',
     description: 'N5 dan N2 gacha barcha bosqichlarni kafolat bilan zabt eting.',

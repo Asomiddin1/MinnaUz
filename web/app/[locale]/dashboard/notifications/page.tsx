@@ -105,12 +105,12 @@ export default function NotificationsPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-20 px-4 sm:px-0">
       {/* Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-card/80 via-card to-background p-6 sm:p-8 backdrop-blur-xl shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
-          <div className="space-y-2">
+      <div className="border-b border-border/70 pb-5">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide uppercase">
-                <Bell className="h-3.5 w-3.5" />
+              <span className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-primary">
+                <Bell className="h-3.5 w-3.5" aria-hidden="true" />
                 Bildirishnomalar
               </span>
               {unreadCount > 0 && (
@@ -119,10 +119,10 @@ export default function NotificationsPage() {
                 </span>
               )}
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
               Xabarnomalar markazi
             </h1>
-            <p className="text-sm text-muted-foreground max-w-lg">
+            <p className="text-sm text-muted-foreground">
               Platforma yangiliklari, video darslar va muhim eslatmalar bir joyda.
             </p>
           </div>

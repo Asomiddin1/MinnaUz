@@ -63,7 +63,7 @@ export class CoursesSeedService implements OnModuleInit {
             title: 'Minna no Nihongo I (N5)',
             slug: 'minna-no-nihongo-1',
             description:
-              'Boshlangʻich yapon tili: Hiragana, Katakana, 100+ Kanji, 25 ta dars va toʻliq audio talaffuzlar.',
+              'Boshlangʻich yapon tili: Hiragana, Katakana, 100+ Kanji, 5 ta tayyor dars va toʻliq audio talaffuzlar.',
             level: 'N5',
             order: 1,
             isPublished: true,
@@ -101,8 +101,17 @@ export class CoursesSeedService implements OnModuleInit {
             courseId: n5Course.id,
             title: '2-Modul: Kundalik Harakatlar va Sifatlar (6–10 darslar)',
             description:
-              'Harakat obyektlari, birgalikda harakat qilish, sifatlar va mavjudlik.',
+              'Tayyorlanmoqda. 6–10-darslar keyingi bosqichda qoʻshiladi.',
             order: 2,
+          },
+        });
+      } else {
+        await this.prisma.courseModule.update({
+          where: { id: mod2.id },
+          data: {
+            title: '2-Modul: Kundalik Harakatlar va Sifatlar (6–10 darslar)',
+            description:
+              'Tayyorlanmoqda. 6–10-darslar keyingi bosqichda qoʻshiladi.',
           },
         });
       }
@@ -1715,6 +1724,13 @@ export class CoursesSeedService implements OnModuleInit {
       }
 
       this.logger.log('1-Modulning barcha 5 ta darsi toʻliq seed qilindi! 🎉');
+      await this.prisma.course.update({
+        where: { id: n5Course.id },
+        data: {
+          description:
+            'Boshlangʻich yapon tili: Hiragana, Katakana, 100+ Kanji, 5 ta tayyor dars va toʻliq audio talaffuzlar.',
+        },
+      });
     } catch (err) {
       this.logger.error('Kurslarni seed qilishda xatolik:', err);
     }

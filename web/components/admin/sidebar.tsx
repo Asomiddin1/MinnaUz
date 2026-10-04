@@ -130,7 +130,7 @@ export function AdminSidebar({
 
   const renderNavContent = (isMobileDrawer = false) => (
     <div
-      className={`flex h-full flex-col justify-between bg-card border-r border-border transition-all duration-300 ease-in-out ${
+      className={`flex h-full flex-col justify-between bg-card border-r border-border transition-[padding,align-items] duration-300 ease-in-out ${
         !isMobileDrawer && isCollapsed ? 'p-2.5 items-center' : 'p-4'
       }`}
     >
@@ -221,7 +221,7 @@ export function AdminSidebar({
                 href={item.href}
                 title={!isMobileDrawer && isCollapsed ? item.label : undefined}
                 onClick={onMobileClose}
-                className={`group flex items-center justify-between rounded-xl text-[14px] font-medium transition-all duration-200 ${
+                className={`group flex items-center justify-between rounded-xl text-[14px] font-medium transition-[background-color,color,box-shadow] duration-200 ${
                   !isMobileDrawer && isCollapsed
                     ? 'h-11 w-11 justify-center mx-auto'
                     : 'px-3.5 py-2.5'
@@ -330,7 +330,7 @@ export function AdminSidebar({
 
       {/* Desktop Persistent Sidebar */}
       <aside
-        className={`hidden h-screen shrink-0 md:sticky md:top-0 md:block transition-all duration-300 ease-in-out ${
+        className={`hidden h-screen shrink-0 md:sticky md:top-0 md:block transition-[width] duration-300 ease-in-out ${
           isCollapsed ? 'w-[72px]' : 'w-64'
         }`}
       >

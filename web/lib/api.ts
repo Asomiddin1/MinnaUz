@@ -800,10 +800,11 @@ export interface LessonDetailsResponse {
 class ApiClient {
   private refreshPromise: Promise<boolean> | null = null;
 
-  private getAuthHeader(): Record<string, string> {
+  private getAuthHeader(token?: string | null): Record<string, string> {
     if (typeof window === 'undefined') return {};
-    const token = localStorage.getItem('minna_access_token');
-    return token ? { Authorization: `Bearer ${token}` } : {};
+    const authToken =
+      token === undefined ? localStorage.getItem('minna_access_token') : token;
+    return authToken ? { Authorization: `Bearer ${authToken}` } : {};
   }
 
   private async tryRefreshTokens(): Promise<boolean> {
@@ -842,12 +843,16 @@ class ApiClient {
   async request<T>(endpoint: string, options: RequestInit = {}, isRetry = false): Promise<T> {
     const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
     const url = `${API_URL}${cleanEndpoint}`;
+    const requestToken =
+      typeof window !== 'undefined'
+        ? localStorage.getItem('minna_access_token')
+        : null;
 
     const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
     const headers: Record<string, string> = {
       ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...((options.headers as Record<string, string>) || {}),
-      ...this.getAuthHeader(),
+      ...this.getAuthHeader(requestToken),
     };
     if (isFormData && headers['Content-Type']) {
       delete headers['Content-Type'];
@@ -862,12 +867,15 @@ class ApiClient {
 
     if (!res.ok) {
       if (res.status === 401 && typeof window !== 'undefined') {
-        const hadToken = !!localStorage.getItem('minna_access_token');
+        const currentToken = localStorage.getItem('minna_access_token');
+        const hadToken = !!requestToken;
         const isAuthEndpoint =
           cleanEndpoint.includes('/auth/otp') ||
           cleanEndpoint.includes('/auth/google') ||
           cleanEndpoint.includes('/auth/refresh');
-        if (hadToken && !isAuthEndpoint) {
+        // Do not clear a newer session created while this request was in flight.
+        const isCurrentSession = requestToken === currentToken;
+        if (hadToken && isCurrentSession && !isAuthEndpoint) {
           if (!isRetry && (await this.tryRefreshTokens())) {
             return this.request<T>(endpoint, options, true);
           }
@@ -2375,4 +2383,3 @@ export interface AdminDeletionRequestItem {
 }
 
 export const api = new ApiClient();
-

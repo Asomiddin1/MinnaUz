@@ -22,7 +22,10 @@ export class TestsService {
 
   // 1. Get all tests with user's latest status
   async findAll(userId?: string, query?: QueryTestsDto) {
-    const where: any = { isPublished: true };
+    const where: any = {
+      isPublished: true,
+      questions: { some: {} },
+    };
     if (query?.level) where.level = query.level;
     if (query?.category) where.category = query.category;
 
@@ -144,6 +147,7 @@ export class TestsService {
       where: {
         OR: [{ slug: idOrSlug }, { id: idOrSlug }],
         isPublished: true,
+        questions: { some: {} },
       },
       include: {
         questions: {

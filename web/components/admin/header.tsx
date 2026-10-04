@@ -77,7 +77,7 @@ export function AdminHeader({
           type="button"
           onClick={onMenuClick}
           aria-label="Admin menyu"
-          className="grid h-9 w-9 place-items-center rounded-xl border border-border text-foreground hover:bg-secondary active:scale-95 transition-all md:hidden cursor-pointer"
+          className="grid h-9 w-9 place-items-center rounded-xl border border-border text-foreground hover:bg-secondary active:scale-95 transition-[background-color,transform] md:hidden cursor-pointer"
         >
           <Menu className="h-4 w-4" />
         </button>

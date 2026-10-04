@@ -6,6 +6,12 @@ import Logo from './Logo'
 
 export default function Footer() {
   const { t } = useLang()
+  const getFooterHref = (columnIndex: number, linkIndex: number) => {
+    if (columnIndex === 0) return '#levels'
+    if (columnIndex === 1) return linkIndex === 0 ? '/dashboard/tests' : '#practice'
+    if (columnIndex === 2) return linkIndex === 3 ? 'mailto:support@minna.uz' : '#top'
+    return 'mailto:support@minna.uz'
+  }
 
   return (
     <footer className="border-t border-border">
@@ -44,16 +50,16 @@ export default function Footer() {
             </div>
           </div>
 
-          {t.footer.columns.map((col) => (
+          {t.footer.columns.map((col, columnIndex) => (
             <div key={col.title}>
               <p className="text-[12px] uppercase tracking-[0.16em] text-muted-foreground">
                 {col.title}
               </p>
               <ul className="mt-4 space-y-2.5">
-                {col.links.map((l) => (
+                {col.links.map((l, linkIndex) => (
                   <li key={l}>
                     <a
-                      href="#top"
+                      href={getFooterHref(columnIndex, linkIndex)}
                       className="text-[14px] text-foreground/80 transition-colors duration-300 hover:text-foreground"
                     >
                       {l}

@@ -28,7 +28,7 @@ export default function CoursesPage() {
     loadCourses();
   }, []);
 
-  const levels = ['ALL', 'N5', 'N4', 'N3'];
+  const levels = ['ALL', 'N5', 'N4', 'N3', 'N2', 'N1'];
 
   const filteredCourses = courses.filter((c) => {
     if (selectedLevel === 'ALL') return true;

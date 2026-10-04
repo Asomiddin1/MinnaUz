@@ -45,13 +45,13 @@ export class CoursesService {
       const defaultLesson = defaultCourse?.modules[0]?.lessons[0];
       const defaultTotal = defaultCourse
         ? defaultCourse.modules.reduce((acc, m) => acc + m.lessons.length, 0)
-        : 25;
+        : 0;
 
       return {
-        streakDays: 1,
+        streakDays: 0,
         wordsLearned: 0,
         completedLessons: 0,
-        totalLessons: totalLessons || 50,
+        totalLessons,
         n5ProgressPercent: 0,
         recentLessons: [],
         studyPlan: {
@@ -157,7 +157,7 @@ export class CoursesService {
     });
 
     const uniqueDays = Array.from(studyDates);
-    const streakDays = Math.max(1, uniqueDays.length);
+    const streakDays = uniqueDays.length;
 
     // Extract day numbers in the current month for Calendar
     const activeDates: number[] = [];
@@ -167,9 +167,6 @@ export class CoursesService {
         activeDates.push(d.getDate());
       }
     });
-    if (!activeDates.includes(today.getDate())) {
-      activeDates.push(today.getDate());
-    }
 
     // 3. User Target JLPT Level Progress percent
     const targetLevel = studyPlan?.targetLevel || 'N5';
@@ -349,7 +346,7 @@ export class CoursesService {
       streakDays,
       wordsLearned,
       completedLessons: completedProgress.length,
-      totalLessons: totalLessons || 50,
+      totalLessons,
       n5ProgressPercent,
       recentLessons,
       activeCourse,

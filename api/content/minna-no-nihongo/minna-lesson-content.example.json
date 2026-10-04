@@ -1,0 +1,118 @@
+{
+  "schemaVersion": "1.0",
+  "source": {
+    "provider": "internal",
+    "name": "Minna no Nihongo lesson content",
+    "edition": "REPLACE_WITH_EDITION",
+    "licenseReference": "REPLACE_WITH_LICENSE_REFERENCE",
+    "contentVersion": "2026.10.04",
+    "language": "ja-UZ",
+    "contentHash": "OPTIONAL_SHA256"
+  },
+  "course": {
+    "level": "N5",
+    "title": "Minna no Nihongo I (N5)",
+    "slug": "minna-no-nihongo-1",
+    "description": "Kurs tavsifi",
+    "order": 1,
+    "isPublished": false
+  },
+  "modules": [
+    {
+      "sourceKey": "n5-module-01",
+      "order": 1,
+      "title": "1-modul",
+      "description": "Modul tavsifi",
+      "lessons": [
+        {
+          "sourceKey": "n5-lesson-01",
+          "lessonNumber": 1,
+          "order": 1,
+          "title": "1-dars: Tanishtiruv",
+          "japaneseTitle": "第1課",
+          "slug": "lesson-01",
+          "summary": "Dars qisqacha mazmuni",
+          "isPublished": false,
+          "isFree": true,
+          "videoUrl": null,
+          "attachments": [],
+          "kaiwaScenario": {
+            "topic": "Tanishtiruv",
+            "partnerName": "Sensei",
+            "goal": "O'zini yapon tilida tanishtirish",
+            "sampleDialog": []
+          },
+          "kotoba": [
+            {
+              "sourceKey": "n5-l01-kotoba-001",
+              "order": 1,
+              "word": "わたし",
+              "furigana": "わたし",
+              "romaji": "watashi",
+              "meaningUz": "men",
+              "meaningRu": null,
+              "meaningEn": "I; me",
+              "partOfSpeech": "Olmosh",
+              "audioUrl": null,
+              "sampleSentence": "わたしは がくせいです。",
+              "sampleSentenceUz": "Men talabaman."
+            }
+          ],
+          "bunpou": [
+            {
+              "sourceKey": "n5-l01-bunpou-001",
+              "order": 1,
+              "title": "N1 は N2 です",
+              "structure": "N1 は N2 です",
+              "explanationUz": "Grammatika izohi.",
+              "examples": [
+                {
+                  "japanese": "わたしは がくせいです。",
+                  "romaji": "Watashi wa gakusei desu.",
+                  "uzbek": "Men talabaman."
+                }
+              ]
+            }
+          ],
+          "kanji": [
+            {
+              "sourceKey": "n5-l01-kanji-001",
+              "order": 1,
+              "character": "一",
+              "onyomi": "イチ",
+              "kunyomi": "ひとつ",
+              "meaningUz": "bir",
+              "strokeCount": 1,
+              "strokeOrderData": null,
+              "radical": "一",
+              "examples": [
+                {
+                  "word": "一つ",
+                  "reading": "ひとつ",
+                  "meaning": "bitta"
+                }
+              ]
+            }
+          ],
+          "renshuu": [
+            {
+              "sourceKey": "n5-l01-renshuu-001",
+              "order": 1,
+              "type": "QUIZ",
+              "question": "わたし ___ がくせいです。",
+              "audioUrl": null,
+              "options": [
+                "は",
+                "が",
+                "を",
+                "に"
+              ],
+              "correctAnswer": "は",
+              "explanation": "は mavzu ko'rsatkichidir."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
