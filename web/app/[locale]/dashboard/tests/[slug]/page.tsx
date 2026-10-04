@@ -1,5 +1,7 @@
 'use client';
 
+import { KitsuneMessage } from '@/components/kitsune/kitsune-message';
+
 import * as React from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
@@ -463,6 +465,8 @@ export default function TestRunnerPage() {
             />
           </div>
         </div>
+
+        <KitsuneMessage state="studying" variant="expression" level={test.level} messageKey="testing" size="small" />
 
         {/* CONTINUOUS FLOATING AUDIO BAR FOR CHOUKAI (Faqat Choukaida chiqadi) */}
         {test.audioUrl && activeModule === 'MODULE_3_LISTENING' && (

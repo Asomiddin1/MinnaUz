@@ -1,5 +1,8 @@
 'use client';
 
+import { KitsuneMessage } from '@/components/kitsune/kitsune-message';
+import { KitsuneMascot } from '@/components/kitsune/kitsune-mascot';
+
 import * as React from 'react';
 import Link from 'next/link';
 import {
@@ -17,6 +20,7 @@ import {
 } from 'lucide-react';
 import { TestSubmitResponse } from '@/lib/api';
 import { useLang } from '@/lib/i18n';
+import { testKitsuneState } from '@/lib/kitsune/state';
 
 interface TestResultsViewProps {
   result: TestSubmitResponse;
@@ -97,6 +101,13 @@ export function TestResultsView({ result, onRetake }: TestResultsViewProps) {
         </button>
       </div>
 
+      <KitsuneMessage
+        state={testKitsuneState(result.isPassed)}
+        messageKey={result.isPassed ? 'passed' : 'encouraging'}
+        animate
+        announce
+      />
+
       {/* Hero Scorecard Banner */}
       <div
         className={`relative overflow-hidden rounded-3xl border p-6 sm:p-8 shadow-lg backdrop-blur-xl ${
@@ -148,9 +159,18 @@ export function TestResultsView({ result, onRetake }: TestResultsViewProps) {
             </div>
           </div>
 
-          {/* Big Score Dial */}
+          {/* Big Score Dial with Kitsune */}
           <div className="flex flex-col items-center justify-center p-5 rounded-2xl border border-border/60 bg-card/60 shadow-md min-w-[170px] shrink-0 text-center">
-            <div className="flex items-baseline gap-1">
+            {/* Center Kitsune mascot large on result */}
+            <KitsuneMascot
+              size="hero"
+              state={result.isPassed ? 'celebrating' : 'encouraging'}
+              variant="pose"
+              level={result.passingScore !== undefined ? String(result.passingScore) : null}
+              animate
+              className="w-36 sm:w-72"
+            />
+            <div className="flex items-baseline gap-1 mt-3">
               <span className="text-4xl sm:text-5xl font-black text-foreground">
                 {result.score}
               </span>
@@ -175,6 +195,27 @@ export function TestResultsView({ result, onRetake }: TestResultsViewProps) {
           </div>
         </div>
       </div>
+
+      {/* Confetti Animation on Pass */}
+      {result.isPassed && (
+        <div className="absolute inset-0 pointer-events-none z-20">
+          <div className="confetti-container h-full w-full grid place-items-center">
+            {Array.from({ length: 100 }).map((_, i) => (
+              <div
+                key={i}
+                className="confetti-piece absolute w-3 h-3 opacity-70"
+                style={{
+                  animation: `confetti-fall 3s ease-in-out infinite`,
+                  animationDelay: `${i * 0.05}s`,
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * -20}%`,
+                  background: `hsl(${Math.random() * 360}, 70%, 70%)`,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Section Breakdown Cards */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">

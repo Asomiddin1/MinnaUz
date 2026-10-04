@@ -1,5 +1,7 @@
 'use client';
 
+import { KitsuneMessage } from '@/components/kitsune/kitsune-message';
+
 import * as React from 'react';
 import Link from 'next/link';
 import {
@@ -204,7 +206,7 @@ export function MainDashboard() {
   const statsProps = [
     {
       label: t?.dash?.stats?.streak || 'Streak (kunlar)',
-      value: `${statsData?.streakDays || 1} ${daysSuffix}`,
+      value: `${statsData?.streakDays ?? 0} ${daysSuffix}`,
       icon: Flame,
       color: 'text-amber-500 bg-amber-500/10',
     },
@@ -254,6 +256,17 @@ export function MainDashboard() {
         notification={selectedNotification}
         onClose={() => setSelectedNotification(null)}
       />
+
+      {!loading && (
+        <KitsuneMessage
+          state="welcome"
+          variant={studyPlan?.isConfigured ? 'level' : 'pose'}
+          level={studyPlan?.isConfigured ? studyPlan.targetLevel : undefined}
+          messageKey="welcome"
+          showLevel
+          animate
+        />
+      )}
 
       {/* 1. DINAMIK BANNER */}
       <DashboardBanner
@@ -341,9 +354,10 @@ export function MainDashboard() {
         </div>
 
         <div className="space-y-6">
+          <KitsuneMessage state="resting" messageKey="resting" size="small" />
           <StreakCalendar
-            streakDays={statsData?.streakDays || 1}
-            activeDates={statsData?.activeDates || [new Date().getDate()]}
+            streakDays={statsData?.streakDays ?? 0}
+            activeDates={statsData?.activeDates ?? []}
           />
         </div>
       </div>

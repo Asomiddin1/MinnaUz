@@ -1,0 +1,241 @@
+[
+  {
+    "source": "pozalar/P01_salom.png",
+    "sha256": "f6cf49b5ed448df299372c77588f21cfe58161f8b024758c5db3b8c38b9bfa9f",
+    "outputs": [
+      {
+        "path": "/kitsune/poses/P01_salom.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 48900
+      },
+      {
+        "path": "/kitsune/poses/P01_salom-hero.webp",
+        "width": 768,
+        "height": 768,
+        "bytes": 85634
+      }
+    ]
+  },
+  {
+    "source": "pozalar/P02_oqish.png",
+    "sha256": "9c3a1c82c40ec643e8f9617c88a4a674b6cf7b4b9fb4476b78d9c08682539bd1",
+    "outputs": [
+      {
+        "path": "/kitsune/poses/P02_oqish.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 55788
+      }
+    ]
+  },
+  {
+    "source": "pozalar/P03_fikrlash.png",
+    "sha256": "40f66a3b64cb0f29f52a770a60920ae84e3e0eaf8f2929ff7590acc1f4d722a6",
+    "outputs": [
+      {
+        "path": "/kitsune/poses/P03_fikrlash.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 49460
+      }
+    ]
+  },
+  {
+    "source": "pozalar/P04_tabriklash.png",
+    "sha256": "05ddb58c6c2a33d73598e746e508e2786ca8bc2d79080148dab8893a1d0ef4eb",
+    "outputs": [
+      {
+        "path": "/kitsune/poses/P04_tabriklash.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 52252
+      }
+    ]
+  },
+  {
+    "source": "pozalar/P05_ragbat.png",
+    "sha256": "16b3f55fc017e843baaf02ce8c44798c4441c0403e432e765f18faf03d17cd06",
+    "outputs": [
+      {
+        "path": "/kitsune/poses/P05_ragbat.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 43630
+      }
+    ]
+  },
+  {
+    "source": "pozalar/P06_test.png",
+    "sha256": "0986689b384363c296069341f86e41eb9a57195ca12bab4cbc9928502fd4f21c",
+    "outputs": [
+      {
+        "path": "/kitsune/poses/P06_test.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 52184
+      }
+    ]
+  },
+  {
+    "source": "pozalar/P07_dam_olish.png",
+    "sha256": "51e3531c6184158c291ea5f13b4eb625cf081febafe422cb5cf41e97741bfcf1",
+    "outputs": [
+      {
+        "path": "/kitsune/poses/P07_dam_olish.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 48454
+      }
+    ]
+  },
+  {
+    "source": "darajalar/L01_kana.png",
+    "sha256": "47747304d42639d62eeac8d0aa1d2d4ebe7b5ade012df3c6a2efb54dd2e7f8fe",
+    "outputs": [
+      {
+        "path": "/kitsune/levels/L01_kana.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 43022
+      }
+    ]
+  },
+  {
+    "source": "darajalar/L02_N5.png",
+    "sha256": "64d8effaa5215a2095bbca90b0d4b193b10aa4611f939be42658a57d08d02a61",
+    "outputs": [
+      {
+        "path": "/kitsune/levels/L02_N5.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 46770
+      }
+    ]
+  },
+  {
+    "source": "darajalar/L03_N4.png",
+    "sha256": "eadbf9bbf84090ad6d1515261f277f5a0af2c8017d670bb8cb5375b2e758cbf9",
+    "outputs": [
+      {
+        "path": "/kitsune/levels/L03_N4.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 52444
+      }
+    ]
+  },
+  {
+    "source": "darajalar/L04_N3.png",
+    "sha256": "81301f3a22686a11e6e529f7aed92a5ab4e6f2d59d126db30eee953e8dcf897d",
+    "outputs": [
+      {
+        "path": "/kitsune/levels/L04_N3.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 59326
+      }
+    ]
+  },
+  {
+    "source": "darajalar/L05_N2_N1.png",
+    "sha256": "e364f1f871e67d66e452dc876f067deea2c46ab41c398ccb2db48f75815ebea9",
+    "outputs": [
+      {
+        "path": "/kitsune/levels/L05_N2_N1.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 66226
+      }
+    ]
+  },
+  {
+    "source": "mimikalar/M01_xursand.png",
+    "sha256": "f6cf49b5ed448df299372c77588f21cfe58161f8b024758c5db3b8c38b9bfa9f",
+    "alias": "poses/P01_salom"
+  },
+  {
+    "source": "mimikalar/M02_hayajon.png",
+    "sha256": "eb7bd295d136ec649a0c51a25a834e357cc3fd2051db6feb0766e2325c7f292a",
+    "outputs": [
+      {
+        "path": "/kitsune/expressions/M02_hayajon.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 50422
+      }
+    ]
+  },
+  {
+    "source": "mimikalar/M03_diqqat.png",
+    "sha256": "986a993f6e7f3ce05455f4255a8a160558224189345f88ed4ce3f085308deea7",
+    "outputs": [
+      {
+        "path": "/kitsune/expressions/M03_diqqat.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 49424
+      }
+    ]
+  },
+  {
+    "source": "mimikalar/M04_fikr.png",
+    "sha256": "cf7c38bbbe7df743d0462c9bfb46a3389804e432c29fb73a7530f8f3328c1180",
+    "outputs": [
+      {
+        "path": "/kitsune/expressions/M04_fikr.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 49670
+      }
+    ]
+  },
+  {
+    "source": "mimikalar/M05_gurur.png",
+    "sha256": "e678fcd09d3bda44f8a3244424691793f392b7e213b861b86b1006a7ee8cc620",
+    "outputs": [
+      {
+        "path": "/kitsune/expressions/M05_gurur.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 49560
+      }
+    ]
+  },
+  {
+    "source": "mimikalar/M06_ragbat.png",
+    "sha256": "dce5aaf993744e785ec743df5a40d318678bbd7ab812baab33fa3a084d4dcb93",
+    "outputs": [
+      {
+        "path": "/kitsune/expressions/M06_ragbat.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 50236
+      }
+    ]
+  },
+  {
+    "source": "mimikalar/M07_hayrat.png",
+    "sha256": "cb8f4ea6535f7a1598947b52a043c8990864eaf185d4af37d8ce29c0afe58201",
+    "outputs": [
+      {
+        "path": "/kitsune/expressions/M07_hayrat.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 51746
+      }
+    ]
+  },
+  {
+    "source": "mimikalar/M08_uyqu.png",
+    "sha256": "f6ea7405bfdf5e41abda9d49d6b7a8f3ef710478e5a3684d4f2fd5c49507180e",
+    "outputs": [
+      {
+        "path": "/kitsune/expressions/M08_uyqu.webp",
+        "width": 512,
+        "height": 512,
+        "bytes": 50642
+      }
+    ]
+  }
+]
