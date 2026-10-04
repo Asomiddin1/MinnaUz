@@ -47,7 +47,7 @@ export function ActiveCourseWidget({ activeCourse, nextLesson, courseTargetUrl }
         .replace('{total}', String(activeCourse.totalLessons))
     : (cDict?.lessonsCount || '{completed} / {total} Dars')
         .replace('{completed}', '0')
-        .replace('{total}', '25');
+        .replace('{total}', '0');
 
   return (
     <div className="space-y-6 rounded-[28px] border border-border bg-card p-6 sm:p-8 shadow-xs">
@@ -72,7 +72,11 @@ export function ActiveCourseWidget({ activeCourse, nextLesson, courseTargetUrl }
               {cDict?.nextLesson || 'Navbatdagi dars:'}
             </p>
             <h3 className="text-[17px] font-semibold text-foreground mt-1">
-              {nextLesson ? `${nextLesson.order}-dars: ${nextLesson.title}` : (cDict?.defaultNextLesson || '1-dars: Tanishtiruv va asoslar')}
+              {nextLesson
+                ? nextLesson.title.replace(/^\s*\d+\s*[-–—.]?\s*dars\s*:\s*/i, '')
+                  ? `${nextLesson.order}-dars: ${nextLesson.title.replace(/^\s*\d+\s*[-–—.]?\s*dars\s*:\s*/i, '')}`
+                  : `${nextLesson.order}-dars`
+                : (cDict?.defaultNextLesson || '1-dars: Tanishtiruv va asoslar')}
             </h3>
           </div>
           <span className="shrink-0 rounded-lg bg-[#0071e3]/10 px-2.5 py-1 text-[12px] font-semibold text-[#0071e3]">
@@ -361,7 +365,7 @@ export function ProgressWidget({ studyTime, weeklyActivity, weeklyGoalHours, wee
           <div className="flex items-baseline gap-1 mt-0.5">
             <span className="text-[28px] font-bold text-foreground">{studyTime?.todayHours ?? 0}</span>
             <span className="text-[15px] font-semibold text-foreground">{pwDict?.hourUnit || 'h'}</span>
-            <span className="text-[28px] font-bold text-foreground ml-1">{studyTime?.todayMinutesRemainder ?? 15}</span>
+            <span className="text-[28px] font-bold text-foreground ml-1">{studyTime?.todayMinutesRemainder ?? 0}</span>
             <span className="text-[15px] font-semibold text-foreground">{pwDict?.minUnit || 'm'}</span>
           </div>
         </div>

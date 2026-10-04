@@ -24,7 +24,7 @@ export default function Schools() {
                 {t.schools.heading}
               </h2>
             </div>
-            <CTA href="#top" variant="ghost">
+            <CTA href="#practice" variant="ghost">
               {t.schools.demo}
             </CTA>
           </div>

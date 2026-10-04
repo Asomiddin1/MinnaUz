@@ -134,7 +134,7 @@ export function MainDashboard() {
   const activeCourse = statsData?.activeCourse;
   const nextLesson = activeCourse?.nextLesson;
   const studyTime = statsData?.studyTime;
-  const weeklyProgress = studyTime?.weeklyProgressPercent ?? 75;
+  const weeklyProgress = studyTime?.weeklyProgressPercent ?? 0;
 
   const courseTargetUrl = activeCourse
     ? nextLesson
@@ -216,7 +216,7 @@ export function MainDashboard() {
     },
     {
       label: t?.dash?.stats?.lessonsCompleted || 'Yakunlangan darslar',
-      value: `${statsData?.completedLessons || 0} / ${statsData?.totalLessons || 25}`,
+      value: `${statsData?.completedLessons || 0} / ${statsData?.totalLessons || activeCourse?.totalLessons || 0}`,
       icon: CheckCircle2,
       color: 'text-emerald-500 bg-emerald-500/10',
     },
@@ -229,16 +229,6 @@ export function MainDashboard() {
   ];
 
   const weekdays = t?.dash?.calendar?.weekdays || ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'];
-  const weeklyActivityMock = [
-    { day: weekdays[0] || 'Du', active: false, height: 'h-8' },
-    { day: weekdays[1] || 'Se', active: false, height: 'h-12' },
-    { day: weekdays[2] || 'Ch', active: false, height: 'h-10' },
-    { day: weekdays[3] || 'Pa', active: true, height: 'h-16' },
-    { day: weekdays[4] || 'Ju', active: false, height: 'h-10' },
-    { day: weekdays[5] || 'Sh', active: false, height: 'h-6' },
-    { day: weekdays[6] || 'Ya', active: false, height: 'h-14' },
-  ];
-
   const timeUnits = [
     { label: t?.dash?.countdown?.units?.days || 'KUN', value: String(countdown.days).padStart(2, '0') },
     { label: t?.dash?.countdown?.units?.hours || 'SOAT', value: String(countdown.hours).padStart(2, '0') },
@@ -343,7 +333,7 @@ export function MainDashboard() {
 
             <ProgressWidget
               studyTime={studyTime}
-              weeklyActivity={studyTime?.weeklyActivity || weeklyActivityMock}
+              weeklyActivity={studyTime?.weeklyActivity || []}
               weeklyGoalHours={weeklyGoalHours}
               weeklyProgress={weeklyProgress}
             />

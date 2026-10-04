@@ -76,7 +76,7 @@ export function TeacherHeader({
             onClick={onToggleCollapse}
             title={isCollapsed ? 'Sidebarni kengaytirish' : 'Sidebarni kichraytirish'}
             aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            className="hidden md:flex h-9 w-9 items-center justify-center rounded-xl border border-border/70 bg-card text-muted-foreground hover:text-foreground hover:bg-secondary/70 transition-all cursor-pointer shadow-2xs"
+            className="hidden md:flex h-9 w-9 items-center justify-center rounded-xl border border-border/70 bg-card text-muted-foreground hover:text-foreground hover:bg-secondary/70 transition-[background-color,color,box-shadow] cursor-pointer shadow-2xs"
           >
             {isCollapsed ? (
               <PanelLeft className="h-4 w-4" />
@@ -113,7 +113,7 @@ export function TeacherHeader({
           type="button"
           onClick={toggle}
           title={theme === 'dark' ? 'Yorugʻ rejim' : 'Qorongʻu rejim'}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/70 bg-card text-muted-foreground hover:text-foreground hover:bg-secondary/70 transition-all cursor-pointer shadow-2xs"
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/70 bg-card text-muted-foreground hover:text-foreground hover:bg-secondary/70 transition-[background-color,color,box-shadow] cursor-pointer shadow-2xs"
         >
           {theme === 'dark' ? (
             <Sun className="h-4 w-4" />

@@ -28,22 +28,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<User | null>(null);
   const [devices, setDevices] = React.useState<DeviceSession[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const sessionCheckRef = React.useRef<Promise<void> | null>(null);
 
   // Restore user from localStorage and verify with /auth/me on mount + heartbeat check
   React.useEffect(() => {
     const checkSession = async () => {
-      const token = localStorage.getItem('minna_access_token');
-      const savedUser = localStorage.getItem('minna_user');
+      if (sessionCheckRef.current) return sessionCheckRef.current;
 
-      if (token && savedUser) {
-        try {
-          const freshUser = await api.getMe();
-          setUser(freshUser);
-          localStorage.setItem('minna_user', JSON.stringify(freshUser));
-        } catch {
-          // If 401, api client will automatically clear storage and redirect
-          setUser(null);
+      sessionCheckRef.current = (async () => {
+        const token = localStorage.getItem('minna_access_token');
+        const savedUser = localStorage.getItem('minna_user');
+
+        if (token && savedUser) {
+          try {
+            const freshUser = await api.getMe();
+            if (localStorage.getItem('minna_access_token') === token) {
+              setUser(freshUser);
+              localStorage.setItem('minna_user', JSON.stringify(freshUser));
+            }
+          } catch {
+            // A stale check must not clear a session created while it was in flight.
+            if (localStorage.getItem('minna_access_token') === token) {
+              setUser(null);
+            }
+          }
         }
+      })();
+
+      try {
+        await sessionCheckRef.current;
+      } finally {
+        sessionCheckRef.current = null;
       }
     };
 

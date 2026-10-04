@@ -127,19 +127,19 @@ export default function ProfilePage() {
       />
 
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br from-card/80 via-card to-background p-6 sm:p-8 backdrop-blur-xl shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
-          <div className="space-y-2">
+      <div className="border-b border-border/70 pb-5">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold tracking-wide uppercase">
-                <Sparkles className="h-3.5 w-3.5" />
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wide text-primary">
+                <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                 <span>{pDict?.badge || 'Shaxsiy Kabinet'}</span>
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
               {pDict?.title || 'Profil & Sozlamalar'}
             </h1>
-            <p className="text-sm text-muted-foreground max-w-lg">
+            <p className="text-sm text-muted-foreground">
               {pDict?.subtitle || 'Shaxsiy maʼlumotlar, oʻrganish surʼati va qurilmalar xavfsizligini boshqaring.'}
             </p>
           </div>
@@ -149,7 +149,7 @@ export default function ProfilePage() {
               type="button"
               onClick={handleRefresh}
               disabled={refreshing}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-card border border-border/60 hover:bg-secondary text-foreground text-xs font-medium transition-all cursor-pointer shadow-xs active:scale-95 disabled:opacity-50"
+              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-border/60 hover:bg-secondary text-foreground text-xs font-medium transition-all cursor-pointer active:scale-95 disabled:opacity-50"
               title={pDict?.refresh || t?.admin?.overview?.refresh || 'Yangilash'}
             >
               <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
@@ -160,7 +160,7 @@ export default function ProfilePage() {
       </div>
 
       {/* 1. User Info Card */}
-      <div className="rounded-3xl border border-border/60 bg-card p-6 sm:p-8 shadow-xs space-y-6">
+      <div className="rounded-2xl border border-border/60 bg-card p-6 sm:p-8 shadow-xs space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 pb-6 border-b border-border/50">
           <div className="flex items-center gap-4">
             <button
@@ -285,7 +285,7 @@ export default function ProfilePage() {
       <ProfileFramesCard />
 
       {/* 3. Study Plan Section */}
-      <div className="rounded-3xl border border-border/60 bg-card p-6 sm:p-8 shadow-xs space-y-6">
+      <div className="rounded-2xl border border-border/60 bg-card p-6 sm:p-8 shadow-xs space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/50">
           <div className="space-y-1">
             <div className="flex items-center gap-2.5">
@@ -346,7 +346,7 @@ export default function ProfilePage() {
             </p>
           </div>
 
-          <div className="rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent p-4 border border-amber-500/20 space-y-2">
+          <div className="rounded-2xl bg-secondary/30 p-4 border border-border/40 space-y-2">
             <div className="flex items-center gap-2 text-amber-500">
               <Calendar className="h-4 w-4" />
               <span className="text-[11px] uppercase font-bold tracking-wider">{planDict?.jlptExam || 'JLPT Imtihoni'}</span>
@@ -360,7 +360,7 @@ export default function ProfilePage() {
       </div>
 
       {/* 3. Device Manager Section */}
-      <div className="rounded-3xl border border-border/60 bg-card p-6 sm:p-8 shadow-xs space-y-6">
+      <div className="rounded-2xl border border-border/60 bg-card p-6 sm:p-8 shadow-xs space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border/50">
           <div className="space-y-1">
             <div className="flex items-center gap-2">

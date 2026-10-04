@@ -21,6 +21,15 @@ export default function TeacherLayout({
   const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   React.useEffect(() => {
+    if (!mobileOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileOpen]);
+
+  React.useEffect(() => {
     const saved = localStorage.getItem('minna-teacher-sidebar-collapsed');
     if (saved === 'true') {
       setIsCollapsed(true);

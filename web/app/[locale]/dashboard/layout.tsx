@@ -22,6 +22,15 @@ export default function DashboardLayout({
   const [isSearchModalOpen, setIsSearchModalOpen] = React.useState(false);
 
   React.useEffect(() => {
+    if (!mobileSidebarOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileSidebarOpen]);
+
+  React.useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.replace(`/${lang}/auth/login`);
     }

@@ -72,12 +72,17 @@
   html {
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--muted-foreground) 55%, transparent) transparent;
   }
 
   body {
     background-color: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans);
+    min-width: 0;
+    overflow-x: clip;
     transition:
       background-color 0.4s ease,
       color 0.4s ease;
@@ -93,29 +98,21 @@
     outline-offset: 3px;
   }
 
-  /* Scrollbars stay out of the way until the page is actually moving. */
-  html {
-    scrollbar-width: none;
-  }
-
-  html.scrolling {
-    scrollbar-width: thin;
-    scrollbar-color: var(--muted-foreground) transparent;
-  }
-
   ::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-  }
-
-  html.scrolling ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
 
-  html.scrolling ::-webkit-scrollbar-thumb {
+  ::-webkit-scrollbar-thumb {
     background-color: color-mix(in srgb, var(--muted-foreground) 55%, transparent);
     border-radius: 99px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
   }
 }
 
@@ -148,7 +145,20 @@
     transform: none;
   }
 
+  .safe-area-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
   @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+
     .reveal {
       opacity: 1;
       transform: none;

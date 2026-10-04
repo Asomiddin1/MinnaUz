@@ -13,6 +13,26 @@ export class TestsSeedService implements OnModuleInit {
   }
 
   async seedJlptTests() {
+    const emptyPublishedTests = await this.prisma.jlptTest.findMany({
+      where: {
+        isPublished: true,
+        questions: { none: {} },
+      },
+      select: { id: true, title: true },
+    });
+
+    if (emptyPublishedTests.length > 0) {
+      await this.prisma.jlptTest.updateMany({
+        where: { id: { in: emptyPublishedTests.map((test) => test.id) } },
+        data: { isPublished: false },
+      });
+      this.logger.warn(
+        `Savolsiz testlar qoralamaga o'tkazildi: ${emptyPublishedTests
+          .map((test) => test.title)
+          .join(', ')}`,
+      );
+    }
+
     // Delete non-full tests if any exist, to ensure only full 3-module tests are shown
     const existing = await this.prisma.jlptTest.findMany({
       select: { id: true, category: true },

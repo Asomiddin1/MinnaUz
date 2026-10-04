@@ -183,7 +183,7 @@ export function TeacherSidebar({
               href={item.href}
               onClick={isMobileDrawer ? onMobileClose : undefined}
               title={!isMobileDrawer && isCollapsed ? item.label : undefined}
-              className={`group flex items-center rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer ${
+              className={`group flex items-center rounded-xl text-xs font-semibold transition-[background-color,color,box-shadow] duration-150 cursor-pointer ${
                 !isMobileDrawer && isCollapsed
                   ? 'h-10 w-10 justify-center mx-auto'
                   : 'gap-3 px-3 py-2.5'

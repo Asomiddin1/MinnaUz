@@ -285,8 +285,11 @@ export default function TestsPage() {
                       <div className="space-y-1 min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h2 className="text-sm sm:text-base font-bold text-foreground group-hover:text-primary transition-colors truncate">
-                            {t.title}
+                            {t.questionCount < 20 ? `Mini-test — ${t.level} #${t.order}` : t.title}
                           </h2>
+                          <span className="inline-flex items-center rounded-md bg-secondary px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                            {t.questionCount < 20 ? 'Mini-test' : 'Toʻliq mock'}
+                          </span>
                           {t.audioUrl && (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-500 text-[10px] font-bold shrink-0">
                               <Headphones className="h-3 w-3" />

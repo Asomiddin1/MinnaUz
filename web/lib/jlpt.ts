@@ -71,7 +71,7 @@ export function getNextJLPTExamDate(fromDate: Date = new Date()): JLPTExamInfo {
   }
 
   const diffMs = targetExamDate.getTime() - fromDate.getTime();
-  const daysRemaining = Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+  const daysRemaining = Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
 
   const dayNum = targetExamDate.getDate();
   const monthName = MONTH_NAMES_UZ[targetExamDate.getMonth()];

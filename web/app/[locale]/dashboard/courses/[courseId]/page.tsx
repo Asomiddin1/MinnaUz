@@ -154,7 +154,15 @@ export default function CourseRoadmapPage() {
                 </div>
               </div>
 
-              {/* Responsive Table Container */}
+              {mod.lessons.length === 0 ? (
+                <div className="px-5 py-8 text-center">
+                  <p className="text-sm font-semibold text-foreground">Tayyorlanmoqda</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Ushbu modul darslari keyingi bosqichda qoʻshiladi.
+                  </p>
+                </div>
+              ) : (
+              /* Responsive Table Container */
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-[13px] border-collapse">
                   <thead>
@@ -294,6 +302,7 @@ export default function CourseRoadmapPage() {
                   </tbody>
                 </table>
               </div>
+              )}
             </div>
           );
         })}
