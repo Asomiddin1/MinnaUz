@@ -54,6 +54,7 @@ Explore the detailed documentation files:
 | [environment.md](file:///c:/Users/WhiteDuke/Desktop/Projects/minnauz-2.0/docs/environment.md) | Environment variables catalog for API and Web services |
 | [deployment.md](file:///c:/Users/WhiteDuke/Desktop/Projects/minnauz-2.0/docs/deployment.md) | Deployment guidelines, Docker containers, Nginx reverse proxy, and Prisma migrations |
 | [security.md](file:///c:/Users/WhiteDuke/Desktop/Projects/minnauz-2.0/docs/security.md) | Security protocols, authentication guards, data validation, rate limits, and CORS |
+| [quality-launch.md](file:///c:/Users/WhiteDuke/Desktop/Projects/minnauz-2.0/docs/quality-launch.md) | Launch-readiness checklist for e2e critical path, accessibility, monitoring, alerting, backup/restore, and security sign-off |
 | [decisions.md](file:///c:/Users/WhiteDuke/Desktop/Projects/minnauz-2.0/docs/decisions.md) | Architectural Decision Records (ADRs) and technical rationale |
 | [changelog.md](file:///c:/Users/WhiteDuke/Desktop/Projects/minnauz-2.0/docs/changelog.md) | Major release log and architectural changes |
 
