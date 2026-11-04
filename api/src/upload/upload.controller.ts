@@ -29,6 +29,7 @@ import { CloudflareR2StorageService } from './cloudflare-r2-storage.service';
 import { StorageCategory } from './storage.interface';
 import { CreatePresignedUrlDto, CompleteUploadDto } from './dto/upload.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { SubscriptionStatus } from '@prisma/client';
 
 interface AuthUser {
   id: string;
@@ -282,8 +283,29 @@ export class UploadController {
       user?.role,
     );
 
-    if (!isOwner && !isPrivileged && user?.role !== Role.USER) {
-      throw new ForbiddenException("Ushbu faylga kirish huquqingiz yo'q");
+    if (!isOwner && !isPrivileged) {
+      const isOfflineMaterial = ['documents', 'materials'].includes(
+        fileRecord.category,
+      );
+
+      if (!isOfflineMaterial || user?.role !== Role.USER) {
+        throw new ForbiddenException("Ushbu faylga kirish huquqingiz yo'q");
+      }
+
+      const activeSub = await this.prisma.userSubscription.findFirst({
+        where: {
+          userId: user.id,
+          status: SubscriptionStatus.ACTIVE,
+          endDate: { gt: new Date() },
+        },
+        select: { id: true },
+      });
+
+      if (!activeSub) {
+        throw new ForbiddenException(
+          'PDF va offline materiallar uchun faol Premium Pro obuna kerak',
+        );
+      }
     }
 
     // Qisqa muddatli Signed Download URL berish (30 daqiqa)

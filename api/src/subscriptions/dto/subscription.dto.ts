@@ -26,6 +26,28 @@ export class SimulatePaymentDto {
   transactionId: string;
 }
 
+export class ConfirmPaymentSuccessDto {
+  @IsString({ message: 'Tranzaksiya ID kiritilishi shart' })
+  transactionId: string;
+
+  @IsOptional()
+  @IsString()
+  externalId?: string;
+}
+
+export class SubscriptionWebhookDto {
+  @IsString({ message: 'Tranzaksiya ID kiritilishi shart' })
+  transactionId: string;
+
+  @IsOptional()
+  @IsString()
+  externalId?: string;
+
+  @IsOptional()
+  @IsString()
+  status?: string;
+}
+
 export class GrantSubscriptionDto {
   @IsString({ message: 'Foydalanuvchi ID kiritilishi shart' })
   userId: string;

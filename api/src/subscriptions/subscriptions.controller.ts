@@ -8,6 +8,8 @@ import {
   Param,
   Query,
   UseGuards,
+  Headers,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { SubscriptionsService } from './subscriptions.service';
@@ -20,6 +22,8 @@ import {
   CheckoutSubscriptionDto,
   ValidateCodeDto,
   SimulatePaymentDto,
+  ConfirmPaymentSuccessDto,
+  SubscriptionWebhookDto,
   GrantSubscriptionDto,
   CreatePlanDto,
   UpdatePlanDto,
@@ -81,6 +85,42 @@ export class SubscriptionsController {
     @Body() dto: SimulatePaymentDto,
   ) {
     return this.subscriptionsService.simulatePayment(userId, dto.transactionId);
+  }
+
+  @Post('success')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Toʻlov muvaffaqiyatli tugagach obunani faollashtirish' })
+  async paymentSuccess(
+    @CurrentUser('id') userId: string,
+    @Body() dto: ConfirmPaymentSuccessDto,
+  ) {
+    return this.subscriptionsService.confirmPaymentSuccess(
+      userId,
+      dto.transactionId,
+      dto.externalId,
+    );
+  }
+
+  @Post('webhook')
+  @ApiOperation({ summary: 'Toʻlov tizimi webhook callbacki' })
+  async paymentWebhook(
+    @Body() dto: SubscriptionWebhookDto,
+    @Headers('x-subscription-webhook-secret') secret?: string,
+  ) {
+    const expectedSecret = process.env.SUBSCRIPTION_WEBHOOK_SECRET?.trim();
+    if (expectedSecret && expectedSecret !== (secret || '').trim()) {
+      throw new ForbiddenException('Webhook kaliti notoʻgʻri');
+    }
+
+    if (dto.status && dto.status.toUpperCase() !== 'SUCCESS') {
+      return { received: true, ignored: true };
+    }
+
+    return this.subscriptionsService.processPaymentSuccess(
+      dto.transactionId,
+      dto.externalId,
+    );
   }
 
   @Post('cancel')
