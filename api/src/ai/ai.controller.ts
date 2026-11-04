@@ -20,6 +20,7 @@ import { ExplainMistakeDto } from './dto/explain.dto';
 import { GenerateDokkaiDto } from './dto/dokkai.dto';
 import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { requireKaiwaAccess } from './kaiwa-access';
 
 @ApiTags('AI')
 @Controller('ai')
@@ -48,6 +49,7 @@ export class AiController {
     @Body() dto: KaiwaMessageDto,
     @CurrentUser('id') userId?: string,
   ): Promise<KaiwaResponse> {
+    await requireKaiwaAccess(userId);
     return this.aiService.chatKaiwa(dto, userId);
   }
 
