@@ -345,6 +345,32 @@ export class SubscriptionsService implements OnModuleInit {
 
     // Bazada tranzaksiya o'tkazish: tranzaksiyani COMPLETED qilish, vaucherni ishlatilgan deb belgilash, UserSubscription yaratish
     const [updatedTx, userSub] = await this.prisma.$transaction(async (tx) => {
+      const completeTx = await tx.paymentTransaction.updateMany({
+        where: {
+          id: transactionId,
+          status: PaymentStatus.PENDING,
+        },
+        data: {
+          status: PaymentStatus.COMPLETED,
+          paidAt: now,
+          externalId: externalId || `DEMO-${Date.now()}`,
+        },
+      });
+
+      if (completeTx.count === 0) {
+        const latestTx = await tx.paymentTransaction.findUnique({
+          where: { id: transactionId },
+        });
+
+        if (latestTx?.status === PaymentStatus.COMPLETED) {
+          return [latestTx, null] as const;
+        }
+
+        throw new BadRequestException(
+          'Toʻlov faqat PENDING holatida tasdiqlanishi mumkin',
+        );
+      }
+
       // 1. Agar do'kon vaucheri ishlatilgan bo'lsa, uni isUsed = true qilish
       if (transaction.inventoryItemId) {
         await tx.userInventoryItem.update({
@@ -380,13 +406,10 @@ export class SubscriptionsService implements OnModuleInit {
         });
       }
 
-      // 3. Tranzaksiyani yangilash
+      // 3. Tranzaksiyani obunaga ulash
       const updatedTx = await tx.paymentTransaction.update({
         where: { id: transactionId },
         data: {
-          status: PaymentStatus.COMPLETED,
-          paidAt: now,
-          externalId: externalId || `DEMO-${Date.now()}`,
           subscriptionId: sub.id,
         },
       });
@@ -411,6 +434,13 @@ export class SubscriptionsService implements OnModuleInit {
 
       return [updatedTx, sub];
     });
+
+    if (!userSub) {
+      return {
+        success: true,
+        message: 'Ushbu toʻlov allaqachon qabul qilingan',
+      };
+    }
 
     // Foydalanuvchiga muvaffaqiyatli xabarnoma yuborish
     try {
@@ -458,6 +488,23 @@ export class SubscriptionsService implements OnModuleInit {
     return this.processPaymentSuccess(transactionId, `SIMULATED-${Date.now()}`);
   }
 
+  async confirmPaymentSuccess(
+    userId: string,
+    transactionId: string,
+    externalId?: string,
+  ) {
+    const tx = await this.prisma.paymentTransaction.findUnique({
+      where: { id: transactionId },
+      select: { id: true, userId: true },
+    });
+
+    if (!tx || tx.userId !== userId) {
+      throw new NotFoundException('Toʻlov tranzaksiyasi topilmadi');
+    }
+
+    return this.processPaymentSuccess(transactionId, externalId);
+  }
+
   // 7. Obunani bekor qilish (Avto-yangilanishni to'xtatish)
   async cancelSubscription(userId: string) {
     const activeSub = await this.prisma.userSubscription.findFirst({
@@ -477,7 +524,7 @@ export class SubscriptionsService implements OnModuleInit {
       data: {
         autoRenew: false,
         cancelledAt: new Date(),
-        status: SubscriptionStatus.CANCELED,
+        status: SubscriptionStatus.ACTIVE,
       },
     });
 
