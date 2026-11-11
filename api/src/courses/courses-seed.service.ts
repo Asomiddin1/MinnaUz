@@ -1,5 +1,9 @@
 import { Injectable, OnModuleInit, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { seedModule2 } from './seeds/module2.seed';
+import { seedModule3 } from './seeds/module3.seed';
+import { seedModule4 } from './seeds/module4.seed';
+import { seedModule5 } from './seeds/module5.seed';
 
 @Injectable()
 export class CoursesSeedService implements OnModuleInit {
@@ -1724,11 +1728,18 @@ export class CoursesSeedService implements OnModuleInit {
       }
 
       this.logger.log('1-Modulning barcha 5 ta darsi toʻliq seed qilindi! 🎉');
+
+      // Seed Modules 2, 3, 4, 5 (Lessons 6 - 25)
+      await seedModule2(this.prisma, n5Course.id);
+      await seedModule3(this.prisma, n5Course.id);
+      await seedModule4(this.prisma, n5Course.id);
+      await seedModule5(this.prisma, n5Course.id);
+
       await this.prisma.course.update({
         where: { id: n5Course.id },
         data: {
           description:
-            'Boshlangʻich yapon tili: Hiragana, Katakana, 100+ Kanji, 5 ta tayyor dars va toʻliq audio talaffuzlar.',
+            'Boshlangʻich yapon tili (JLPT N5): Hiragana, Katakana, 100+ Kanji, toʻliq 25 ta dars (1-5 modullar) va toʻliq audio/mashqlar bazasi.',
         },
       });
     } catch (err) {
