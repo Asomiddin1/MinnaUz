@@ -60,3 +60,11 @@ Student -> Next.js Frontend -> Backend API -> Payment Provider (Payme / Click / 
 - **Signature Verification**: Every webhook callback must verify HMAC SHA256 signatures before processing state changes.
 - **Idempotency**: Webhook events check for unique transaction IDs to avoid duplicate subscription credit.
 - **Receipts**: Automated confirmation notification sent to `UserNotification` inbox and student email upon successful transaction.
+
+## Optional Longplay Kaiwa admission
+
+The existing `POST /ai/kaiwa` route can check a Longplay access Feature before calling the model. `LONGPLAY_KAIWA_FEATURE_ID` unset preserves current behavior with no billing network call. To opt in, configure that Feature UUID, server-only `LONGPLAY_SECRET_KEY`, `LONGPLAY_BASE_URL`, `LONGPLAY_APP_ID` and explicit `LONGPLAY_ENVIRONMENT` (`sandbox` or `live`). SDK 0.10.15 is pinned and requires Node.js 22 or newer; its ESM server entry is loaded through native dynamic import in the Nest NodeNext build.
+
+Enabled requests require the existing verified JWT user. The server resolves `minnauz:user:<user-id>`; the caller cannot supply a billing Customer. Missing authentication is 401, denied access is 402, and configuration/service failure is a sanitized 503. Checks happen before Kaiwa model work and do not send lesson text, prompts, answers or model credentials to billing.
+
+This slice covers Kaiwa only. Translation, explanations and Dokkai retain their current behavior. It does not enable checkout, turn the demo `simulate-payment` route into verified payment, reserve credits or implement monthly allowances. Reconcile valid manual grants, payment-provider eligibility, actual purchase/webhook lifecycle and SDK usage terms before enabling a commercial pilot.
