@@ -17,6 +17,7 @@ web/out/
 web/build/
 web/.vercel/
 api/dist/
+mcp-server/dist/
 
 # Logs & Temporary
 api/storage/
